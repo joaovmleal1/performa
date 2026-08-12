@@ -48,7 +48,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "download:exercises": "node scripts/download-exercises.js"
+    "download:exercises": "node scripts/download-exercises.js",
+    "export:web": "expo export -p web",
+    "deploy:vercel": "vercel --prod"
   },
   "private": true
 }

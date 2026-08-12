@@ -34,13 +34,34 @@ function metroOrigin(): string | undefined {
   return `http://${host}:8081`;
 }
 
+function driveUrl(exercise: Pick<Exercise, 'gifUrl' | 'driveFileId'>): string | undefined {
+  if (exercise.gifUrl) return exercise.gifUrl;
+  if (exercise.driveFileId) {
+    return `https://lh3.googleusercontent.com/d/${exercise.driveFileId}`;
+  }
+  return undefined;
+}
+
+function isProductionWeb(): boolean {
+  if (Platform.OS !== 'web') return false;
+  // Vercel / static hosting — no local public/exercises pack
+  if (typeof process !== 'undefined' && process.env?.VERCEL) return true;
+  if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') return true;
+  return false;
+}
+
 /**
- * Prefer locally downloaded media from `public/exercises/` (served by Expo),
- * then fall back to the Google Drive URL.
+ * Prefer locally downloaded media from `public/exercises/` in local/dev,
+ * and Google Drive URLs in production (Vercel).
  */
 export function getExerciseGifUrl(
   exercise: Pick<Exercise, 'id' | 'gifUrl' | 'driveFileId'>
 ): string | undefined {
+  const remote = driveUrl(exercise);
+  if (isProductionWeb()) {
+    return remote;
+  }
+
   const localPath = `/exercises/${exercise.id}.gif`;
 
   if (Platform.OS === 'web') {
@@ -52,11 +73,7 @@ export function getExerciseGifUrl(
     return `${origin}${localPath}`;
   }
 
-  if (exercise.gifUrl) return exercise.gifUrl;
-  if (exercise.driveFileId) {
-    return `https://lh3.googleusercontent.com/d/${exercise.driveFileId}`;
-  }
-  return undefined;
+  return remote;
 }
 
 export { legacyAliases };
