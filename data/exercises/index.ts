@@ -1,3 +1,6 @@
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
+
 import type { Exercise } from '@/types';
 
 import catalogJson from './catalog.json';
@@ -20,7 +23,35 @@ export function resolveExercise(id: string | undefined | null): Exercise | undef
   return aliased ? byId.get(aliased) : undefined;
 }
 
-export function getExerciseGifUrl(exercise: Pick<Exercise, 'gifUrl' | 'driveFileId'>): string | undefined {
+function metroOrigin(): string | undefined {
+  const hostUri =
+    Constants.expoConfig?.hostUri ??
+    (Constants as { manifest?: { debuggerHost?: string } }).manifest?.debuggerHost;
+
+  if (!hostUri || typeof hostUri !== 'string') return undefined;
+  const host = hostUri.split(':')[0];
+  if (!host) return undefined;
+  return `http://${host}:8081`;
+}
+
+/**
+ * Prefer locally downloaded media from `public/exercises/` (served by Expo),
+ * then fall back to the Google Drive URL.
+ */
+export function getExerciseGifUrl(
+  exercise: Pick<Exercise, 'id' | 'gifUrl' | 'driveFileId'>
+): string | undefined {
+  const localPath = `/exercises/${exercise.id}.gif`;
+
+  if (Platform.OS === 'web') {
+    return localPath;
+  }
+
+  const origin = metroOrigin();
+  if (origin) {
+    return `${origin}${localPath}`;
+  }
+
   if (exercise.gifUrl) return exercise.gifUrl;
   if (exercise.driveFileId) {
     return `https://lh3.googleusercontent.com/d/${exercise.driveFileId}`;

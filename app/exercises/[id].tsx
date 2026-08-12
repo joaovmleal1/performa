@@ -28,7 +28,10 @@ export default function ExerciseDetailScreen() {
     <Screen scroll>
       <ScreenHeader title={exercise.name} showBack />
 
-      <ExerciseGif exercise={exercise} style={styles.hero} />
+      <AppText variant="label" muted style={styles.gifLabel}>
+        Execução
+      </AppText>
+      <ExerciseGif exercise={exercise} style={styles.hero} contentFit="contain" />
 
       <View style={styles.meta}>
         <Pill label={muscleGroupLabels[exercise.muscleGroup]} />
@@ -36,9 +39,9 @@ export default function ExerciseDetailScreen() {
       </View>
 
       <Card style={styles.section}>
-        <AppText variant="h3">Como executar</AppText>
+        <AppText variant="h3">Passo a passo</AppText>
         <AppText variant="caption" muted>
-          Veja o GIF acima e siga os passos:
+          Acompanhe o GIF de execução acima:
         </AppText>
         {exercise.instructions.map((step, index) => (
           <AppText key={step} variant="body" muted>
@@ -99,9 +102,11 @@ function Pill({ label }: { label: string }) {
 }
 
 const styles = StyleSheet.create({
+  gifLabel: { marginBottom: spacing.xs },
   hero: {
-    height: 240,
+    height: 280,
     marginBottom: spacing.lg,
+    backgroundColor: '#fff',
   },
   meta: {
     flexDirection: 'row',

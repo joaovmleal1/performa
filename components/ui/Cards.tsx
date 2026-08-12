@@ -113,8 +113,8 @@ export function ExerciseCard({
         {gifUrl ? (
           <Image
             source={{ uri: gifUrl }}
-            style={styles.thumb}
-            contentFit="cover"
+            style={[styles.thumb, styles.thumbMedia]}
+            contentFit="contain"
             cachePolicy="memory-disk"
           />
         ) : (
@@ -178,7 +178,8 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   exercise: { padding: 12 },
   exerciseRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  thumb: { width: 48, height: 48, borderRadius: 12, backgroundColor: colors.surfaceMuted },
+  thumb: { width: 56, height: 56, borderRadius: 12, backgroundColor: colors.surfaceMuted },
+  thumbMedia: { backgroundColor: '#fff' },
   check: {
     width: 22,
     height: 22,

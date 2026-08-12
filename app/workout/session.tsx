@@ -76,6 +76,9 @@ export default function WorkoutSessionScreen() {
         Série {setIndex + 1} de {exercise.sets} · {exercise.reps} reps
       </AppText>
 
+      <AppText variant="label" muted style={{ marginTop: spacing.md }}>
+        Execução
+      </AppText>
       <ExerciseGif exercise={exercise.exercise} style={styles.gif} />
 
       {isResting ? (
@@ -151,8 +154,9 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   gif: {
-    height: 200,
-    marginTop: spacing.md,
+    height: 220,
+    marginTop: spacing.sm,
+    backgroundColor: '#fff',
   },
   restCard: {
     alignItems: 'center',

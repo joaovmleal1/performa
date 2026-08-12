@@ -24,7 +24,17 @@ Atalho demo no login: **Entrar com dados demo (Amanda)**.
 
 ## Biblioteca de exercícios
 
-~700 exercícios com **GIF de execução** do pack no Google Drive (peito, costas, ombros, braços, inferiores, abdômen). Metadados em `data/exercises/catalog.json`; mídias carregadas sob demanda via URL pública do Drive.
+~700 exercícios com **GIF de execução** do pack no Google Drive (peito, costas, ombros, braços, inferiores, abdômen).
+
+1. Baixe as mídias para o app (uma vez):
+
+```bash
+npm run download:exercises
+```
+
+Isso grava os GIFs em `public/exercises/` (servidos localmente pelo Expo). Metadados ficam em `data/exercises/catalog.json`.
+
+Onde ver no app: **Treino → Biblioteca de exercícios** (lista + detalhe com GIF) e na **sessão de treino**.
 
 ## Estrutura
 

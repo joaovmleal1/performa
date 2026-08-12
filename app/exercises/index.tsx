@@ -99,29 +99,23 @@ export default function ExerciseLibraryScreen() {
             </AppText>
           }
           renderItem={({ item }) => {
-            const gif = getExerciseGifUrl(item);
+            const gif =
+              getExerciseGifUrl(item) ??
+              item.gifUrl ??
+              `/exercises/${item.id}.gif`;
             return (
               <Pressable
                 style={styles.row}
                 onPress={() => router.push(`/exercises/${item.id}`)}
                 accessibilityRole="button"
               >
-                {gif ? (
-                  <Image
-                    source={{ uri: gif }}
-                    style={styles.thumb}
-                    contentFit="cover"
-                    cachePolicy="memory-disk"
-                    recyclingKey={item.id}
-                  />
-                ) : (
-                  <View
-                    style={[
-                      styles.thumb,
-                      { backgroundColor: item.thumbnailColor ?? colors.surface },
-                    ]}
-                  />
-                )}
+                <Image
+                  source={{ uri: gif }}
+                  style={styles.thumb}
+                  contentFit="contain"
+                  cachePolicy="memory-disk"
+                  recyclingKey={item.id}
+                />
                 <View style={{ flex: 1 }}>
                   <AppText variant="bodyMedium">{item.name}</AppText>
                   <AppText variant="caption" muted>
@@ -165,9 +159,9 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSubtle,
   },
   thumb: {
-    width: 56,
-    height: 56,
+    width: 64,
+    height: 64,
     borderRadius: radius.md,
-    backgroundColor: colors.surfaceMuted,
+    backgroundColor: '#fff',
   },
 });

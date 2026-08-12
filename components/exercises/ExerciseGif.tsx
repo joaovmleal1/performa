@@ -1,6 +1,12 @@
 import { Image } from 'expo-image';
-import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 import { AppText } from '@/components/ui/AppText';
 import { getExerciseGifUrl } from '@/data/exercises';
@@ -8,17 +14,36 @@ import type { Exercise } from '@/types';
 import { colors, radius } from '@/theme';
 
 type Props = {
-  exercise: Pick<Exercise, 'gifUrl' | 'driveFileId' | 'thumbnailColor' | 'name'>;
+  exercise: Pick<Exercise, 'id' | 'gifUrl' | 'driveFileId' | 'thumbnailColor' | 'name'>;
   style?: StyleProp<ViewStyle>;
   contentFit?: 'contain' | 'cover';
 };
 
-export function ExerciseGif({ exercise, style, contentFit = 'contain' }: Props) {
-  const uri = getExerciseGifUrl(exercise);
-  const [loading, setLoading] = useState(Boolean(uri));
-  const [failed, setFailed] = useState(false);
+function candidateUrls(exercise: Props['exercise']): string[] {
+  const primary = getExerciseGifUrl(exercise);
+  const localGif = `/exercises/${exercise.id}.gif`;
+  const localJpg = `/exercises/${exercise.id}.jpg`;
+  const drive = exercise.gifUrl
+    ?? (exercise.driveFileId
+      ? `https://lh3.googleusercontent.com/d/${exercise.driveFileId}`
+      : undefined);
 
-  if (!uri || failed) {
+  const list = [primary, localGif, localJpg, drive].filter(Boolean) as string[];
+  return [...new Set(list)];
+}
+
+export function ExerciseGif({ exercise, style, contentFit = 'contain' }: Props) {
+  const urls = candidateUrls(exercise);
+  const [index, setIndex] = useState(0);
+  const [loading, setLoading] = useState(urls.length > 0);
+  const uri = urls[index];
+
+  useEffect(() => {
+    setIndex(0);
+    setLoading(urls.length > 0);
+  }, [exercise.id]);
+
+  if (!uri) {
     return (
       <View
         style={[
@@ -28,7 +53,7 @@ export function ExerciseGif({ exercise, style, contentFit = 'contain' }: Props) 
         ]}
       >
         <AppText variant="caption" color={colors.white} center>
-          {failed ? 'Não foi possível carregar o GIF' : 'GIF indisponível'}
+          GIF indisponível
         </AppText>
       </View>
     );
@@ -38,20 +63,25 @@ export function ExerciseGif({ exercise, style, contentFit = 'contain' }: Props) 
     <View
       style={[
         styles.frame,
-        { backgroundColor: exercise.thumbnailColor ?? colors.surfaceElevated },
+        { backgroundColor: '#ffffff' },
         style,
       ]}
     >
       <Image
+        key={uri}
         source={{ uri }}
         style={styles.image}
         contentFit={contentFit}
         cachePolicy="memory-disk"
-        recyclingKey={uri}
+        recyclingKey={`${exercise.id}:${uri}`}
         onLoad={() => setLoading(false)}
         onError={() => {
+          if (index < urls.length - 1) {
+            setIndex((i) => i + 1);
+            setLoading(true);
+            return;
+          }
           setLoading(false);
-          setFailed(true);
         }}
         accessibilityLabel={`Demonstração: ${exercise.name}`}
       />
@@ -70,6 +100,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
   },
   image: {
     width: '100%',
