@@ -1,0 +1,171 @@
+import { useRouter } from 'expo-router';
+import { Droplets, Sparkles } from 'lucide-react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+
+import {
+  AppButton,
+  AppText,
+  Card,
+  MacroProgress,
+  ProgressRing,
+  Screen,
+} from '@/components/ui';
+import { useNutritionStore } from '@/stores/nutrition-store';
+import { colors, spacing } from '@/theme';
+
+export default function NutritionTabScreen() {
+  const router = useRouter();
+  const daily = useNutritionStore((s) => s.daily);
+  const hasDietPlan = useNutritionStore((s) => s.hasDietPlan);
+  const addWater = useNutritionStore((s) => s.addWater);
+  const calorieProgress =
+    daily.target.calories > 0 ? daily.consumed.calories / daily.target.calories : 0;
+
+  return (
+    <Screen scroll>
+      <View style={styles.header}>
+        <AppText variant="h1">Nutrição</AppText>
+        <AppText variant="body" muted>
+          Acompanhe macros, água e seu plano alimentar.
+        </AppText>
+      </View>
+
+      <Card style={styles.caloriesCard}>
+        <ProgressRing
+          progress={calorieProgress}
+          size={120}
+          value={`${daily.consumed.calories}`}
+          label="kcal"
+          color={colors.primary}
+        />
+        <View style={{ flex: 1, gap: 8 }}>
+          <AppText variant="h3">Hoje</AppText>
+          <AppText variant="caption" muted>
+            Meta {daily.target.calories} kcal
+          </AppText>
+          <AppText variant="caption" muted>
+            Restam {Math.max(0, daily.target.calories - daily.consumed.calories)} kcal
+          </AppText>
+        </View>
+      </Card>
+
+      <Card style={styles.section}>
+        <MacroProgress
+          label="Proteína"
+          current={daily.consumed.proteinG}
+          target={daily.target.proteinG}
+          color={colors.protein}
+        />
+        <MacroProgress
+          label="Carboidratos"
+          current={daily.consumed.carbsG}
+          target={daily.target.carbsG}
+          color={colors.carbs}
+        />
+        <MacroProgress
+          label="Gorduras"
+          current={daily.consumed.fatG}
+          target={daily.target.fatG}
+          color={colors.fats}
+        />
+      </Card>
+
+      <Card style={styles.section}>
+        <View style={styles.waterRow}>
+          <View style={styles.waterLeft}>
+            <Droplets size={18} color={colors.water} />
+            <AppText variant="h3">Água</AppText>
+          </View>
+          <AppText variant="label" color={colors.water}>
+            {daily.waterLiters.toFixed(1)} / {daily.waterGoalLiters.toFixed(1)} L
+          </AppText>
+        </View>
+        <Pressable
+          onPress={() => addWater(0.25)}
+          style={styles.waterBtn}
+          accessibilityRole="button"
+        >
+          <AppText variant="label" color={colors.onPrimary}>
+            + 250 ml
+          </AppText>
+        </Pressable>
+      </Card>
+
+      <Card style={styles.section}>
+        <AppText variant="h3">Refeições</AppText>
+        {daily.meals.map((meal) => (
+          <View key={meal.id} style={styles.mealRow}>
+            <View>
+              <AppText variant="bodyMedium">{meal.name}</AppText>
+              <AppText variant="caption" muted>
+                {meal.time} · {meal.items.reduce((sum, i) => sum + i.calories, 0)} kcal
+              </AppText>
+            </View>
+            <AppText variant="caption" color={meal.logged ? colors.primary : colors.textMuted}>
+              {meal.logged ? 'Registrada' : 'Pendente'}
+            </AppText>
+          </View>
+        ))}
+      </Card>
+
+      {hasDietPlan ? (
+        <AppButton
+          label="Ver plano alimentar"
+          onPress={() => router.push('/nutrition/meal-plan')}
+        />
+      ) : (
+        <Card accent="purple" style={styles.aiCard}>
+          <View style={styles.aiHeader}>
+            <Sparkles size={18} color={colors.secondary} />
+            <AppText variant="h3">Dieta com IA</AppText>
+          </View>
+          <AppText variant="body" muted>
+            Gere um plano personalizado com base na sua rotina e preferências.
+          </AppText>
+          <AppButton
+            label="Criar dieta com IA"
+            variant="ai"
+            onPress={() => router.push('/nutrition/ai-diet')}
+          />
+        </Card>
+      )}
+
+      <AppButton
+        label="Lista de compras"
+        variant="secondary"
+        onPress={() => router.push('/nutrition/shopping-list')}
+        style={{ marginTop: spacing.md }}
+      />
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: { gap: spacing.xs, marginBottom: spacing.xl, marginTop: spacing.md },
+  caloriesCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+  },
+  section: { gap: spacing.md, marginTop: spacing.lg },
+  waterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  waterLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  waterBtn: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  mealRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  aiCard: { gap: spacing.md, marginTop: spacing.lg },
+  aiHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+});
