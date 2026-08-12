@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { ExerciseGif } from '@/components/exercises/ExerciseGif';
 import {
   AppButton,
   AppText,
@@ -75,6 +76,8 @@ export default function WorkoutSessionScreen() {
         Série {setIndex + 1} de {exercise.sets} · {exercise.reps} reps
       </AppText>
 
+      <ExerciseGif exercise={exercise.exercise} style={styles.gif} />
+
       {isResting ? (
         <Card accent="purple" style={styles.restCard}>
           <AppText variant="h3" center>
@@ -146,6 +149,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     gap: spacing.lg,
+  },
+  gif: {
+    height: 200,
+    marginTop: spacing.md,
   },
   restCard: {
     alignItems: 'center',

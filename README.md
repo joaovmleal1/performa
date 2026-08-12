@@ -22,12 +22,17 @@ npx expo start
 
 Atalho demo no login: **Entrar com dados demo (Amanda)**.
 
+## Biblioteca de exercícios
+
+~700 exercícios com **GIF de execução** do pack no Google Drive (peito, costas, ombros, braços, inferiores, abdômen). Metadados em `data/exercises/catalog.json`; mídias carregadas sob demanda via URL pública do Drive.
+
 ## Estrutura
 
 ```
 app/                 # rotas (auth, evaluation, tabs, workout, nutrition, habits)
 components/ui/       # design system
 components/brand/    # logo PERFORMA
+data/exercises/      # catálogo + GIFs (URLs) de execução
 data/mock/           # dados coerentes (Amanda Silva)
 stores/              # estado (auth, evaluation, workout, nutrition, habits)
 theme/               # tokens de cor, tipografia, spacing

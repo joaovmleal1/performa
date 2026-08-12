@@ -7,6 +7,7 @@ import {
   Screen,
   WorkoutCard,
 } from '@/components/ui';
+import { getExerciseGifUrl } from '@/data/exercises';
 import { mockTodayWorkout } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
@@ -45,6 +46,7 @@ export default function WorkoutTabScreen() {
             previousWeightKg={item.previousWeightKg}
             completed={item.completed}
             color={item.exercise.thumbnailColor ?? '#2A2A33'}
+            gifUrl={getExerciseGifUrl(item.exercise)}
             onPress={() => router.push(`/exercises/${item.exerciseId}`)}
           />
         ))}

@@ -92,6 +92,11 @@ export interface Exercise {
   instructions: string[];
   commonMistakes: string[];
   thumbnailColor?: string;
+  /** Google Drive file id for the exercise GIF */
+  driveFileId?: string;
+  /** Direct URL to the execution GIF */
+  gifUrl?: string;
+  sourceFolder?: string;
   restSecondsDefault?: number;
   defaultSets?: number;
   defaultReps?: number;

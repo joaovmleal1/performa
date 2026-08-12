@@ -1,19 +1,17 @@
 import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { ExerciseGif } from '@/components/exercises/ExerciseGif';
 import { AppText, Card, Screen, ScreenHeader } from '@/components/ui';
-import {
-  equipmentLabels,
-  mockExerciseHistory,
-  mockExercises,
-  muscleGroupLabels,
-} from '@/data/mock';
+import { resolveExercise } from '@/data/exercises';
+import { equipmentLabels, mockExerciseHistory, muscleGroupLabels } from '@/data/mock';
 import { colors, radius, spacing } from '@/theme';
 
 export default function ExerciseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const exercise = mockExercises.find((e) => e.id === id);
-  const history = (id && mockExerciseHistory[id]) || [];
+  const exercise = resolveExercise(id);
+  const history =
+    (id && (mockExerciseHistory[id] || mockExerciseHistory[exercise?.id ?? ''])) || [];
 
   if (!exercise) {
     return (
@@ -30,16 +28,7 @@ export default function ExerciseDetailScreen() {
     <Screen scroll>
       <ScreenHeader title={exercise.name} showBack />
 
-      <View
-        style={[
-          styles.hero,
-          { backgroundColor: exercise.thumbnailColor ?? colors.surface },
-        ]}
-      >
-        <AppText variant="caption" color={colors.white}>
-          Vídeo / GIF em breve
-        </AppText>
-      </View>
+      <ExerciseGif exercise={exercise} style={styles.hero} />
 
       <View style={styles.meta}>
         <Pill label={muscleGroupLabels[exercise.muscleGroup]} />
@@ -47,7 +36,10 @@ export default function ExerciseDetailScreen() {
       </View>
 
       <Card style={styles.section}>
-        <AppText variant="h3">Instruções</AppText>
+        <AppText variant="h3">Como executar</AppText>
+        <AppText variant="caption" muted>
+          Veja o GIF acima e siga os passos:
+        </AppText>
         {exercise.instructions.map((step, index) => (
           <AppText key={step} variant="body" muted>
             {index + 1}. {step}
@@ -108,10 +100,7 @@ function Pill({ label }: { label: string }) {
 
 const styles = StyleSheet.create({
   hero: {
-    height: 180,
-    borderRadius: radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 240,
     marginBottom: spacing.lg,
   },
   meta: {

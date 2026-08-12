@@ -1,7 +1,9 @@
-import { colors, spacing } from '@/theme';
+import { Image } from 'expo-image';
 import { Dumbbell, Flame, Zap } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+
+import { colors, spacing } from '@/theme';
 import type { WorkoutPlan } from '@/types';
 import { AppButton } from './AppButton';
 import { AppText } from './AppText';
@@ -90,6 +92,7 @@ type ExerciseCardProps = {
   previousWeightKg?: number;
   completed?: boolean;
   color: string;
+  gifUrl?: string;
   onPress?: () => void;
 };
 
@@ -101,12 +104,22 @@ export function ExerciseCard({
   previousWeightKg,
   completed,
   color,
+  gifUrl,
   onPress,
 }: ExerciseCardProps) {
   return (
     <Card onPress={onPress} style={styles.exercise} padded={false}>
       <View style={styles.exerciseRow}>
-        <View style={[styles.thumb, { backgroundColor: color }]} />
+        {gifUrl ? (
+          <Image
+            source={{ uri: gifUrl }}
+            style={styles.thumb}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+          />
+        ) : (
+          <View style={[styles.thumb, { backgroundColor: color }]} />
+        )}
         <View style={{ flex: 1, gap: 2 }}>
           <AppText variant="bodyMedium">{name}</AppText>
           <AppText variant="caption" muted>
@@ -165,7 +178,7 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   exercise: { padding: 12 },
   exerciseRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  thumb: { width: 48, height: 48, borderRadius: 12 },
+  thumb: { width: 48, height: 48, borderRadius: 12, backgroundColor: colors.surfaceMuted },
   check: {
     width: 22,
     height: 22,
