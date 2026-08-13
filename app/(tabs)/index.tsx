@@ -1,14 +1,23 @@
-import { Droplets, Flame } from 'lucide-react-native';
+import {
+  BookOpenCheck,
+  Droplets,
+  Flame,
+  MessageCircle,
+  Repeat2,
+} from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { PerformaMark } from '@/components/brand/PerformaLogo';
 import {
   AIInsightCard,
   AppText,
   Card,
+  IconTile,
   MacroProgress,
   MetricCard,
+  PageHeading,
+  ProgressBar,
   Screen,
+  SectionHeading,
   WorkoutCard,
 } from '@/components/ui';
 import { mockInsights, mockTodayWorkout } from '@/data/mock';
@@ -45,18 +54,11 @@ export default function DashboardScreen() {
 
   return (
     <Screen scroll>
-      <View style={styles.header}>
-        <View style={styles.brandRow}>
-          <PerformaMark size={36} />
-          <AppText variant="caption" color={colors.primary} style={styles.brandTag}>
-            TREINO • NUTRIÇÃO • RESULTADOS
-          </AppText>
-        </View>
-        <AppText variant="h1">Olá, {firstName}!</AppText>
-        <AppText variant="body" muted>
-          Pronta para superar seus limites hoje?
-        </AppText>
-      </View>
+      <PageHeading
+        eyebrow="Seu dia no PERFORMA"
+        title={`Olá, ${firstName}!`}
+        subtitle="Seu treino, nutrição e evolução em um só lugar."
+      />
 
       <WorkoutCard workout={mockTodayWorkout} onStart={handleStartWorkout} />
 
@@ -108,6 +110,11 @@ export default function DashboardScreen() {
             {daily.waterLiters.toFixed(1)} / {daily.waterGoalLiters.toFixed(1)} L
           </AppText>
         </View>
+        <ProgressBar
+          progress={daily.waterGoalLiters ? daily.waterLiters / daily.waterGoalLiters : 0}
+          color={colors.water}
+          height={6}
+        />
         <Pressable
           onPress={() => addWater(0.25)}
           style={styles.waterBtn}
@@ -142,7 +149,11 @@ export default function DashboardScreen() {
       </Card>
 
       <View style={styles.insights}>
-        <AppText variant="h3">Insights PERFORMA AI</AppText>
+        <SectionHeading
+          title="Insights para você"
+          actionLabel="Ver progresso"
+          onAction={() => router.push('/(tabs)/progress')}
+        />
         {mockInsights.slice(0, 2).map((insight) => (
           <AIInsightCard
             key={insight.id}
@@ -152,48 +163,34 @@ export default function DashboardScreen() {
         ))}
       </View>
 
-      <Card
-        accent="purple"
-        onPress={() => router.push('/technique')}
-        accessibilityLabel="Abrir técnica de execução"
-      >
-        <AppText variant="h3">Como fazer e como não fazer</AppText>
-        <AppText variant="caption" muted>
-          400+ vídeos de técnica certa e erros comuns
-        </AppText>
-      </Card>
-
-      <Card
-        accent="purple"
-        onPress={() => router.push('/habits')}
-        accessibilityLabel="Abrir hábitos"
-        style={{ marginTop: spacing.md }}
-      >
-        <AppText variant="h3">Hábitos diários</AppText>
-        <AppText variant="caption" muted>
-          Toque para acompanhar sua rotina
-        </AppText>
-      </Card>
-
-      <Card
-        accent="purple"
-        onPress={() => router.push('/ai')}
-        accessibilityLabel="Abrir ajuda PERFORMA"
-        style={{ marginTop: spacing.md }}
-      >
-        <AppText variant="h3">Dúvidas sobre seu treino?</AppText>
-        <AppText variant="caption" muted>
-          Converse com o PERFORMA e receba orientação em tempo real
-        </AppText>
-      </Card>
+      <View style={styles.quickActions}>
+        <SectionHeading title="Explore" />
+        <IconTile
+          icon={<BookOpenCheck size={20} color={colors.primary} />}
+          title="Técnica de execução"
+          subtitle="400+ vídeos com acertos e erros comuns"
+          onPress={() => router.push('/technique')}
+        />
+        <IconTile
+          icon={<Repeat2 size={20} color={colors.secondary} />}
+          title="Hábitos diários"
+          subtitle="Consistência fora do treino também conta"
+          accent="purple"
+          onPress={() => router.push('/habits')}
+        />
+        <IconTile
+          icon={<MessageCircle size={20} color={colors.info} />}
+          title="Ajuda PERFORMA"
+          subtitle="Tire dúvidas sobre o seu treino em tempo real"
+          accent="blue"
+          onPress={() => router.push('/ai')}
+        />
+      </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { gap: spacing.sm, marginBottom: spacing.xl, marginTop: spacing.md },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.xs },
-  brandTag: { letterSpacing: 1.1, fontFamily: 'Sora_500Medium' },
   row: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg },
   section: { gap: spacing.md, marginTop: spacing.lg },
   waterRow: {
@@ -231,4 +228,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   insights: { gap: spacing.md, marginTop: spacing.lg, marginBottom: spacing.lg },
+  quickActions: { gap: spacing.sm, marginBottom: spacing.xl },
 });

@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
+import { X } from 'lucide-react-native';
 import { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ExerciseGif } from '@/components/exercises/ExerciseGif';
 import {
@@ -10,6 +11,8 @@ import {
   NumberStepper,
   ProgressRing,
   Screen,
+  ScreenProgress,
+  StatusPill,
 } from '@/components/ui';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
 import { colors, spacing } from '@/theme';
@@ -66,15 +69,33 @@ export default function WorkoutSessionScreen() {
 
   return (
     <Screen scroll edges={['top', 'left', 'right', 'bottom']}>
-      <AppButton label="Fechar" variant="ghost" onPress={() => router.back()} />
+      <View style={styles.topBar}>
+        <View style={{ flex: 1 }}>
+          <AppText variant="caption" muted>
+            TREINO EM ANDAMENTO
+          </AppText>
+          <AppText variant="label">
+            Exercício {exerciseIndex + 1} de {workout.exercises.length}
+          </AppText>
+        </View>
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Fechar treino"
+          style={styles.closeBtn}
+        >
+          <X size={20} color={colors.text} />
+        </Pressable>
+      </View>
+      <ScreenProgress current={exerciseIndex} total={workout.exercises.length} />
 
-      <AppText variant="caption" muted>
-        Exercício {exerciseIndex + 1} de {workout.exercises.length}
-      </AppText>
-      <AppText variant="h1">{exercise.exercise.name}</AppText>
-      <AppText variant="body" muted>
-        Série {setIndex + 1} de {exercise.sets} · {exercise.reps} reps
-      </AppText>
+      <View style={styles.exerciseHeader}>
+        <AppText variant="h1">{exercise.exercise.name}</AppText>
+        <StatusPill
+          label={`Série ${setIndex + 1}/${exercise.sets} · ${exercise.reps} reps`}
+          tone="success"
+        />
+      </View>
 
       <AppText variant="label" muted style={{ marginTop: spacing.md }}>
         Execução
@@ -148,6 +169,24 @@ export default function WorkoutSessionScreen() {
 }
 
 const styles = StyleSheet.create({
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  closeBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceMedium,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  exerciseHeader: { gap: spacing.sm, marginTop: spacing.xl },
   done: {
     flex: 1,
     justifyContent: 'center',

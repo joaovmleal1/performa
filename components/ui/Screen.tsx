@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   View,
@@ -51,6 +52,16 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
+    width: '100%',
+    ...(Platform.OS === 'web'
+      ? ({
+          maxWidth: 520,
+          alignSelf: 'center',
+          borderLeftWidth: StyleSheet.hairlineWidth,
+          borderRightWidth: StyleSheet.hairlineWidth,
+          borderColor: colors.border,
+        } as object)
+      : null),
   },
   flex: { flex: 1 },
   padding: {

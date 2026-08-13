@@ -7,8 +7,11 @@ import {
   AppText,
   Card,
   MacroProgress,
+  PageHeading,
+  ProgressBar,
   ProgressRing,
   Screen,
+  StatusPill,
 } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth-store';
 import { useNutritionStore } from '@/stores/nutrition-store';
@@ -28,12 +31,11 @@ export default function NutritionTabScreen() {
 
   return (
     <Screen scroll>
-      <View style={styles.header}>
-        <AppText variant="h1">Nutrição</AppText>
-        <AppText variant="body" muted>
-          Acompanhe macros, água e seu plano alimentar.
-        </AppText>
-      </View>
+      <PageHeading
+        eyebrow="Resumo de hoje"
+        title="Nutrição"
+        subtitle="Acompanhe macros, hidratação e seu plano alimentar."
+      />
 
       <Card style={styles.caloriesCard}>
         <ProgressRing
@@ -85,6 +87,11 @@ export default function NutritionTabScreen() {
             {daily.waterLiters.toFixed(1)} / {daily.waterGoalLiters.toFixed(1)} L
           </AppText>
         </View>
+        <ProgressBar
+          progress={daily.waterGoalLiters ? daily.waterLiters / daily.waterGoalLiters : 0}
+          color={colors.water}
+          height={6}
+        />
         <Pressable
           onPress={() => addWater(0.25)}
           style={styles.waterBtn}
@@ -106,9 +113,10 @@ export default function NutritionTabScreen() {
                 {meal.time} · {meal.items.reduce((sum, i) => sum + i.calories, 0)} kcal
               </AppText>
             </View>
-            <AppText variant="caption" color={meal.logged ? colors.primary : colors.textMuted}>
-              {meal.logged ? 'Registrada' : 'Pendente'}
-            </AppText>
+            <StatusPill
+              label={meal.logged ? 'Registrada' : 'Pendente'}
+              tone={meal.logged ? 'success' : 'neutral'}
+            />
           </View>
         ))}
       </Card>
@@ -167,7 +175,6 @@ export default function NutritionTabScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: spacing.xs, marginBottom: spacing.xl, marginTop: spacing.md },
   caloriesCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -191,6 +198,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: spacing.md,
+    minHeight: 54,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
   aiCard: { gap: spacing.md, marginTop: spacing.lg },
   aiHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },

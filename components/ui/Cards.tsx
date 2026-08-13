@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Dumbbell, Flame, Zap } from 'lucide-react-native';
+import { Check, Dumbbell, Flame, Zap } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -133,7 +133,9 @@ export function ExerciseCard({
             styles.check,
             completed && { backgroundColor: colors.primary, borderColor: colors.primary },
           ]}
-        />
+        >
+          {completed ? <Check size={14} color={colors.onPrimary} strokeWidth={3} /> : null}
+        </View>
       </View>
     </Card>
   );
@@ -186,6 +188,8 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     borderWidth: 2,
     borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   insight: { gap: 10 },
   insightBadge: {

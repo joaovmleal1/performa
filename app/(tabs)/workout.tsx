@@ -6,7 +6,9 @@ import {
   AppText,
   Card,
   ExerciseCard,
+  PageHeading,
   Screen,
+  SectionHeading,
   WorkoutCard,
 } from '@/components/ui';
 import { getExerciseGifUrl } from '@/data/exercises';
@@ -31,14 +33,15 @@ export default function WorkoutTabScreen() {
 
   return (
     <Screen scroll>
-      <View style={styles.header}>
-        <AppText variant="h1">Treino</AppText>
-        <AppText variant="body" muted>
-          {plan
-            ? `Modo preparação · ${plan.competitionName}`
-            : 'Seu plano de hoje está pronto.'}
-        </AppText>
-      </View>
+      <PageHeading
+        eyebrow={plan ? 'Modo preparação' : 'Plano de hoje'}
+        title="Treino"
+        subtitle={
+          plan
+            ? `${plan.competitionName} · ${plan.totalWeeks} semanas de preparação`
+            : 'Seu plano está pronto. Foque em uma série de cada vez.'
+        }
+      />
 
       {plan ? (
         <Card accent="purple" style={styles.prepCard}>
@@ -90,7 +93,11 @@ export default function WorkoutTabScreen() {
       <WorkoutCard workout={workout} onStart={handleStart} />
 
       <View style={styles.list}>
-        <AppText variant="h3">Exercícios de hoje</AppText>
+        <SectionHeading
+          title="Exercícios de hoje"
+          actionLabel="Biblioteca"
+          onAction={() => router.push('/exercises')}
+        />
         {workout.exercises.map((item) => (
           <ExerciseCard
             key={item.exerciseId}
@@ -107,13 +114,6 @@ export default function WorkoutTabScreen() {
         ))}
       </View>
 
-      <AppButton label="Iniciar sessão" onPress={handleStart} />
-      <AppButton
-        label="Biblioteca de exercícios"
-        variant="secondary"
-        onPress={() => router.push('/exercises')}
-        style={{ marginTop: spacing.sm }}
-      />
       <AppButton
         label="Como fazer e como não fazer"
         variant="secondary"
@@ -125,7 +125,6 @@ export default function WorkoutTabScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: spacing.xs, marginBottom: spacing.xl, marginTop: spacing.md },
   prepCard: { gap: spacing.md, marginBottom: spacing.lg },
   prepHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   phaseList: { gap: 6 },

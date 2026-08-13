@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { PerformaLogo } from '@/components/brand/PerformaLogo';
 import { AppButton, AppText, Input, Screen } from '@/components/ui';
@@ -107,16 +107,9 @@ export default function LoginScreen() {
         </AppText>
       </Pressable>
 
-      <Pressable
-        onPress={() =>
-          Alert.alert('Login social', 'Em breve. Use e-mail e senha por enquanto.')
-        }
-        style={{ marginTop: spacing.lg }}
-      >
-        <AppText variant="caption" muted center>
-          Apple / Google em breve
-        </AppText>
-      </Pressable>
+      <AppText variant="caption" muted center style={styles.legal}>
+        Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade.
+      </AppText>
     </Screen>
   );
 }
@@ -130,4 +123,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   register: { marginTop: spacing['2xl'], minHeight: 44, justifyContent: 'center' },
+  legal: { marginTop: spacing.xl, paddingHorizontal: spacing.lg },
 });

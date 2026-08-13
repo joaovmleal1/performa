@@ -24,3 +24,10 @@ export { RadioOption } from './RadioOption';
 export { MealCard, NutritionCard } from './MealCards';
 export { Logo, ChartCard, EmptyState, Skeleton, Avatar } from './Misc';
 export { Tabs, SegmentedControl } from './Tabs';
+export {
+  PageHeading,
+  SectionHeading,
+  IconTile,
+  ListRow,
+  StatusPill,
+} from './Premium';

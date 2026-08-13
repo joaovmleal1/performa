@@ -1,12 +1,24 @@
-import { StyleSheet, View } from 'react-native';
+import {
+  BookOpen,
+  CalendarDays,
+  ChevronRight,
+  HelpCircle,
+  LogOut,
+  Repeat2,
+  Scale,
+  Target,
+} from 'lucide-react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { PerformaMark } from '@/components/brand/PerformaLogo';
 import {
-  AppButton,
   AppText,
   Avatar,
   Card,
+  ListRow,
+  PageHeading,
   Screen,
+  StatusPill,
 } from '@/components/ui';
 import { goalLabels } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
@@ -21,87 +33,118 @@ export default function ProfileScreen() {
 
   return (
     <Screen scroll>
-      <View style={styles.header}>
-        <PerformaMark size={40} />
-        <Avatar name={name} size={72} />
-        <AppText variant="h1" style={{ marginTop: spacing.md }}>
-          {name}
-        </AppText>
-        <AppText variant="body" muted>
-          @{user?.username ?? 'performa'}
-        </AppText>
-        <AppText variant="caption" color={colors.primary} style={{ letterSpacing: 1.2, marginTop: 4 }}>
-          TREINO • NUTRIÇÃO • RESULTADOS
-        </AppText>
-      </View>
+      <PageHeading
+        eyebrow="Conta"
+        title="Perfil"
+        subtitle="Seus dados, metas e preferências."
+        right={<PerformaMark size={38} />}
+      />
 
-      <Card style={styles.section}>
-        <Row label="E-mail" value={user?.email ?? '—'} />
-        <Row label="Objetivo" value={goalLabels[user?.goal ?? 'definition'] ?? '—'} />
-        <Row label="Peso" value={`${user?.weightKg ?? '—'} kg`} />
-        <Row label="Altura" value={`${user?.heightCm ?? '—'} cm`} />
-        <Row label="Experiência" value={user?.experience ?? '—'} />
-        <Row label="Treinos/semana" value={`${user?.trainingDaysPerWeek ?? '—'}`} />
-        <Row label="Sequência" value={`${user?.streakDays ?? 0} dias`} />
+      <Card style={styles.identity}>
+        <Avatar name={name} size={68} />
+        <View style={styles.identityCopy}>
+          <AppText variant="h2">{name}</AppText>
+          <AppText variant="caption" muted>
+            @{user?.username ?? 'performa'} · {user?.email ?? '—'}
+          </AppText>
+          <StatusPill
+            label={`${user?.streakDays ?? 0} dias de sequência`}
+            tone="success"
+          />
+        </View>
       </Card>
 
-      <AppButton
-        label="Hábitos diários"
-        variant="secondary"
-        onPress={() => router.push('/habits')}
-      />
-      <AppButton
-        label="Calendário"
-        variant="secondary"
-        onPress={() => router.push('/calendar')}
-        style={{ marginTop: spacing.sm }}
-      />
-      <AppButton
-        label="Ajuda e suporte"
-        variant="ai"
-        onPress={() => router.push('/ai')}
-        style={{ marginTop: spacing.sm }}
-      />
-      <AppButton
-        label="Biblioteca de exercícios"
-        variant="ghost"
-        onPress={() => router.push('/exercises')}
-        style={{ marginTop: spacing.sm }}
-      />
+      <AppText variant="label" muted style={styles.sectionLabel}>
+        SEU PLANO
+      </AppText>
+      <Card style={styles.group}>
+        <ListRow
+          icon={<Target size={18} color={colors.primary} />}
+          title="Objetivo"
+          value={goalLabels[user?.goal ?? 'definition'] ?? '—'}
+        />
+        <ListRow
+          icon={<Scale size={18} color={colors.secondary} />}
+          title="Medidas"
+          value={`${user?.weightKg ?? '—'} kg · ${user?.heightCm ?? '—'} cm`}
+        />
+        <ListRow
+          icon={<Repeat2 size={18} color={colors.info} />}
+          title="Rotina"
+          value={`${user?.trainingDaysPerWeek ?? '—'} treinos/sem`}
+          last
+        />
+      </Card>
 
-      <AppButton
-        label="Sair da conta"
-        variant="danger"
+      <AppText variant="label" muted style={styles.sectionLabel}>
+        RECURSOS
+      </AppText>
+      <Card style={styles.group}>
+        <ListRow
+          icon={<Repeat2 size={18} color={colors.primary} />}
+          title="Hábitos diários"
+          onPress={() => router.push('/habits')}
+        />
+        <ListRow
+          icon={<CalendarDays size={18} color={colors.secondary} />}
+          title="Calendário"
+          onPress={() => router.push('/calendar')}
+        />
+        <ListRow
+          icon={<BookOpen size={18} color={colors.info} />}
+          title="Biblioteca de exercícios"
+          onPress={() => router.push('/exercises')}
+        />
+        <ListRow
+          icon={<HelpCircle size={18} color={colors.primary} />}
+          title="Ajuda e suporte"
+          onPress={() => router.push('/ai')}
+          last
+        />
+      </Card>
+
+      <Pressable
         onPress={() => {
           logout();
           router.replace('/(auth)/login');
         }}
-        style={{ marginTop: spacing.md }}
-      />
+        accessibilityRole="button"
+        style={({ pressed }) => [styles.logout, pressed && { opacity: 0.65 }]}
+      >
+        <LogOut size={18} color={colors.error} />
+        <AppText variant="bodyMedium" color={colors.error}>
+          Sair da conta
+        </AppText>
+        <ChevronRight size={18} color={colors.error} />
+      </Pressable>
     </Screen>
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.row}>
-      <AppText variant="caption" muted>
-        {label}
-      </AppText>
-      <AppText variant="bodyMedium">{value}</AppText>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  header: { alignItems: 'center', marginTop: spacing.lg, marginBottom: spacing.xl },
-  section: { gap: spacing.md, marginBottom: spacing.xl },
-  row: {
+  identity: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.borderSubtle,
-    paddingVertical: spacing.sm,
+    gap: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  identityCopy: { flex: 1, gap: spacing.xs },
+  sectionLabel: {
+    letterSpacing: 1,
+    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  group: {
+    paddingVertical: 0,
+    marginBottom: spacing.lg,
+  },
+  logout: {
+    minHeight: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xl,
   },
 });
