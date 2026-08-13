@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
-import { Check, Dumbbell, Flame, Zap } from 'lucide-react-native';
+import { Check, Flame, Zap } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { colors, spacing } from '@/theme';
+import { AIOrb } from '@/components/brand/PerformaLogo';
+import { colors, radius, spacing } from '@/theme';
 import type { WorkoutPlan } from '@/types';
 import { AppButton } from './AppButton';
 import { AppText } from './AppText';
@@ -21,7 +22,7 @@ export function MetricCard({ label, value, hint, accent = 'default', icon }: Met
   return (
     <Card style={styles.metric}>
       <View style={styles.metricTop}>
-        <AppText variant="caption" muted>
+        <AppText variant="caption" color={colors.textMuted}>
           {label}
         </AppText>
         {icon}
@@ -39,7 +40,7 @@ export function MetricCard({ label, value, hint, accent = 'default', icon }: Met
         {value}
       </AppText>
       {hint ? (
-        <AppText variant="caption" muted>
+        <AppText variant="caption" color={colors.textSecondary}>
           {hint}
         </AppText>
       ) : null}
@@ -52,15 +53,14 @@ type WorkoutCardProps = {
   onStart: () => void;
 };
 
+/** Card “Treino de hoje” — board 04/05, com orb de IA */
 export function WorkoutCard({ workout, onStart }: WorkoutCardProps) {
   return (
-    <Card glow="purple" style={styles.workout}>
+    <Card accent="purple" style={styles.workout}>
       <View style={styles.row}>
-        <View style={styles.iconBubble}>
-          <Dumbbell size={20} color={colors.secondary} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <AppText variant="caption" muted>
+        <AIOrb size={52} />
+        <View style={{ flex: 1, gap: 2 }}>
+          <AppText variant="caption" color={colors.secondary}>
             Treino de hoje
           </AppText>
           <AppText variant="h2">{workout.name}</AppText>
@@ -68,17 +68,19 @@ export function WorkoutCard({ workout, onStart }: WorkoutCardProps) {
       </View>
       <View style={styles.metaRow}>
         <View style={styles.meta}>
-          <Flame size={14} color={colors.primary} />
+          <Flame size={14} color={colors.primary} strokeWidth={1.85} />
           <AppText variant="caption">{workout.estimatedMinutes} min</AppText>
         </View>
         <View style={styles.meta}>
-          <Zap size={14} color={colors.secondary} />
+          <Zap size={14} color={colors.secondary} strokeWidth={1.85} />
           <AppText variant="caption">{workout.exercises.length} exercícios</AppText>
         </View>
       </View>
-      <AppText variant="caption" muted>
-        {(workout.muscleFocus ?? []).join(' • ')}
-      </AppText>
+      {(workout.muscleFocus?.length ?? 0) > 0 ? (
+        <AppText variant="caption" color={colors.textMuted}>
+          {(workout.muscleFocus ?? []).join(' • ')}
+        </AppText>
+      ) : null}
       <AppButton label="Iniciar treino" onPress={onStart} size="md" />
     </Card>
   );
@@ -122,7 +124,7 @@ export function ExerciseCard({
         )}
         <View style={{ flex: 1, gap: 2 }}>
           <AppText variant="bodyMedium">{name}</AppText>
-          <AppText variant="caption" muted>
+          <AppText variant="caption" color={colors.textMuted}>
             {sets}×{reps}
             {previousWeightKg != null ? ` · anterior ${previousWeightKg} kg` : ''}
             {suggestedWeightKg != null ? ` · sugestão ${suggestedWeightKg} kg` : ''}
@@ -148,39 +150,39 @@ type InsightProps = {
 
 export function AIInsightCard({ title, message }: InsightProps) {
   return (
-    <Card glow="purple" style={styles.insight}>
-      <View style={styles.insightBadge}>
+    <Card accent="purple" style={styles.insight}>
+      <View style={styles.insightHeader}>
+        <AIOrb size={36} />
         <AppText variant="caption" color={colors.secondary}>
           {title}
         </AppText>
       </View>
-      <AppText variant="body">{message}</AppText>
+      <AppText variant="body" color={colors.textSecondary}>
+        {message}
+      </AppText>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  metric: { flex: 1, gap: 6, minHeight: 110 },
+  metric: { flex: 1, gap: 6, minHeight: 108 },
   metricTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   workout: { gap: spacing.md },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  iconBubble: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.secondaryMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   metaRow: { flexDirection: 'row', gap: 16 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   exercise: { padding: 12 },
   exerciseRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  thumb: { width: 56, height: 56, borderRadius: 12, backgroundColor: colors.surfaceMuted },
+  thumb: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMedium,
+  },
   thumbMedia: { backgroundColor: '#fff' },
   check: {
     width: 22,
@@ -192,11 +194,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   insight: { gap: 10 },
-  insightBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    backgroundColor: colors.secondaryMuted,
+  insightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
 });

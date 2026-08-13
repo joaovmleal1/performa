@@ -49,7 +49,8 @@
 
 ## Radius
 
-- Controles/cards: **8–12px** (`sm`/`md`)
+- Controles: **8–12px** (`sm`/`md`)
+- Cards / CTAs: **16–20px** (`lg`/`xl`) — superfície `#2A2A33`
 - Sheets: 16–20
 - full: 999 (só quando interação exigir)
 

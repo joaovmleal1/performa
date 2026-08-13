@@ -1,5 +1,5 @@
-import { StyleSheet, View } from 'react-native';
 import { Trophy } from 'lucide-react-native';
+import { StyleSheet, View } from 'react-native';
 
 import {
   AIInsightCard,
@@ -9,15 +9,10 @@ import {
   ChartCard,
   ListRow,
   MetricCard,
-  PageHeading,
   Screen,
-  SectionHeading,
+  ScreenTitle,
 } from '@/components/ui';
-import {
-  mockInsights,
-  mockPRs,
-  mockWeightHistory,
-} from '@/data/mock';
+import { mockInsights, mockPRs, mockWeightHistory } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
 import { colors, spacing } from '@/theme';
 
@@ -29,11 +24,7 @@ export default function ProgressScreen() {
 
   return (
     <Screen scroll>
-      <PageHeading
-        eyebrow="Sua evolução"
-        title="Progresso"
-        subtitle="Acompanhe tendências, consistência e novos recordes."
-      />
+      <ScreenTitle title="Progresso" subtitle="Peso, composição e recordes." />
 
       <View style={styles.row}>
         <MetricCard
@@ -52,7 +43,7 @@ export default function ProgressScreen() {
 
       <View style={styles.section}>
         <ChartCard
-          title="Histórico de peso"
+          title="Evolução de peso"
           points={mockWeightHistory.map((point) => point.weightKg)}
           valueLabel={`${latest?.weightKg ?? 72} kg`}
           changeLabel={`${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg`}
@@ -60,11 +51,41 @@ export default function ProgressScreen() {
       </View>
 
       <Card style={styles.section}>
-        <SectionHeading title="Recordes pessoais" />
+        <AppText variant="h3">Composição corporal</AppText>
+        <View style={styles.compRow}>
+          <View style={styles.compItem}>
+            <AppText variant="caption" color={colors.textMuted}>
+              Gordura
+            </AppText>
+            <AppText variant="h2" color={colors.warning}>
+              18%
+            </AppText>
+          </View>
+          <View style={styles.compItem}>
+            <AppText variant="caption" color={colors.textMuted}>
+              Músculo
+            </AppText>
+            <AppText variant="h2" color={colors.primary}>
+              42%
+            </AppText>
+          </View>
+          <View style={styles.compItem}>
+            <AppText variant="caption" color={colors.textMuted}>
+              Água
+            </AppText>
+            <AppText variant="h2" color={colors.info}>
+              55%
+            </AppText>
+          </View>
+        </View>
+      </Card>
+
+      <Card style={styles.section}>
+        <AppText variant="h3">Recordes pessoais</AppText>
         {mockPRs.map((pr, index) => (
           <ListRow
             key={pr.id}
-            icon={<Trophy size={17} color={colors.warning} />}
+            icon={<Trophy size={17} color={colors.warning} strokeWidth={1.85} />}
             title={pr.exerciseName}
             subtitle={pr.date}
             value={`${pr.weightKg} kg × ${pr.reps}`}
@@ -95,11 +116,6 @@ export default function ProgressScreen() {
           variant="secondary"
           onPress={() => router.push('/progress-photos')}
         />
-        <AppButton
-          label="Tirar uma dúvida"
-          variant="ai"
-          onPress={() => router.push('/ai')}
-        />
       </View>
     </Screen>
   );
@@ -108,6 +124,8 @@ export default function ProgressScreen() {
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: spacing.md },
   section: { gap: spacing.md, marginTop: spacing.lg },
+  compRow: { flexDirection: 'row', gap: spacing.md },
+  compItem: { flex: 1, gap: 4 },
   insights: { gap: spacing.md, marginTop: spacing.xl },
   actions: { gap: spacing.sm, marginTop: spacing.xl, marginBottom: spacing['2xl'] },
 });

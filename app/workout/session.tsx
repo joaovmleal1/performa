@@ -12,10 +12,9 @@ import {
   ProgressRing,
   Screen,
   ScreenProgress,
-  StatusPill,
 } from '@/components/ui';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 
 export default function WorkoutSessionScreen() {
   const router = useRouter();
@@ -58,7 +57,7 @@ export default function WorkoutSessionScreen() {
           <AppText variant="h1" center>
             Treino concluído!
           </AppText>
-          <AppText variant="body" muted center>
+          <AppText variant="body" color={colors.textSecondary} center>
             Ótimo trabalho. Seu progresso foi registrado.
           </AppText>
           <AppButton label="Voltar" onPress={() => router.back()} />
@@ -71,10 +70,10 @@ export default function WorkoutSessionScreen() {
     <Screen scroll edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.topBar}>
         <View style={{ flex: 1 }}>
-          <AppText variant="caption" muted>
+          <AppText variant="caption" color={colors.primary} style={styles.eyebrow}>
             TREINO EM ANDAMENTO
           </AppText>
-          <AppText variant="label">
+          <AppText variant="label" color={colors.textSecondary}>
             Exercício {exerciseIndex + 1} de {workout.exercises.length}
           </AppText>
         </View>
@@ -84,22 +83,18 @@ export default function WorkoutSessionScreen() {
           accessibilityLabel="Fechar treino"
           style={styles.closeBtn}
         >
-          <X size={20} color={colors.text} />
+          <X size={20} color={colors.text} strokeWidth={1.85} />
         </Pressable>
       </View>
       <ScreenProgress current={exerciseIndex} total={workout.exercises.length} />
 
       <View style={styles.exerciseHeader}>
         <AppText variant="h1">{exercise.exercise.name}</AppText>
-        <StatusPill
-          label={`Série ${setIndex + 1}/${exercise.sets} · ${exercise.reps} reps`}
-          tone="success"
-        />
+        <AppText variant="body" color={colors.textSecondary}>
+          Série {setIndex + 1}/{exercise.sets}
+        </AppText>
       </View>
 
-      <AppText variant="label" muted style={{ marginTop: spacing.md }}>
-        Execução
-      </AppText>
       <ExerciseGif exercise={exercise.exercise} style={styles.gif} />
 
       {isResting ? (
@@ -109,9 +104,7 @@ export default function WorkoutSessionScreen() {
           </AppText>
           <ProgressRing
             progress={
-              exercise.restSeconds
-                ? restSecondsLeft / exercise.restSeconds
-                : 0
+              exercise.restSeconds ? restSecondsLeft / exercise.restSeconds : 0
             }
             size={140}
             value={`${restSecondsLeft}s`}
@@ -129,7 +122,14 @@ export default function WorkoutSessionScreen() {
         </Card>
       ) : (
         <Card style={styles.logger}>
-          <AppText variant="label" muted>
+          <AppText variant="metricLg" center color={colors.primary}>
+            {currentReps}
+          </AppText>
+          <AppText variant="caption" color={colors.textMuted} center>
+            repetições · {currentWeight} kg
+          </AppText>
+
+          <AppText variant="label" color={colors.textMuted} style={{ marginTop: spacing.lg }}>
             Carga (kg)
           </AppText>
           <NumberStepper
@@ -139,15 +139,10 @@ export default function WorkoutSessionScreen() {
             step={2.5}
             onChange={setWeight}
           />
-          <AppText variant="label" muted style={{ marginTop: spacing.lg }}>
+          <AppText variant="label" color={colors.textMuted} style={{ marginTop: spacing.lg }}>
             Repetições
           </AppText>
-          <NumberStepper
-            value={currentReps}
-            min={1}
-            max={50}
-            onChange={setReps}
-          />
+          <NumberStepper value={currentReps} min={1} max={50} onChange={setReps} />
           <AppButton
             label="Concluir série"
             onPress={completeSet}
@@ -159,7 +154,7 @@ export default function WorkoutSessionScreen() {
       <Card style={styles.tips}>
         <AppText variant="h3">Como executar</AppText>
         {exercise.exercise.instructions.map((tip) => (
-          <AppText key={tip} variant="body" muted>
+          <AppText key={tip} variant="body" color={colors.textSecondary}>
             • {tip}
           </AppText>
         ))}
@@ -176,17 +171,21 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     marginBottom: spacing.md,
   },
+  eyebrow: {
+    letterSpacing: 1.2,
+    fontFamily: 'Sora_600SemiBold',
+  },
   closeBtn: {
     width: 44,
     height: 44,
-    borderRadius: 12,
-    backgroundColor: colors.surfaceMedium,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceLight,
     borderWidth: 1,
     borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  exerciseHeader: { gap: spacing.sm, marginTop: spacing.xl },
+  exerciseHeader: { gap: 4, marginTop: spacing.xl },
   done: {
     flex: 1,
     justifyContent: 'center',
@@ -194,8 +193,9 @@ const styles = StyleSheet.create({
   },
   gif: {
     height: 220,
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
     backgroundColor: '#fff',
+    borderRadius: radius.lg,
   },
   restCard: {
     alignItems: 'center',

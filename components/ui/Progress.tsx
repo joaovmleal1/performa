@@ -19,7 +19,7 @@ export function ProgressRing({
   size = 88,
   stroke = 8,
   color = colors.primary,
-  trackColor = colors.surfaceLight,
+  trackColor = colors.surfaceMedium,
   label,
   value,
 }: RingProps) {
@@ -76,7 +76,7 @@ export function ProgressBar({
   progress,
   color = colors.primary,
   height = 8,
-  trackColor = colors.surfaceLight,
+  trackColor = colors.surfaceMedium,
 }: BarProps) {
   const clamped = Math.max(0, Math.min(1, progress));
   return (

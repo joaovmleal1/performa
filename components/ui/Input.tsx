@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
   label: { color: colors.textSecondary, marginBottom: 2 },
   field: {
     minHeight: 52,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceMedium,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceLight,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.lg,

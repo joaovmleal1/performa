@@ -6,15 +6,15 @@ import {
   AppText,
   Card,
   ExerciseCard,
-  PageHeading,
   Screen,
+  ScreenTitle,
   SectionHeading,
   WorkoutCard,
 } from '@/components/ui';
 import { getExerciseGifUrl } from '@/data/exercises';
 import { mockTodayWorkout } from '@/data/mock';
-import { loadLabels, phaseKindLabels } from '@/lib/periodization';
 import { useAppRouter } from '@/hooks/useAppRouter';
+import { loadLabels, phaseKindLabels } from '@/lib/periodization';
 import { useAuthStore } from '@/stores/auth-store';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
 import { colors, spacing } from '@/theme';
@@ -33,20 +33,14 @@ export default function WorkoutTabScreen() {
 
   return (
     <Screen scroll>
-      <PageHeading
-        eyebrow={plan ? 'Modo preparação' : 'Plano de hoje'}
-        title="Treino"
-        subtitle={
-          plan
-            ? `${plan.competitionName} · ${plan.totalWeeks} semanas de preparação`
-            : 'Seu plano está pronto. Foque em uma série de cada vez.'
-        }
-      />
+      <ScreenTitle title="Treino" subtitle="Foque em uma série de cada vez." />
+
+      <WorkoutCard workout={workout} onStart={handleStart} />
 
       {plan ? (
         <Card accent="purple" style={styles.prepCard}>
           <View style={styles.prepHeader}>
-            <Flag size={18} color={colors.secondary} />
+            <Flag size={18} color={colors.secondary} strokeWidth={1.85} />
             <AppText variant="h3">Periodização</AppText>
           </View>
           <AppText variant="bodyMedium">
@@ -58,17 +52,12 @@ export default function WorkoutTabScreen() {
                 <AppText variant="caption" color={colors.primary}>
                   {index + 1}. {phaseKindLabels[phase.kind]}
                 </AppText>
-                <AppText variant="caption" muted>
+                <AppText variant="caption" color={colors.textMuted}>
                   {phase.weeks} sem · vol. {loadLabels[phase.volume]} · int.{' '}
                   {loadLabels[phase.intensity]}
                 </AppText>
               </View>
             ))}
-            {plan.phases.length > 3 ? (
-              <AppText variant="caption" muted>
-                + {plan.phases.length - 3} fases na visão completa
-              </AppText>
-            ) : null}
           </View>
           <AppButton
             label="Ver periodização completa"
@@ -76,21 +65,7 @@ export default function WorkoutTabScreen() {
             onPress={() => router.push('/preparation')}
           />
         </Card>
-      ) : (
-        <Card style={styles.prepCard}>
-          <AppText variant="h3">Modo preparação</AppText>
-          <AppText variant="body" muted>
-            Vai competir? Ative o modo e monte a periodização completa para o seu esporte.
-          </AppText>
-          <AppButton
-            label="Ativar modo preparação"
-            variant="secondary"
-            onPress={() => router.push('/preparation')}
-          />
-        </Card>
-      )}
-
-      <WorkoutCard workout={workout} onStart={handleStart} />
+      ) : null}
 
       <View style={styles.list}>
         <SectionHeading
@@ -115,19 +90,18 @@ export default function WorkoutTabScreen() {
       </View>
 
       <AppButton
-        label="Como fazer e como não fazer"
+        label="Técnica de execução"
         variant="secondary"
         onPress={() => router.push('/technique')}
-        style={{ marginTop: spacing.sm }}
       />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  prepCard: { gap: spacing.md, marginBottom: spacing.lg },
+  prepCard: { gap: spacing.md, marginTop: spacing.lg },
   prepHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   phaseList: { gap: 6 },
   phaseRow: { gap: 2 },
-  list: { gap: spacing.sm, marginTop: spacing.xl, marginBottom: spacing.xl },
+  list: { gap: spacing.sm, marginTop: spacing.xl, marginBottom: spacing.lg },
 });

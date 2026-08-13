@@ -107,7 +107,7 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 44,
@@ -115,18 +115,18 @@ const styles = StyleSheet.create({
   },
   fullWidth: { width: '100%' },
   sm: { paddingVertical: 10, paddingHorizontal: 14, minHeight: 40 },
-  md: { paddingVertical: 12, paddingHorizontal: 16, minHeight: 44 },
-  lg: { paddingVertical: 16, paddingHorizontal: 20, minHeight: 52 },
+  md: { paddingVertical: 12, paddingHorizontal: 16, minHeight: 48 },
+  lg: { paddingVertical: 16, paddingHorizontal: 20, minHeight: 54 },
   primary: {
     backgroundColor: colors.primary,
     shadowColor: colors.primary,
-    shadowOpacity: 0.32,
-    shadowRadius: 12,
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
   secondary: {
-    backgroundColor: colors.surfaceMedium,
+    backgroundColor: colors.surfaceLight,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -148,10 +148,10 @@ const styles = StyleSheet.create({
   },
   aiFill: {
     width: '100%',
-    minHeight: 52,
+    minHeight: 54,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
   },
   aiContent: {
     paddingVertical: 16,

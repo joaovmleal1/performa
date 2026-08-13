@@ -1,24 +1,24 @@
 import {
+  Bell,
   BookOpen,
   CalendarDays,
-  ChevronRight,
   HelpCircle,
   LogOut,
   Repeat2,
   Scale,
   Target,
+  UserRound,
 } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { PerformaMark } from '@/components/brand/PerformaLogo';
 import {
+  AppButton,
   AppText,
   Avatar,
   Card,
   ListRow,
-  PageHeading,
   Screen,
-  StatusPill,
+  ScreenTitle,
 } from '@/components/ui';
 import { goalLabels } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
@@ -33,70 +33,67 @@ export default function ProfileScreen() {
 
   return (
     <Screen scroll>
-      <PageHeading
-        eyebrow="Conta"
-        title="Perfil"
-        subtitle="Seus dados, metas e preferências."
-        right={<PerformaMark size={38} />}
-      />
+      <ScreenTitle title="Perfil" />
 
       <Card style={styles.identity}>
-        <Avatar name={name} size={68} />
-        <View style={styles.identityCopy}>
-          <AppText variant="h2">{name}</AppText>
-          <AppText variant="caption" muted>
-            @{user?.username ?? 'performa'} · {user?.email ?? '—'}
-          </AppText>
-          <StatusPill
-            label={`${user?.streakDays ?? 0} dias de sequência`}
-            tone="success"
-          />
-        </View>
+        <Avatar name={name} size={72} />
+        <AppText variant="h2" center>
+          {name}
+        </AppText>
+        <AppText variant="caption" color={colors.textMuted} center>
+          @{user?.username ?? 'performa'} · {user?.streakDays ?? 0} dias de sequência
+        </AppText>
+        <AppButton
+          label="Ver meu perfil"
+          variant="secondary"
+          size="md"
+          onPress={() => router.push('/(tabs)/progress')}
+        />
       </Card>
 
-      <AppText variant="label" muted style={styles.sectionLabel}>
-        SEU PLANO
-      </AppText>
       <Card style={styles.group}>
         <ListRow
-          icon={<Target size={18} color={colors.primary} />}
+          icon={<UserRound size={18} color={colors.primary} strokeWidth={1.85} />}
+          title="Dados pessoais"
+          value={`${user?.weightKg ?? '—'} kg`}
+          onPress={() => {}}
+        />
+        <ListRow
+          icon={<Target size={18} color={colors.primary} strokeWidth={1.85} />}
           title="Objetivo"
           value={goalLabels[user?.goal ?? 'definition'] ?? '—'}
         />
         <ListRow
-          icon={<Scale size={18} color={colors.secondary} />}
+          icon={<Scale size={18} color={colors.secondary} strokeWidth={1.85} />}
           title="Medidas"
-          value={`${user?.weightKg ?? '—'} kg · ${user?.heightCm ?? '—'} cm`}
+          value={`${user?.heightCm ?? '—'} cm`}
         />
         <ListRow
-          icon={<Repeat2 size={18} color={colors.info} />}
-          title="Rotina"
-          value={`${user?.trainingDaysPerWeek ?? '—'} treinos/sem`}
+          icon={<Bell size={18} color={colors.info} strokeWidth={1.85} />}
+          title="Notificações"
+          onPress={() => {}}
           last
         />
       </Card>
 
-      <AppText variant="label" muted style={styles.sectionLabel}>
-        RECURSOS
-      </AppText>
       <Card style={styles.group}>
         <ListRow
-          icon={<Repeat2 size={18} color={colors.primary} />}
+          icon={<Repeat2 size={18} color={colors.primary} strokeWidth={1.85} />}
           title="Hábitos diários"
           onPress={() => router.push('/habits')}
         />
         <ListRow
-          icon={<CalendarDays size={18} color={colors.secondary} />}
+          icon={<CalendarDays size={18} color={colors.secondary} strokeWidth={1.85} />}
           title="Calendário"
           onPress={() => router.push('/calendar')}
         />
         <ListRow
-          icon={<BookOpen size={18} color={colors.info} />}
+          icon={<BookOpen size={18} color={colors.info} strokeWidth={1.85} />}
           title="Biblioteca de exercícios"
           onPress={() => router.push('/exercises')}
         />
         <ListRow
-          icon={<HelpCircle size={18} color={colors.primary} />}
+          icon={<HelpCircle size={18} color={colors.primary} strokeWidth={1.85} />}
           title="Ajuda e suporte"
           onPress={() => router.push('/ai')}
           last
@@ -111,11 +108,10 @@ export default function ProfileScreen() {
         accessibilityRole="button"
         style={({ pressed }) => [styles.logout, pressed && { opacity: 0.65 }]}
       >
-        <LogOut size={18} color={colors.error} />
+        <LogOut size={18} color={colors.error} strokeWidth={1.85} />
         <AppText variant="bodyMedium" color={colors.error}>
           Sair da conta
         </AppText>
-        <ChevronRight size={18} color={colors.error} />
       </Pressable>
     </Screen>
   );
@@ -123,27 +119,20 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   identity: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.lg,
+    gap: spacing.sm,
     marginBottom: spacing.xl,
   },
-  identityCopy: { flex: 1, gap: spacing.xs },
-  sectionLabel: {
-    letterSpacing: 1,
-    marginBottom: spacing.sm,
-    marginTop: spacing.sm,
-  },
   group: {
-    paddingVertical: 0,
+    paddingVertical: spacing.xs,
     marginBottom: spacing.lg,
   },
   logout: {
     minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    paddingHorizontal: spacing.md,
+    justifyContent: 'center',
+    gap: spacing.sm,
     marginTop: spacing.sm,
     marginBottom: spacing.xl,
   },

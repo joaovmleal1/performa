@@ -5,28 +5,42 @@ import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
 import { colors, radius, spacing } from '@/theme';
 import { AppText } from './AppText';
 
-export function PageHeading({
+/** Saudação do dashboard — board 04 */
+export function Greeting({
+  name,
+  subtitle,
+}: {
+  name: string;
+  subtitle?: string;
+}) {
+  return (
+    <View style={styles.greeting}>
+      <AppText variant="h1">Olá, {name}!</AppText>
+      {subtitle ? (
+        <AppText variant="body" color={colors.textSecondary}>
+          {subtitle}
+        </AppText>
+      ) : null}
+    </View>
+  );
+}
+
+/** Título de tela sem eyebrow de marketing */
+export function ScreenTitle({
   title,
   subtitle,
-  eyebrow,
   right,
 }: {
   title: string;
   subtitle?: string;
-  eyebrow?: string;
   right?: ReactNode;
 }) {
   return (
-    <View style={styles.pageHeading}>
-      <View style={styles.pageCopy}>
-        {eyebrow ? (
-          <AppText variant="caption" color={colors.primary} style={styles.eyebrow}>
-            {eyebrow}
-          </AppText>
-        ) : null}
+    <View style={styles.screenTitle}>
+      <View style={styles.screenTitleCopy}>
         <AppText variant="h1">{title}</AppText>
         {subtitle ? (
-          <AppText variant="body" muted>
+          <AppText variant="body" color={colors.textSecondary}>
             {subtitle}
           </AppText>
         ) : null}
@@ -34,6 +48,20 @@ export function PageHeading({
       {right}
     </View>
   );
+}
+
+/** @deprecated use ScreenTitle / Greeting */
+export function PageHeading({
+  title,
+  subtitle,
+  right,
+}: {
+  title: string;
+  subtitle?: string;
+  eyebrow?: string;
+  right?: ReactNode;
+}) {
+  return <ScreenTitle title={title} subtitle={subtitle} right={right} />;
 }
 
 export function SectionHeading({
@@ -64,56 +92,6 @@ export function SectionHeading({
   );
 }
 
-export function IconTile({
-  icon,
-  title,
-  subtitle,
-  onPress,
-  accent = 'green',
-  style,
-}: {
-  icon: ReactNode;
-  title: string;
-  subtitle?: string;
-  onPress: () => void;
-  accent?: 'green' | 'purple' | 'blue';
-  style?: ViewStyle;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={title}
-      style={({ pressed }) => [
-        styles.tile,
-        accent === 'purple' && styles.tilePurple,
-        accent === 'blue' && styles.tileBlue,
-        pressed && styles.pressed,
-        style,
-      ]}
-    >
-      <View
-        style={[
-          styles.tileIcon,
-          accent === 'purple' && { backgroundColor: colors.secondaryMuted },
-          accent === 'blue' && { backgroundColor: 'rgba(92,140,255,0.16)' },
-        ]}
-      >
-        {icon}
-      </View>
-      <View style={{ flex: 1, gap: 2 }}>
-        <AppText variant="bodyMedium">{title}</AppText>
-        {subtitle ? (
-          <AppText variant="caption" muted numberOfLines={2}>
-            {subtitle}
-          </AppText>
-        ) : null}
-      </View>
-      <ChevronRight size={18} color={colors.textMuted} strokeWidth={1.8} />
-    </Pressable>
-  );
-}
-
 export function ListRow({
   icon,
   title,
@@ -139,13 +117,13 @@ export function ListRow({
           {title}
         </AppText>
         {subtitle ? (
-          <AppText variant="caption" muted>
+          <AppText variant="caption" color={colors.textMuted}>
             {subtitle}
           </AppText>
         ) : null}
       </View>
       {value ? (
-        <AppText variant="label" muted>
+        <AppText variant="label" color={colors.textSecondary}>
           {value}
         </AppText>
       ) : null}
@@ -153,7 +131,7 @@ export function ListRow({
         <ChevronRight
           size={18}
           color={destructive ? colors.error : colors.textMuted}
-          strokeWidth={1.8}
+          strokeWidth={1.85}
         />
       ) : null}
     </>
@@ -213,73 +191,109 @@ export function StatusPill({
   );
 }
 
+/** Mantido só para compat; não usar em layouts novos */
+export function IconTile({
+  icon,
+  title,
+  subtitle,
+  onPress,
+  style,
+}: {
+  icon: ReactNode;
+  title: string;
+  subtitle?: string;
+  onPress: () => void;
+  accent?: 'green' | 'purple' | 'blue';
+  style?: ViewStyle;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      style={({ pressed }) => [styles.legacyTile, pressed && styles.rowPressed, style]}
+    >
+      <View style={styles.legacyIcon}>{icon}</View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <AppText variant="bodyMedium">{title}</AppText>
+        {subtitle ? (
+          <AppText variant="caption" color={colors.textMuted} numberOfLines={2}>
+            {subtitle}
+          </AppText>
+        ) : null}
+      </View>
+      <ChevronRight size={18} color={colors.textMuted} strokeWidth={1.85} />
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  pageHeading: {
+  greeting: {
+    gap: spacing.xs,
+    marginTop: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  screenTitle: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: spacing.md,
     marginTop: spacing.md,
     marginBottom: spacing.xl,
   },
-  pageCopy: { flex: 1, gap: spacing.xs },
-  eyebrow: {
-    fontFamily: 'Sora_600SemiBold',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-  },
+  screenTitleCopy: { flex: 1, gap: spacing.xs },
   sectionHeading: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
   },
-  tile: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.md,
-    minHeight: 76,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: 'rgba(0,255,133,0.18)',
-    backgroundColor: colors.surfaceMedium,
-  },
-  tilePurple: { borderColor: 'rgba(123,92,255,0.25)' },
-  tileBlue: { borderColor: 'rgba(92,140,255,0.22)' },
-  tileIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: radius.md,
-    backgroundColor: colors.primaryMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pressed: { opacity: 0.88, transform: [{ scale: 0.985 }] },
   listRow: {
-    minHeight: 58,
+    minHeight: 56,
     paddingVertical: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
   },
-  listBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
+  listBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
   rowIcon: {
-    width: 34,
-    height: 34,
+    width: 36,
+    height: 36,
     borderRadius: radius.sm,
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.surfaceMedium,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowPressed: { opacity: 0.68 },
+  rowPressed: { opacity: 0.7 },
   pill: {
     alignSelf: 'flex-start',
     borderRadius: radius.full,
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.surfaceMedium,
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
   pillSuccess: { backgroundColor: colors.primaryMuted },
   pillPurple: { backgroundColor: colors.secondaryMuted },
   pillWarning: { backgroundColor: 'rgba(255,202,58,0.14)' },
+  legacyTile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    minHeight: 72,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surfaceLight,
+  },
+  legacyIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMedium,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

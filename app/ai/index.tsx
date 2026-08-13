@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { MessageCircle, Send, Sparkles } from 'lucide-react-native';
+import { Send } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 
+import { AIOrb } from '@/components/brand/PerformaLogo';
 import { AppText, ScreenHeader } from '@/components/ui';
 import { useAIStore } from '@/stores/ai-store';
 import { colors, gradients, radius, spacing } from '@/theme';
@@ -61,11 +62,9 @@ export default function AIScreen() {
         >
           {showEmptyHints ? (
             <View style={styles.emptyState}>
-              <View style={styles.emptyIcon}>
-                <MessageCircle size={28} color={colors.primary} />
-              </View>
+              <AIOrb size={96} />
               <AppText variant="h3">Como posso ajudar?</AppText>
-              <AppText variant="caption" muted style={styles.emptyText}>
+              <AppText variant="caption" color={colors.textSecondary} style={styles.emptyText}>
                 Pergunte sobre execução, organização do treino, recuperação ou seu planejamento.
               </AppText>
               <View style={styles.suggestions}>
@@ -89,8 +88,8 @@ export default function AIScreen() {
             >
               {msg.role === 'assistant' ? (
                 <View style={styles.aiLabel}>
-                  <Sparkles size={12} color={colors.primary} />
-                  <AppText variant="caption" color={colors.primary}>
+                  <AIOrb size={22} />
+                  <AppText variant="caption" color={colors.secondary}>
                     PERFORMA
                   </AppText>
                 </View>
@@ -168,21 +167,17 @@ const styles = StyleSheet.create({
   subtitle: { paddingHorizontal: spacing.lg, marginBottom: spacing.sm },
   chat: { flex: 1 },
   chatContent: { padding: spacing.lg, paddingBottom: spacing.sm, gap: spacing.sm },
-  emptyState: { alignItems: 'center', paddingTop: spacing.lg, paddingHorizontal: spacing.sm, gap: spacing.sm },
-  emptyIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.lg,
-    backgroundColor: colors.primaryMuted,
+  emptyState: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
+    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.sm,
+    gap: spacing.sm,
   },
   emptyText: { textAlign: 'center', marginBottom: spacing.md },
   suggestions: { width: '100%', gap: spacing.sm },
   suggestionChip: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.md,
+    backgroundColor: colors.surfaceLight,
+    borderRadius: radius.lg,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.border,
@@ -198,11 +193,11 @@ const styles = StyleSheet.create({
   },
   aiBubble: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.surfaceMedium,
+    backgroundColor: colors.surfaceLight,
     borderWidth: 1,
     borderColor: colors.border,
   },
-  aiLabel: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
+  aiLabel: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 },
   bubbleText: { lineHeight: 21 },
   bubbleTime: { marginTop: 6, alignSelf: 'flex-end' },
   typingBubble: { flexDirection: 'row', alignItems: 'center', gap: 10 },
@@ -217,8 +212,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: colors.surfaceMedium,
-    borderRadius: radius.md,
+    backgroundColor: colors.surfaceLight,
+    borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
     fontSize: 15,
@@ -228,11 +223,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  sendBtnShell: { borderRadius: radius.md, overflow: 'hidden' },
+  sendBtnShell: { borderRadius: radius.lg, overflow: 'hidden' },
   sendBtn: {
     width: 44,
     height: 44,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },

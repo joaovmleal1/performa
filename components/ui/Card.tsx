@@ -58,8 +58,9 @@ export function Card({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surfaceMedium,
-    borderRadius: radius.md,
+    // Board: cards em #2A2A33 com cantos ~16–20
+    backgroundColor: colors.surfaceLight,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
@@ -68,18 +69,10 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   glowGreen: {
-    shadowColor: colors.primary,
-    shadowOpacity: 0.16,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 0 },
-    borderColor: 'rgba(0,255,133,0.28)',
+    borderColor: 'rgba(0,255,133,0.35)',
   },
   glowPurple: {
-    shadowColor: colors.secondary,
-    shadowOpacity: 0.2,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 0 },
-    borderColor: 'rgba(123,92,255,0.32)',
+    borderColor: 'rgba(123,92,255,0.4)',
   },
   pressed: { opacity: 0.92, transform: [{ scale: 0.99 }] },
 });

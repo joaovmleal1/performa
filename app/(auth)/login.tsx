@@ -34,13 +34,7 @@ export default function LoginScreen() {
   return (
     <Screen scroll>
       <View style={styles.top}>
-        <PerformaLogo size={64} />
-        <AppText variant="h1" style={{ marginTop: spacing['2xl'] }}>
-          Bem-vindo de volta!
-        </AppText>
-        <AppText variant="body" muted style={{ marginTop: spacing.sm }}>
-          Entre para continuar sua evolução.
-        </AppText>
+        <PerformaLogo size={72} />
       </View>
 
       <Controller
@@ -99,29 +93,32 @@ export default function LoginScreen() {
         onPress={() => router.push('/(auth)/register')}
         style={styles.register}
       >
-        <AppText variant="body" muted center>
+        <AppText variant="body" color={colors.textSecondary} center>
           Não tem conta?{' '}
           <AppText variant="bodyMedium" color={colors.primary}>
             Criar conta
           </AppText>
         </AppText>
       </Pressable>
-
-      <AppText variant="caption" muted center style={styles.legal}>
-        Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade.
-      </AppText>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  top: { marginTop: spacing['2xl'], marginBottom: spacing['3xl'], alignItems: 'center' },
+  top: {
+    marginTop: spacing['3xl'],
+    marginBottom: spacing['3xl'],
+    alignItems: 'center',
+  },
   forgot: {
     alignSelf: 'flex-end',
     marginBottom: spacing.xl,
     minHeight: 44,
     justifyContent: 'center',
   },
-  register: { marginTop: spacing['2xl'], minHeight: 44, justifyContent: 'center' },
-  legal: { marginTop: spacing.xl, paddingHorizontal: spacing.lg },
+  register: {
+    marginTop: spacing['2xl'],
+    minHeight: 44,
+    justifyContent: 'center',
+  },
 });

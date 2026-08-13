@@ -165,12 +165,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   avatar: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   aiBanner: {
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     borderWidth: 1,
     borderColor: 'rgba(123,92,255,0.35)',

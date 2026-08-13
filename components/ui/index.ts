@@ -25,6 +25,8 @@ export { MealCard, NutritionCard } from './MealCards';
 export { Logo, ChartCard, EmptyState, Skeleton, Avatar } from './Misc';
 export { Tabs, SegmentedControl } from './Tabs';
 export {
+  Greeting,
+  ScreenTitle,
   PageHeading,
   SectionHeading,
   IconTile,

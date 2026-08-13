@@ -1,16 +1,11 @@
 import { Tabs } from 'expo-router';
 import { Apple, Dumbbell, Home, LineChart, User } from 'lucide-react-native';
-import type { ReactNode } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '@/theme';
 
 const ICON_STROKE = 1.85;
-
-function TabIcon({ focused, children }: { focused: boolean; children: ReactNode }) {
-  return <View style={[styles.icon, focused && styles.iconActive]}>{children}</View>;
-}
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
@@ -22,12 +17,12 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.tabActive,
         tabBarInactiveTintColor: colors.tabInactive,
         tabBarStyle: {
-          backgroundColor: colors.backgroundElevated,
+          backgroundColor: colors.surfaceDark,
           borderTopColor: colors.border,
           borderTopWidth: StyleSheet.hairlineWidth,
-          height: 62 + Math.max(insets.bottom, 8),
-          paddingTop: 8,
-          paddingBottom: Math.max(insets.bottom, 8),
+          height: 64 + Math.max(insets.bottom, 6),
+          paddingTop: 6,
+          paddingBottom: Math.max(insets.bottom, 6),
           ...(Platform.OS === 'web'
             ? {
                 maxWidth: 520,
@@ -41,7 +36,7 @@ export default function TabsLayout() {
         tabBarLabelStyle: {
           fontFamily: 'Sora_500Medium',
           fontSize: 11,
-          letterSpacing: 0.2,
+          letterSpacing: 0.15,
         },
         tabBarHideOnKeyboard: true,
       }}
@@ -50,10 +45,8 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Início',
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused}>
-              <Home color={color} size={size - 2} strokeWidth={ICON_STROKE} />
-            </TabIcon>
+          tabBarIcon: ({ color, size }) => (
+            <Home color={color} size={size - 2} strokeWidth={ICON_STROKE} />
           ),
         }}
       />
@@ -61,10 +54,8 @@ export default function TabsLayout() {
         name="workout"
         options={{
           title: 'Treino',
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused}>
-              <Dumbbell color={color} size={size - 2} strokeWidth={ICON_STROKE} />
-            </TabIcon>
+          tabBarIcon: ({ color, size }) => (
+            <Dumbbell color={color} size={size - 2} strokeWidth={ICON_STROKE} />
           ),
         }}
       />
@@ -72,10 +63,8 @@ export default function TabsLayout() {
         name="nutrition"
         options={{
           title: 'Nutrição',
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused}>
-              <Apple color={color} size={size - 2} strokeWidth={ICON_STROKE} />
-            </TabIcon>
+          tabBarIcon: ({ color, size }) => (
+            <Apple color={color} size={size - 2} strokeWidth={ICON_STROKE} />
           ),
         }}
       />
@@ -83,10 +72,8 @@ export default function TabsLayout() {
         name="progress"
         options={{
           title: 'Progresso',
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused}>
-              <LineChart color={color} size={size - 2} strokeWidth={ICON_STROKE} />
-            </TabIcon>
+          tabBarIcon: ({ color, size }) => (
+            <LineChart color={color} size={size - 2} strokeWidth={ICON_STROKE} />
           ),
         }}
       />
@@ -94,26 +81,11 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon focused={focused}>
-              <User color={color} size={size - 2} strokeWidth={ICON_STROKE} />
-            </TabIcon>
+          tabBarIcon: ({ color, size }) => (
+            <User color={color} size={size - 2} strokeWidth={ICON_STROKE} />
           ),
         }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  icon: {
-    width: 34,
-    height: 30,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconActive: {
-    backgroundColor: colors.primaryMuted,
-  },
-});
