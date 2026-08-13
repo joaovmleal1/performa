@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Droplets, Sparkles } from 'lucide-react-native';
+import { Droplets, Lock, Sparkles } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
@@ -10,6 +10,7 @@ import {
   ProgressRing,
   Screen,
 } from '@/components/ui';
+import { useAuthStore } from '@/stores/auth-store';
 import { useNutritionStore } from '@/stores/nutrition-store';
 import { colors, spacing } from '@/theme';
 
@@ -18,6 +19,10 @@ export default function NutritionTabScreen() {
   const daily = useNutritionStore((s) => s.daily);
   const hasDietPlan = useNutritionStore((s) => s.hasDietPlan);
   const addWater = useNutritionStore((s) => s.addWater);
+  const user = useAuthStore((s) => s.user);
+  const unlockDietBuilder = useAuthStore((s) => s.unlockDietBuilder);
+
+  const dietUnlocked = Boolean(user?.dietBuilderUnlocked || hasDietPlan);
   const calorieProgress =
     daily.target.calories > 0 ? daily.consumed.calories / daily.target.calories : 0;
 
@@ -113,19 +118,40 @@ export default function NutritionTabScreen() {
           label="Ver plano alimentar"
           onPress={() => router.push('/nutrition/meal-plan')}
         />
-      ) : (
+      ) : dietUnlocked ? (
         <Card accent="purple" style={styles.aiCard}>
           <View style={styles.aiHeader}>
             <Sparkles size={18} color={colors.secondary} />
             <AppText variant="h3">Dieta com IA</AppText>
           </View>
           <AppText variant="body" muted>
-            Gere um plano personalizado com base na sua rotina e preferências.
+            Montagem desbloqueada. Gere um plano personalizado com base na sua rotina e
+            preferências.
           </AppText>
           <AppButton
-            label="Criar dieta com IA"
+            label="Montar minha dieta"
             variant="ai"
             onPress={() => router.push('/nutrition/ai-diet')}
+          />
+        </Card>
+      ) : (
+        <Card style={styles.aiCard}>
+          <View style={styles.aiHeader}>
+            <Lock size={18} color={colors.textMuted} />
+            <AppText variant="h3">Montagem de dieta</AppText>
+          </View>
+          <AppText variant="body" muted>
+            {user?.dietInterest === 'already_doing'
+              ? 'Você indicou que já faz dieta. Se quiser, pode montar um plano com a gente a qualquer momento.'
+              : 'Na entrevista inicial você optou por não montar a dieta agora. Libere quando quiser.'}
+          </AppText>
+          <AppButton
+            label="Quero montar minha dieta"
+            variant="secondary"
+            onPress={() => {
+              unlockDietBuilder();
+              router.push('/nutrition/ai-diet');
+            }}
           />
         </Card>
       )}

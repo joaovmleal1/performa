@@ -2,8 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { buildPeriodization } from '@/lib/periodization';
 import { mockUser } from '@/data/mock';
-import type { UserProfile } from '@/types';
+import type { PeriodizationPlan, UserProfile } from '@/types';
 
 type AuthState = {
   isHydrated: boolean;
@@ -19,6 +20,13 @@ type AuthState = {
   register: (name: string, email: string, _password: string) => Promise<void>;
   completeEvaluation: (partial?: Partial<UserProfile>) => void;
   completeAssessment: (partial?: Partial<UserProfile>) => void;
+  unlockDietBuilder: () => void;
+  activatePreparationMode: (input: {
+    sport: string;
+    competitionName: string;
+    competitionDate: string;
+  }) => PeriodizationPlan;
+  deactivatePreparationMode: () => void;
   logout: () => void;
   updateUser: (partial: Partial<UserProfile>) => void;
   skipToApp: () => void;
@@ -76,14 +84,85 @@ export const useAuthStore = create<AuthState>()(
       },
       completeEvaluation: (partial = {}) => {
         const current = get().user ?? mockUser;
+        const dietInterest = partial.dietInterest ?? current.dietInterest;
+        const dietBuilderUnlocked =
+          typeof partial.dietBuilderUnlocked === 'boolean'
+            ? partial.dietBuilderUnlocked
+            : dietInterest === 'want_with_us' || Boolean(current.dietBuilderUnlocked);
+
+        let periodization = partial.periodization ?? current.periodization ?? null;
+        const preparationMode = partial.preparationMode ?? false;
+        if (
+          preparationMode &&
+          partial.preparationSport &&
+          partial.competitionName &&
+          partial.competitionDate
+        ) {
+          periodization = buildPeriodization({
+            sport: partial.preparationSport,
+            competitionName: partial.competitionName,
+            competitionDate: partial.competitionDate,
+          });
+        }
+
         set({
           hasCompletedEvaluation: true,
           hasCompletedAssessment: true,
-          user: withNames({ ...partial, assessmentCompleted: true }, current),
+          user: withNames(
+            {
+              ...partial,
+              assessmentCompleted: true,
+              evaluationCompleted: true,
+              dietInterest,
+              dietBuilderUnlocked: Boolean(dietBuilderUnlocked),
+              preparationMode,
+              periodization,
+            },
+            current,
+          ),
         });
       },
       completeAssessment: (partial = {}) => {
         get().completeEvaluation(partial);
+      },
+      unlockDietBuilder: () => {
+        const current = get().user;
+        if (!current) return;
+        set({
+          user: {
+            ...current,
+            dietBuilderUnlocked: true,
+            dietInterest: current.dietInterest ?? 'want_with_us',
+          },
+        });
+      },
+      activatePreparationMode: (input) => {
+        const current = get().user ?? mockUser;
+        const periodization = buildPeriodization(input);
+        set({
+          user: withNames(
+            {
+              preparationMode: true,
+              preparationSport: input.sport,
+              competitionName: input.competitionName,
+              competitionDate: input.competitionDate,
+              periodization,
+            },
+            current,
+          ),
+        });
+        return periodization;
+      },
+      deactivatePreparationMode: () => {
+        const current = get().user;
+        if (!current) return;
+        set({
+          user: {
+            ...current,
+            preparationMode: false,
+            periodization: null,
+          },
+        });
       },
       logout: () =>
         set({

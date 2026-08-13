@@ -28,8 +28,13 @@ export const mockUser: UserProfile = {
   sessionDurationMin: 60,
   restrictions: [],
   streakDays: 7,
+  dietInterest: 'want_with_us',
+  dietBuilderUnlocked: true,
+  preparationMode: false,
+  periodization: null,
   onboardingCompleted: true,
   assessmentCompleted: true,
+  evaluationCompleted: true,
   units: { weight: 'kg', height: 'cm' },
 };
 

@@ -66,6 +66,7 @@ export default function RootLayout() {
           <Stack.Screen name="workout/session" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="exercises" />
           <Stack.Screen name="technique" />
+          <Stack.Screen name="preparation" />
           <Stack.Screen name="nutrition" />
           <Stack.Screen name="habits/index" />
           <Stack.Screen name="calendar/index" />
