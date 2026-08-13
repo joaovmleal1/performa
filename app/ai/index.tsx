@@ -1,4 +1,4 @@
-import { BookOpen, Send, Sparkles } from 'lucide-react-native';
+import { BookOpen, Send, Settings, Sparkles } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 
 import { AppText, ScreenHeader } from '@/components/ui';
 import { useAIStore } from '@/stores/ai-store';
+import { useSettingsStore } from '@/stores/settings-store';
 import { colors, radius, spacing } from '@/theme';
 
 export default function AIScreen() {
@@ -25,6 +27,7 @@ export default function AIScreen() {
   const isTyping = useAIStore((s) => s.isTyping);
   const send = useAIStore((s) => s.send);
   const suggestions = useAIStore((s) => s.suggestions());
+  const hasKey = useSettingsStore((s) => s.hasOpenRouterKey());
 
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
@@ -42,9 +45,20 @@ export default function AIScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScreenHeader title="Coach Especialista" showBack />
+      <View style={styles.headerRow}>
+        <View style={{ flex: 1 }}>
+          <ScreenHeader title="Coach Especialista" showBack />
+        </View>
+        <Pressable
+          onPress={() => router.push('/ai/settings')}
+          style={styles.settingsBtn}
+          hitSlop={10}
+        >
+          <Settings size={18} color={colors.text} />
+        </Pressable>
+      </View>
       <AppText variant="caption" muted style={styles.subtitle}>
-        EF · Fisioterapia · Musculação · Periodização
+        {hasKey ? 'OpenRouter + base científica' : 'Modo local · configure OpenRouter'} · EF · Fisio · Musculação
       </AppText>
 
       <KeyboardAvoidingView
@@ -91,7 +105,7 @@ export default function AIScreen() {
                 <View style={styles.aiLabel}>
                   <Sparkles size={12} color={colors.primary} />
                   <AppText variant="caption" color={colors.primary}>
-                    Coach
+                    Coach{msg.provider === 'openrouter' ? ' · OpenRouter' : msg.provider === 'local' ? ' · local' : ''}
                   </AppText>
                 </View>
               ) : null}
@@ -164,6 +178,16 @@ export default function AIScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
+  headerRow: { flexDirection: 'row', alignItems: 'center', paddingRight: spacing.md },
+  settingsBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.sm,
+  },
   subtitle: { paddingHorizontal: spacing.lg, marginBottom: spacing.sm },
   chat: { flex: 1 },
   chatContent: { padding: spacing.lg, paddingBottom: spacing.sm, gap: spacing.sm },

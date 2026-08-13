@@ -1,15 +1,22 @@
 import { retrieveKnowledge, knowledgeSources } from '@/data/knowledge';
 import { buildPeriodization } from '@/lib/periodization';
+import { openRouterChat } from '@/services/openrouter';
 import type { PeriodizationPlan, UserProfile } from '@/types';
 
 export type CoachContext = {
   user?: UserProfile | null;
   hasDietPlan?: boolean;
+  /** Se informado, usa OpenRouter com RAG; senão cai no motor local. */
+  openRouterApiKey?: string;
+  openRouterModel?: string;
+  preferCloud?: boolean;
 };
 
 export type CoachAnswer = {
   content: string;
   sources: string[];
+  provider?: 'openrouter' | 'local';
+  model?: string;
 };
 
 export type CoachMessage = {
@@ -193,8 +200,7 @@ function summarizeBullets(text: string, max = 4): string {
   return unique.map((s) => `• ${s}`).join('\n');
 }
 
-/** Resposta do agente especialista (RAG local sobre cânone + estudos). */
-export function coachAnswer(question: string, context: CoachContext = {}): CoachAnswer {
+function buildRetrieval(question: string, context: CoachContext) {
   const enrichedQuery = [
     question,
     context.user?.goal,
@@ -204,12 +210,92 @@ export function coachAnswer(question: string, context: CoachContext = {}): Coach
     .filter(Boolean)
     .join(' ');
 
-  const chunks = retrieveKnowledge(enrichedQuery, 6);
+  const chunks = retrieveKnowledge(enrichedQuery, 8);
   const texts = chunks.map((c) => `[${c.title}] ${c.content}`);
+  return { chunks, texts };
+}
+
+function systemPromptForCloud(user?: UserProfile | null): string {
+  return [
+    'Você é o PERFORMA Coach, especialista em educação física, fisioterapia esportiva, musculação e periodização.',
+    'Responda em português do Brasil, de forma prática e segura.',
+    'Use PRIORITARIAMENTE o contexto científico fornecido (RAG). Se faltar dado do aluno, peça ou declare premissa.',
+    'Não diagnostique doenças nem substitua médico/fisioterapeuta.',
+    'Estruture com bullets curtos quando útil. Inclua aplicação prática ao perfil do aluno.',
+    `Perfil do aluno: ${profileSummary(user)}`,
+  ].join('\n');
+}
+
+/** Resposta local (RAG + templates) — funciona sem API. */
+export function coachAnswerLocal(question: string, context: CoachContext = {}): CoachAnswer {
+  const { chunks, texts } = buildRetrieval(question, context);
   return {
     content: synthesizeFromChunks(question, texts, context.user),
     sources: sourceLabels(chunks),
+    provider: 'local',
   };
+}
+
+/** Compat síncrona. */
+export function coachAnswer(question: string, context: CoachContext = {}): CoachAnswer {
+  return coachAnswerLocal(question, context);
+}
+
+/**
+ * Resposta do Coach: OpenRouter (quando há key) + contexto RAG,
+ * com fallback automático para o motor local.
+ */
+export async function coachAnswerAsync(
+  question: string,
+  context: CoachContext = {},
+): Promise<CoachAnswer> {
+  const { chunks, texts } = buildRetrieval(question, context);
+  const sources = sourceLabels(chunks);
+  const apiKey = context.openRouterApiKey?.trim();
+  const preferCloud = context.preferCloud !== false;
+
+  if (apiKey && preferCloud) {
+    const knowledgeBlock = texts
+      .map((t, i) => `(${i + 1}) ${t}`)
+      .join('\n\n')
+      .slice(0, 9000);
+
+    const cloud = await openRouterChat({
+      apiKey,
+      model: context.openRouterModel,
+      messages: [
+        { role: 'system', content: systemPromptForCloud(context.user) },
+        {
+          role: 'user',
+          content: [
+            'CONTEXTO CIENTÍFICO (use como base):',
+            knowledgeBlock,
+            '',
+            `PERGUNTA DO ALUNO: ${question}`,
+            '',
+            'Responda como coach especialista. Ao final, uma linha: "Fontes usadas: ..." listando 2–4 títulos do contexto.',
+          ].join('\n'),
+        },
+      ],
+    });
+
+    if (cloud.ok) {
+      return {
+        content: `${cloud.content}\n\n${DISCLAIMER}`,
+        sources: [...sources, `OpenRouter · ${cloud.model}`],
+        provider: 'openrouter',
+        model: cloud.model,
+      };
+    }
+
+    const local = coachAnswerLocal(question, context);
+    return {
+      ...local,
+      content: `${local.content}\n\n(Modo local — OpenRouter indisponível: ${cloud.error})`,
+    };
+  }
+
+  return coachAnswerLocal(question, context);
 }
 
 /** Periodização enriquecida com notas do Coach a partir da base de conhecimento. */

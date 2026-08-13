@@ -1,12 +1,17 @@
 import studiesJson from './studies-chunks.json';
 import { expertCanon, type KnowledgeChunk } from './expert-canon';
+import { webScienceChunks } from './web-science';
 
 export type { KnowledgeChunk };
 
 const studyChunks = studiesJson as KnowledgeChunk[];
 
-/** Corpus completo: cânone científico + estudos carregados (Brunaccioni + Fisico Spartano). */
-export const knowledgeCorpus: KnowledgeChunk[] = [...expertCanon, ...studyChunks];
+/** Corpus: cânone + literatura web (ACSM/NSCA/etc.) + estudos PDF. */
+export const knowledgeCorpus: KnowledgeChunk[] = [
+  ...expertCanon,
+  ...webScienceChunks,
+  ...studyChunks,
+];
 
 export const knowledgeSources = [
   {
@@ -23,6 +28,36 @@ export const knowledgeSources = [
     id: 'canon_ef',
     title: 'Cânone PERFORMA — educação física, musculação e fisioterapia esportiva',
     origin: 'internal_canon',
+  },
+  {
+    id: 'web_acsm_2026',
+    title: 'ACSM 2026 Position Stand — Resistance Training (overview de revisões)',
+    origin: 'https://acsm.org/resistance-training-guidelines-update-2026/',
+  },
+  {
+    id: 'web_schoenfeld',
+    title: 'Schoenfeld et al. — volume e frequência para hipertrofia (meta-análises)',
+    origin: 'https://doi.org/10.1080/02640414.2016.1210197',
+  },
+  {
+    id: 'web_nsca',
+    title: 'NSCA / S&C Journal — periodização, taper e deload',
+    origin: 'https://www.nsca.com/',
+  },
+  {
+    id: 'web_ioc_bjsm',
+    title: 'IOC consensus (BJSM) — load management e risco de lesão',
+    origin: 'https://bjsm.bmj.com/content/50/17/1030',
+  },
+  {
+    id: 'web_nutrition_science',
+    title: 'Nutrição esportiva aplicada (proteína/energia para RT)',
+    origin: 'internal_synthesis_from_public_consensus',
+  },
+  {
+    id: 'web_physio',
+    title: 'Fisioterapia esportiva — dor, DOMS e modificação de treino',
+    origin: 'internal_synthesis_from_public_consensus',
   },
 ];
 
@@ -52,8 +87,8 @@ export function retrieveKnowledge(query: string, limit = 6): KnowledgeChunk[] {
         score += 2;
       }
     }
-    // leve prioridade ao cânone para respostas estáveis
     if (chunk.source.startsWith('canon')) score += 0.5;
+    if (chunk.source.startsWith('web_')) score += 0.35;
     return { chunk, score };
   });
 

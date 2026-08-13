@@ -52,9 +52,15 @@ export default function ProfileScreen() {
         style={{ marginTop: spacing.sm }}
       />
       <AppButton
-        label="PERFORMA AI"
+        label="Coach Especialista"
         variant="ai"
         onPress={() => router.push('/ai')}
+        style={{ marginTop: spacing.sm }}
+      />
+      <AppButton
+        label="Configurar OpenRouter"
+        variant="secondary"
+        onPress={() => router.push('/ai/settings')}
         style={{ marginTop: spacing.sm }}
       />
       <AppButton

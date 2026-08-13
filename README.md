@@ -59,13 +59,22 @@ types/               # entidades do domínio
 
 ## Coach Especialista
 
-Agente de suporte e periodização em `/ai` (`services/coach-agent.ts`), com RAG local sobre:
+Agente de suporte e periodização em `/ai` (`services/coach-agent.ts`), com RAG local + opcional **OpenRouter**.
+
+Base de conhecimento (`data/knowledge/`):
 
 - cânone interno (EF / fisioterapia esportiva / musculação)
+- literatura web curada (ACSM 2026, Schoenfeld, NSCA taper/deload, IOC/BJSM load)
 - *Guida Completa Massa Muscolare* (Brunaccioni / V Athlete–InVictus)
 - *Allenamento a Casa* (Fisico Spartano, via Dhoze)
 
-Chunks em `data/knowledge/`. A periodização do modo preparação (`/preparation`) usa o mesmo motor.
+### OpenRouter
+
+1. Crie a key em https://openrouter.ai/keys  
+2. Cole em **Perfil → Configurar OpenRouter** (ou `EXPO_PUBLIC_OPENROUTER_API_KEY` no `.env`)  
+3. Escolha o modelo (padrão: `openai/gpt-4o-mini`)
+
+Sem key, o Coach continua no modo local. Com key, cada pergunta envia trechos RAG como contexto ao LLM.
 
 ## Fluxo
 
