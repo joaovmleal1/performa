@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
 
 import { PerformaMark } from '@/components/brand/PerformaLogo';
-import { colors, gradients, radius, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 
 import { Card } from './Card';
 import { AppText } from './AppText';
