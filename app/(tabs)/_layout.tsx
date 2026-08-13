@@ -116,8 +116,9 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   label: {
     fontFamily: 'Sora_500Medium',
-    fontSize: 10,
-    letterSpacing: -0.2,
+    fontSize: 9,
+    letterSpacing: -0.3,
     marginTop: 2,
+    textAlign: 'center',
   },
 });

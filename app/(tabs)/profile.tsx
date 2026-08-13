@@ -58,13 +58,12 @@ export default function ProfileScreen() {
         </AppText>
         <AppButton
           label="Ver meu perfil"
-          size="md"
           onPress={() => router.push('/(tabs)/progress')}
           style={styles.cta}
         />
       </View>
 
-      <Card style={styles.menu}>
+      <Card style={styles.menu} padded={false}>
         <ListRow
           icon={<UserRound {...ICON} />}
           title="Dados pessoais"
