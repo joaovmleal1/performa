@@ -48,3 +48,4 @@ yarn-error.*
 
 # Exercise media (downloaded from Google Drive; run npm run download:exercises)
 public/exercises/
+.vercel

@@ -59,6 +59,12 @@ export default function WorkoutTabScreen() {
         onPress={() => router.push('/exercises')}
         style={{ marginTop: spacing.sm }}
       />
+      <AppButton
+        label="Como fazer e como não fazer"
+        variant="secondary"
+        onPress={() => router.push('/technique')}
+        style={{ marginTop: spacing.sm }}
+      />
     </Screen>
   );
 }

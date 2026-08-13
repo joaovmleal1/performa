@@ -147,8 +147,20 @@ export default function DashboardScreen() {
 
       <Card
         accent="purple"
+        onPress={() => router.push('/technique')}
+        accessibilityLabel="Abrir técnica de execução"
+      >
+        <AppText variant="h3">Como fazer e como não fazer</AppText>
+        <AppText variant="caption" muted>
+          400+ vídeos de técnica certa e erros comuns
+        </AppText>
+      </Card>
+
+      <Card
+        accent="purple"
         onPress={() => router.push('/habits')}
         accessibilityLabel="Abrir hábitos"
+        style={{ marginTop: spacing.md }}
       >
         <AppText variant="h3">Hábitos diários</AppText>
         <AppText variant="caption" muted>
