@@ -1,7 +1,6 @@
-import { BottomTabBar, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs } from 'expo-router';
 import { Apple, Dumbbell, Home, LineChart, User } from 'lucide-react-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APP_SHELL_MAX, useAppShell } from '@/hooks/useAppShell';
@@ -30,29 +29,35 @@ function TabLabel({
   );
 }
 
-function ShellTabBar(props: BottomTabBarProps) {
-  const { useShell } = useAppShell();
-  return (
-    <View pointerEvents="box-none" style={styles.tabBarHost}>
-      <View
-        style={[
-          styles.tabBarShell,
-          useShell ? { width: APP_SHELL_MAX } : styles.tabBarFull,
-        ]}
-      >
-        <BottomTabBar {...props} />
-      </View>
-    </View>
-  );
-}
-
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const { useShell, shellLeft } = useAppShell();
   const bottomPad = Math.max(insets.bottom, 10);
+
+  const shellTabBar =
+    Platform.OS === 'web'
+      ? useShell
+        ? ({
+            position: 'absolute',
+            left: shellLeft,
+            width: APP_SHELL_MAX,
+            maxWidth: APP_SHELL_MAX,
+            right: 'auto',
+            marginLeft: 0,
+            marginRight: 0,
+            alignSelf: 'flex-start',
+          } as const)
+        : ({
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            width: '100%',
+            maxWidth: '100%',
+          } as const)
+      : {};
 
   return (
     <Tabs
-      tabBar={(props) => <ShellTabBar {...props} />}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.tabActive,
@@ -67,10 +72,7 @@ export default function TabsLayout() {
           paddingHorizontal: 4,
           elevation: 0,
           shadowOpacity: 0,
-          position: 'relative',
-          width: '100%',
-          left: 0,
-          right: 0,
+          ...shellTabBar,
         },
         tabBarItemStyle: {
           flex: 1,
@@ -145,20 +147,6 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabBarHost: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-  },
-  tabBarShell: {
-    overflow: 'hidden',
-    backgroundColor: colors.backgroundElevated,
-  },
-  tabBarFull: {
-    width: '100%',
-  },
   label: {
     fontFamily: 'Sora_500Medium',
     fontSize: 10,

@@ -52,4 +52,14 @@ body {
 *:focus-visible {
   outline: 2px solid #00FF85;
   outline-offset: 2px;
+}
+/* Desktop: centraliza a tab bar sob o phone shell (430px) */
+@media (min-width: 480px) {
+  [role="tablist"] {
+    left: 50% !important;
+    right: auto !important;
+    width: 430px !important;
+    max-width: 430px !important;
+    transform: translateX(-50%) !important;
+  }
 }`
