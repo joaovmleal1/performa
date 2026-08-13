@@ -57,9 +57,9 @@ theme/               # tokens de cor, tipografia, spacing
 types/               # entidades do domínio
 ```
 
-## Coach Especialista
+## Agente interno
 
-Agente de suporte e periodização em `/ai` (`services/coach-agent.ts`), com RAG local + opcional **OpenRouter**.
+O agente de suporte e periodização (`services/coach-agent.ts`) funciona nos bastidores. Usuários veem apenas a interface de ajuda em `/ai`, sem acesso a modelo, chave, fontes internas ou configurações.
 
 Base de conhecimento (`data/knowledge/`):
 
@@ -68,13 +68,11 @@ Base de conhecimento (`data/knowledge/`):
 - *Guida Completa Massa Muscolare* (Brunaccioni / V Athlete–InVictus)
 - *Allenamento a Casa* (Fisico Spartano, via Dhoze)
 
-### OpenRouter
+### OpenRouter (somente servidor)
 
-1. Crie a key em https://openrouter.ai/keys  
-2. Cole em **Perfil → Configurar OpenRouter** (ou `EXPO_PUBLIC_OPENROUTER_API_KEY` no `.env`)  
-3. Escolha o modelo (padrão: `openai/gpt-4o-mini`)
-
-Sem key, o Coach continua no modo local. Com key, cada pergunta envia trechos RAG como contexto ao LLM.
+- Configure `OPENROUTER_API_KEY` nos secrets da Vercel.
+- `/api/coach` faz o proxy para o modelo; a chave nunca entra no bundle do aplicativo.
+- Sem o serviço externo, o agente usa o fallback local.
 
 ## Fluxo
 

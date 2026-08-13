@@ -57,15 +57,9 @@ export default function ProfileScreen() {
         style={{ marginTop: spacing.sm }}
       />
       <AppButton
-        label="Coach Especialista"
+        label="Ajuda e suporte"
         variant="ai"
         onPress={() => router.push('/ai')}
-        style={{ marginTop: spacing.sm }}
-      />
-      <AppButton
-        label="Configurar OpenRouter"
-        variant="secondary"
-        onPress={() => router.push('/ai/settings')}
         style={{ marginTop: spacing.sm }}
       />
       <AppButton

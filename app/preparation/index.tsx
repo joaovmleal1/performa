@@ -63,18 +63,6 @@ export default function PreparationScreen() {
           <AppText variant="caption" muted>
             {plan.sport} · prova em {plan.competitionDate} · {plan.totalWeeks} semanas
           </AppText>
-          {plan.coachNotes?.length ? (
-            <View style={styles.coachNotes}>
-              <AppText variant="caption" color={colors.primary}>
-                Notas do Coach Especialista
-              </AppText>
-              {plan.coachNotes.map((note) => (
-                <AppText key={note} variant="caption" muted>
-                  • {note}
-                </AppText>
-              ))}
-            </View>
-          ) : null}
         </Card>
       ) : null}
 
@@ -163,7 +151,6 @@ export default function PreparationScreen() {
 const styles = StyleSheet.create({
   hero: { gap: spacing.sm, marginBottom: spacing.lg },
   heroRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  coachNotes: { gap: 4, marginTop: spacing.sm },
   form: { gap: spacing.md, marginBottom: spacing.xl },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   timeline: { gap: spacing.sm, paddingBottom: spacing['4xl'] },

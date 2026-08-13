@@ -72,7 +72,6 @@ export default function RootLayout() {
           <Stack.Screen name="calendar/index" />
           <Stack.Screen name="progress-photos/index" />
           <Stack.Screen name="ai/index" options={{ animation: 'slide_from_bottom' }} />
-          <Stack.Screen name="ai/settings" />
         </Stack>
       </QueryClientProvider>
     </GestureHandlerRootView>

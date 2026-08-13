@@ -6,9 +6,6 @@ import type { PeriodizationPlan, UserProfile } from '@/types';
 export type CoachContext = {
   user?: UserProfile | null;
   hasDietPlan?: boolean;
-  /** Se informado, usa OpenRouter com RAG; senão cai no motor local. */
-  openRouterApiKey?: string;
-  openRouterModel?: string;
   preferCloud?: boolean;
 };
 
@@ -242,8 +239,7 @@ export function coachAnswer(question: string, context: CoachContext = {}): Coach
 }
 
 /**
- * Resposta do Coach: OpenRouter (quando há key) + contexto RAG,
- * com fallback automático para o motor local.
+ * Resposta do agente interno + contexto RAG, com fallback local.
  */
 export async function coachAnswerAsync(
   question: string,
@@ -251,18 +247,15 @@ export async function coachAnswerAsync(
 ): Promise<CoachAnswer> {
   const { chunks, texts } = buildRetrieval(question, context);
   const sources = sourceLabels(chunks);
-  const apiKey = context.openRouterApiKey?.trim();
   const preferCloud = context.preferCloud !== false;
 
-  if (apiKey && preferCloud) {
+  if (preferCloud) {
     const knowledgeBlock = texts
       .map((t, i) => `(${i + 1}) ${t}`)
       .join('\n\n')
       .slice(0, 9000);
 
     const cloud = await openRouterChat({
-      apiKey,
-      model: context.openRouterModel,
       messages: [
         { role: 'system', content: systemPromptForCloud(context.user) },
         {
@@ -273,7 +266,7 @@ export async function coachAnswerAsync(
             '',
             `PERGUNTA DO ALUNO: ${question}`,
             '',
-            'Responda como coach especialista. Ao final, uma linha: "Fontes usadas: ..." listando 2–4 títulos do contexto.',
+            'Responda como assistente PERFORMA, sem mencionar modelo, API, RAG ou configuração interna.',
           ].join('\n'),
         },
       ],
@@ -282,7 +275,7 @@ export async function coachAnswerAsync(
     if (cloud.ok) {
       return {
         content: `${cloud.content}\n\n${DISCLAIMER}`,
-        sources: [...sources, `OpenRouter · ${cloud.model}`],
+        sources,
         provider: 'openrouter',
         model: cloud.model,
       };
@@ -291,7 +284,6 @@ export async function coachAnswerAsync(
     const local = coachAnswerLocal(question, context);
     return {
       ...local,
-      content: `${local.content}\n\n(Modo local — OpenRouter indisponível: ${cloud.error})`,
     };
   }
 

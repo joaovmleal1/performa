@@ -178,12 +178,12 @@ export default function DashboardScreen() {
       <Card
         accent="purple"
         onPress={() => router.push('/ai')}
-        accessibilityLabel="Abrir PERFORMA AI"
+        accessibilityLabel="Abrir ajuda PERFORMA"
         style={{ marginTop: spacing.md }}
       >
-        <AppText variant="h3">Coach Especialista</AppText>
+        <AppText variant="h3">Dúvidas sobre seu treino?</AppText>
         <AppText variant="caption" muted>
-          Periodização, musculação e suporte com base científica
+          Converse com o PERFORMA e receba orientação em tempo real
         </AppText>
       </Card>
     </Screen>

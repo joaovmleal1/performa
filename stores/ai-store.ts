@@ -3,7 +3,6 @@ import { create } from 'zustand';
 import { coachAnswerAsync, coachSuggestedPrompts } from '@/services/coach-agent';
 import { useAuthStore } from '@/stores/auth-store';
 import { useNutritionStore } from '@/stores/nutrition-store';
-import { useSettingsStore } from '@/stores/settings-store';
 
 export type AIMessage = {
   id: string;
@@ -24,24 +23,14 @@ type AIState = {
 
 function buildWelcome(): AIMessage {
   const user = useAuthStore.getState().user;
-  const hasKey = useSettingsStore.getState().hasOpenRouterKey();
   const name = user?.name?.split(' ')[0] ?? 'Aluno';
   const prep = user?.preparationMode
     ? ` Vi que você está em modo preparação para ${user?.competitionName ?? 'sua prova'} — posso revisar a periodização.`
     : '';
-  const mode = hasKey
-    ? ' OpenRouter ativo: respostas com modelo LLM + base científica local.'
-    : ' Sem API key ainda: estou no modo local (RAG). Configure a chave OpenRouter em Perfil → OpenRouter.';
   return {
     id: 'ai_welcome',
     role: 'assistant',
-    content: `Olá, ${name}. Sou o PERFORMA Coach — especialista em periodização, musculação, prevenção e suporte ao aluno. Base: ACSM/NSCA/Schoenfeld/IOC + estudos InVictus e treino em casa.${prep}${mode}`,
-    sources: [
-      'ACSM 2026 Position Stand — Resistance Training',
-      'NSCA / taper & periodização',
-      'Schoenfeld — volume e frequência',
-      'Estudos InVictus + Fisico Spartano',
-    ],
+    content: `Olá, ${name}. Como posso ajudar com seu treino hoje? Posso tirar dúvidas, explicar exercícios e orientar ajustes no seu planejamento.${prep}`,
     createdAt: new Date().toISOString(),
   };
 }
@@ -66,14 +55,11 @@ export const useAIStore = create<AIState>((set, get) => ({
 
     const user = useAuthStore.getState().user;
     const hasDietPlan = useNutritionStore.getState().hasDietPlan;
-    const settings = useSettingsStore.getState();
 
     const answer = await coachAnswerAsync(trimmed, {
       user,
       hasDietPlan,
-      openRouterApiKey: settings.resolveApiKey(),
-      openRouterModel: settings.openRouterModel,
-      preferCloud: settings.preferCloudCoach,
+      preferCloud: true,
     });
 
     const reply: AIMessage = {

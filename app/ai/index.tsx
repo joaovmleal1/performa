@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { BookOpen, Send, Settings, Sparkles } from 'lucide-react-native';
+import { MessageCircle, Send, Sparkles } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -13,11 +13,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { router } from 'expo-router';
 
 import { AppText, ScreenHeader } from '@/components/ui';
 import { useAIStore } from '@/stores/ai-store';
-import { useSettingsStore } from '@/stores/settings-store';
 import { colors, gradients, radius, spacing } from '@/theme';
 
 export default function AIScreen() {
@@ -28,7 +26,6 @@ export default function AIScreen() {
   const isTyping = useAIStore((s) => s.isTyping);
   const send = useAIStore((s) => s.send);
   const suggestions = useAIStore((s) => s.suggestions());
-  const hasKey = useSettingsStore((s) => s.hasOpenRouterKey());
 
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
@@ -46,20 +43,9 @@ export default function AIScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.headerRow}>
-        <View style={{ flex: 1 }}>
-          <ScreenHeader title="Coach Especialista" showBack />
-        </View>
-        <Pressable
-          onPress={() => router.push('/ai/settings')}
-          style={styles.settingsBtn}
-          hitSlop={10}
-        >
-          <Settings size={18} color={colors.text} />
-        </Pressable>
-      </View>
+      <ScreenHeader title="Ajuda PERFORMA" showBack />
       <AppText variant="caption" muted style={styles.subtitle}>
-        {hasKey ? 'OpenRouter + base científica' : 'Modo local · configure OpenRouter'} · EF · Fisio · Musculação
+        Tire dúvidas sobre seus treinos e exercícios
       </AppText>
 
       <KeyboardAvoidingView
@@ -76,12 +62,11 @@ export default function AIScreen() {
           {showEmptyHints ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIcon}>
-                <BookOpen size={28} color={colors.primary} />
+                <MessageCircle size={28} color={colors.primary} />
               </View>
-              <AppText variant="h3">Base científica ativa</AppText>
+              <AppText variant="h3">Como posso ajudar?</AppText>
               <AppText variant="caption" muted style={styles.emptyText}>
-                Literatura de educação física, fisioterapia e musculação + estudos InVictus/V Athlete
-                e treino em casa (Dhoze). Peça periodização, técnica ou suporte.
+                Pergunte sobre execução, organização do treino, recuperação ou seu planejamento.
               </AppText>
               <View style={styles.suggestions}>
                 {suggestions.map((s) => (
@@ -106,7 +91,7 @@ export default function AIScreen() {
                 <View style={styles.aiLabel}>
                   <Sparkles size={12} color={colors.primary} />
                   <AppText variant="caption" color={colors.primary}>
-                    Coach{msg.provider === 'openrouter' ? ' · OpenRouter' : msg.provider === 'local' ? ' · local' : ''}
+                    PERFORMA
                   </AppText>
                 </View>
               ) : null}
@@ -117,18 +102,6 @@ export default function AIScreen() {
               >
                 {msg.content}
               </AppText>
-              {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 ? (
-                <View style={styles.sourcesBox}>
-                  <AppText variant="caption" muted style={styles.sourcesTitle}>
-                    Fontes consultadas
-                  </AppText>
-                  {msg.sources.slice(0, 4).map((src) => (
-                    <AppText key={src} variant="caption" muted>
-                      · {src}
-                    </AppText>
-                  ))}
-                </View>
-              ) : null}
               <AppText
                 variant="caption"
                 color={msg.role === 'user' ? 'rgba(10,10,13,0.55)' : colors.textMuted}
@@ -146,7 +119,7 @@ export default function AIScreen() {
             <View style={[styles.bubble, styles.aiBubble, styles.typingBubble]}>
               <ActivityIndicator size="small" color={colors.primary} />
               <AppText variant="caption" muted>
-                Consultando a base científica...
+                Preparando uma resposta...
               </AppText>
             </View>
           ) : null}
@@ -192,16 +165,6 @@ export default function AIScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  headerRow: { flexDirection: 'row', alignItems: 'center', paddingRight: spacing.md },
-  settingsBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.sm,
-  },
   subtitle: { paddingHorizontal: spacing.lg, marginBottom: spacing.sm },
   chat: { flex: 1 },
   chatContent: { padding: spacing.lg, paddingBottom: spacing.sm, gap: spacing.sm },
@@ -241,18 +204,6 @@ const styles = StyleSheet.create({
   },
   aiLabel: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
   bubbleText: { lineHeight: 21 },
-  sourcesBox: {
-    marginTop: spacing.sm,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    gap: 2,
-  },
-  sourcesTitle: {
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-    marginBottom: 2,
-  },
   bubbleTime: { marginTop: 6, alignSelf: 'flex-end' },
   typingBubble: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   inputBar: {
