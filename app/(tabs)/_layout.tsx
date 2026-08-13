@@ -90,7 +90,7 @@ export default function TabsLayout() {
         options={{
           title: 'Progresso',
           tabBarLabel: ({ color }) => (
-            <TabLabel label="Progresso" color={String(color)} />
+            <TabLabel label="Evolução" color={String(color)} />
           ),
           tabBarIcon: ({ color }) => (
             <LineChart color={color} size={22} strokeWidth={ICON_STROKE} />
