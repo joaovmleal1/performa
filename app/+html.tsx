@@ -29,13 +29,20 @@ export default function Root({ children }: { children: ReactNode }) {
 }
 
 const responsiveBackground = `
-html, body {
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
   background: #121217;
   color: #FFFFFF;
 }
 body {
   margin: 0;
   overscroll-behavior: none;
+}
+#root {
+  display: flex;
+  flex-direction: column;
 }
 * {
   box-sizing: border-box;
@@ -44,4 +51,14 @@ body {
 *:focus-visible {
   outline: 2px solid #00FF85;
   outline-offset: 2px;
-}`;
+}
+/* Tab bar no mobile web: nunca colapsar numa caixinha central */
+@media (max-width: 454px) {
+  [role="tablist"],
+  nav[class*="tab"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+}`

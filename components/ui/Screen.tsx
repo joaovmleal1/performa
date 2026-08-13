@@ -1,13 +1,8 @@
 import { ReactNode } from 'react';
-import {
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAppShell } from '@/hooks/useAppShell';
 import { colors, layout, spacing } from '@/theme';
 
 export function Screen({
@@ -25,6 +20,8 @@ export function Screen({
   edges?: ('top' | 'right' | 'bottom' | 'left')[];
   padded?: boolean;
 }) {
+  const { screenStyle } = useAppShell();
+
   const body = scroll ? (
     <ScrollView
       contentContainerStyle={[
@@ -42,7 +39,7 @@ export function Screen({
   );
 
   return (
-    <SafeAreaView edges={edges} style={[styles.safe, style]}>
+    <SafeAreaView edges={edges} style={[styles.safe, screenStyle, style]}>
       {body}
     </SafeAreaView>
   );
@@ -52,13 +49,6 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: colors.background,
-    width: '100%',
-    ...(Platform.OS === 'web'
-      ? ({
-          maxWidth: 430,
-          alignSelf: 'center',
-        } as object)
-      : null),
   },
   flex: { flex: 1 },
   padding: {

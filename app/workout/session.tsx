@@ -19,6 +19,7 @@ import { useAppRouter } from '@/hooks/useAppRouter';
 
 export default function WorkoutSessionScreen() {
   const router = useRouter();
+  const appRouter = useAppRouter();
   const {
     workout,
     exerciseIndex,
@@ -159,6 +160,13 @@ export default function WorkoutSessionScreen() {
             • {tip}
           </AppText>
         ))}
+        <AppButton
+          label="Ver certo × errado em vídeo"
+          variant="secondary"
+          size="md"
+          onPress={() => appRouter.push('/technique')}
+          style={{ marginTop: spacing.md }}
+        />
       </Card>
     </Screen>
   );
