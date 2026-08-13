@@ -36,6 +36,14 @@ Isso grava os GIFs em `public/exercises/` (servidos localmente pelo Expo). Metad
 
 Onde ver no app: **Treino → Biblioteca de exercícios** (lista + detalhe com GIF) e na **sessão de treino**.
 
+## Técnica (como fazer / como não fazer)
+
+Seção **Técnica** com 400+ vídeos educativos do pack `+400 Animazioni` (certo × errado, erros comuns e guias).
+
+- Rota: `/technique`
+- Catálogo: `data/form/catalog.json`
+- Atalhos: Início e Treino → “Como fazer e como não fazer”
+
 ## Estrutura
 
 ```
