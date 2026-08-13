@@ -49,13 +49,13 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
+    <GestureHandlerRootView style={{ flex: 1, width: '100%', backgroundColor: colors.background }}>
       <QueryClientProvider client={queryClient}>
         <StatusBar style="light" />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
+            contentStyle: { backgroundColor: colors.background, flex: 1 },
             animation: 'fade',
             animationDuration: 180,
           }}

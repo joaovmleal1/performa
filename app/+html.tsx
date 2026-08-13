@@ -29,21 +29,25 @@ export default function Root({ children }: { children: ReactNode }) {
 }
 
 const responsiveBackground = `
-/* Shell desktop: gutters escuros; tab bar nunca solta no canto */
 html, body, #root {
-  width: 100%;
-  max-width: 100%;
-  min-height: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh !important;
   background: #080B10 !important;
-  color: #FFFFFF;
+  color: #FFFFFF !important;
 }
 body {
   margin: 0;
   overscroll-behavior: none;
 }
+#root, #root > div, #root > div > div {
+  background: #080B10 !important;
+  min-height: 100%;
+}
 #root {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 * {
   box-sizing: border-box;
@@ -53,7 +57,6 @@ body {
   outline: 2px solid #00FF85;
   outline-offset: 2px;
 }
-/* Desktop: centraliza a tab bar sob o phone shell (430px) */
 @media (min-width: 480px) {
   [role="tablist"] {
     left: 50% !important;

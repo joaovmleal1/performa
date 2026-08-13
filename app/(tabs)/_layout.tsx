@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Apple, Dumbbell, Home, LineChart, User } from 'lucide-react-native';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APP_SHELL_MAX, useAppShell } from '@/hooks/useAppShell';
@@ -21,7 +21,7 @@ function TabLabel({
     <Text
       numberOfLines={1}
       adjustsFontSizeToFit
-      minimumFontScale={0.8}
+      minimumFontScale={0.75}
       style={[styles.label, focused && styles.labelActive, { color }]}
     >
       {label}
@@ -62,6 +62,12 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.tabActive,
         tabBarInactiveTintColor: colors.tabInactive,
+        sceneStyle: {
+          backgroundColor: colors.background,
+          ...(Platform.OS === 'web'
+            ? ({ flex: 1, width: '100%' } as object)
+            : null),
+        },
         tabBarStyle: {
           backgroundColor: colors.backgroundElevated,
           borderTopColor: colors.border,
@@ -69,14 +75,14 @@ export default function TabsLayout() {
           height: layout.bottomNavHeight - 8 + bottomPad,
           paddingTop: 8,
           paddingBottom: bottomPad,
-          paddingHorizontal: 4,
+          paddingHorizontal: 2,
           elevation: 0,
           shadowOpacity: 0,
           ...shellTabBar,
         },
         tabBarItemStyle: {
           flex: 1,
-          paddingHorizontal: 2,
+          paddingHorizontal: 0,
           minWidth: 0,
         },
         tabBarHideOnKeyboard: true,
@@ -149,8 +155,8 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   label: {
     fontFamily: 'Sora_500Medium',
-    fontSize: 10,
-    letterSpacing: -0.2,
+    fontSize: 9,
+    letterSpacing: -0.35,
     marginTop: 2,
     textAlign: 'center',
     width: '100%',

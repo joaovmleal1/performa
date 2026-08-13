@@ -1,6 +1,6 @@
 import { Platform, useWindowDimensions } from 'react-native';
 
-/** Largura do phone shell no desktop web */
+/** Phone shell no desktop — largura suficiente para 5 labels PT */
 export const APP_SHELL_MAX = 430;
 
 export function useAppShell() {
@@ -8,7 +8,7 @@ export function useAppShell() {
   const isWeb = Platform.OS === 'web';
   const useShell = isWeb && width > APP_SHELL_MAX + 48;
   const contentWidth = useShell ? APP_SHELL_MAX : width;
-  const shellLeft = useShell ? Math.max(0, (width - APP_SHELL_MAX) / 2) : 0;
+  const shellLeft = useShell ? Math.max(0, Math.round((width - APP_SHELL_MAX) / 2)) : 0;
 
   return {
     isWeb,
@@ -16,7 +16,6 @@ export function useAppShell() {
     viewportWidth: width,
     contentWidth,
     shellLeft,
-    /** Telas (Stack/auth): coluna central no desktop */
     screenStyle: useShell
       ? {
           width: APP_SHELL_MAX,
@@ -28,10 +27,6 @@ export function useAppShell() {
           maxWidth: '100%' as const,
           alignSelf: 'stretch' as const,
         },
-    /**
-     * Tab bar absoluta no RN Web: NÃO usar left+right juntos com width
-     * (isso empurra a barra para a direita). Só left + width.
-     */
     tabBarStyle: useShell
       ? {
           position: 'absolute' as const,
@@ -39,23 +34,12 @@ export function useAppShell() {
           width: APP_SHELL_MAX,
           right: 'auto' as unknown as number,
           maxWidth: APP_SHELL_MAX,
-          alignSelf: 'auto' as const,
         }
       : {
           position: 'absolute' as const,
           left: 0,
           right: 0,
           width: '100%' as const,
-          maxWidth: '100%' as const,
         },
-    /** Wrapper full-bleed atrás do shell (gutters escuros) */
-    desktopChromeStyle: useShell
-      ? {
-          flex: 1,
-          width: '100%' as const,
-          backgroundColor: '#080B10',
-          alignItems: 'center' as const,
-        }
-      : { flex: 1, width: '100%' as const },
   };
 }
