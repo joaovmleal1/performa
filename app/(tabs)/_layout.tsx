@@ -35,8 +35,11 @@ export default function TabsLayout() {
         },
         tabBarLabelStyle: {
           fontFamily: 'Sora_500Medium',
-          fontSize: 11,
-          letterSpacing: 0.15,
+          fontSize: 10,
+          letterSpacing: 0,
+        },
+        tabBarItemStyle: {
+          paddingHorizontal: 0,
         },
         tabBarHideOnKeyboard: true,
       }}

@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Send } from 'lucide-react-native';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -16,7 +16,9 @@ import * as Haptics from 'expo-haptics';
 
 import { AIOrb } from '@/components/brand/PerformaLogo';
 import { AppText, ScreenHeader } from '@/components/ui';
+import { coachSuggestedPrompts } from '@/services/coach-agent';
 import { useAIStore } from '@/stores/ai-store';
+import { useAuthStore } from '@/stores/auth-store';
 import { colors, gradients, radius, spacing } from '@/theme';
 
 export default function AIScreen() {
@@ -26,7 +28,9 @@ export default function AIScreen() {
   const messages = useAIStore((s) => s.messages);
   const isTyping = useAIStore((s) => s.isTyping);
   const send = useAIStore((s) => s.send);
-  const suggestions = useAIStore((s) => s.suggestions());
+  const user = useAuthStore((s) => s.user);
+  // Não chamar factory no selector do Zustand (array novo a cada render → React #185)
+  const suggestions = useMemo(() => coachSuggestedPrompts(user), [user]);
 
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
