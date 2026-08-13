@@ -12,10 +12,7 @@ type Props = {
   showTagline?: boolean;
 };
 
-/**
- * Símbolo oficial: “P” geométrico inclinado (dois blocos).
- * Superior: PERFORMA Green · Base: green dark.
- */
+/** Símbolo oficial “P” do manual PERFORMA. */
 export function PerformaMark({ size = 48 }: { size?: number }) {
   return (
     <View
@@ -24,16 +21,15 @@ export function PerformaMark({ size = 48 }: { size?: number }) {
         {
           width: size,
           height: size,
-          borderRadius: Math.max(10, size * 0.22),
         },
       ]}
       accessibilityLabel="Símbolo PERFORMA"
     >
-      <Svg width={size * 0.62} height={size * 0.62} viewBox="0 0 64 64">
-        {/* Bloco inferior (green dark) — movimento ascendente */}
-        <Path d="M6 52 L30 28 L46 28 L22 52 Z" fill={colors.primaryDark} />
-        {/* Bloco superior (PERFORMA Green) */}
-        <Path d="M18 30 L42 6 L58 6 L34 30 Z" fill={colors.primary} />
+      <Svg width={size} height={size} viewBox="0 0 64 64">
+        <Path
+          d="M6 8h33.5L52 20.5l-4.5 14L26 56H15V43l12-12H16L6 21h27l3-3H16z"
+          fill={colors.primary}
+        />
       </Svg>
     </View>
   );
@@ -118,15 +114,8 @@ export function AIOrb({ size = 120 }: { size?: number }) {
 const styles = StyleSheet.create({
   wrap: { alignItems: 'center', gap: 16 },
   mark: {
-    backgroundColor: colors.surfaceMedium,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(0,255,133,0.28)',
-    shadowColor: colors.primary,
-    shadowOpacity: 0.32,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 0 },
   },
   wordWrap: { alignItems: 'center', gap: 6 },
   wordmark: {
