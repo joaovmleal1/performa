@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -9,9 +9,10 @@ import Animated, {
 
 import { PerformaLogo } from '@/components/brand/PerformaLogo';
 import { useAuthStore } from '@/stores/auth-store';
-import { colors } from '@/theme';
+import { colors, spacing } from '@/theme';
 import { duration } from '@/theme/motion';
 
+/** Tela 01 — Splash: marca central + loading discreto */
 export default function SplashGateScreen() {
   const isHydrated = useAuthStore((s) => s.isHydrated);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -33,9 +34,16 @@ export default function SplashGateScreen() {
   if (!isHydrated || !ready) {
     return (
       <View style={styles.splash}>
-        <Animated.View style={logoStyle}>
-          <PerformaLogo size={88} />
-        </Animated.View>
+        <View style={styles.center}>
+          <Animated.View style={logoStyle}>
+            <PerformaLogo size={96} />
+          </Animated.View>
+        </View>
+        <ActivityIndicator
+          color={colors.primary}
+          style={styles.loader}
+          accessibilityLabel="Carregando"
+        />
       </View>
     );
   }
@@ -50,7 +58,16 @@ const styles = StyleSheet.create({
   splash: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  center: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: spacing['2xl'],
+  },
+  loader: {
+    position: 'absolute',
+    bottom: 64,
+    alignSelf: 'center',
   },
 });

@@ -18,17 +18,11 @@ type Props = {
   showTagline?: boolean;
 };
 
-/** Símbolo oficial 3D enviado pela marca PERFORMA. */
+/** Símbolo oficial 3D PERFORMA */
 export function PerformaMark({ size = 48 }: { size?: number }) {
   return (
     <View
-      style={[
-        styles.mark,
-        {
-          width: size,
-          height: size,
-        },
-      ]}
+      style={[styles.mark, { width: size, height: size }]}
       accessibilityLabel="Símbolo PERFORMA"
     >
       <Svg width={size} height={size} viewBox="0 0 1024 1024">
@@ -93,54 +87,52 @@ export function PerformaLogo({
   );
 }
 
-/** Orb / aura para superfícies de Inteligência (Coach / Dieta IA) */
+/**
+ * Orb IA — círculo abstrato gradient purple → cyan → green
+ * Spec: sem robô / cérebro / personagem
+ */
 export function AIOrb({ size = 120 }: { size?: number }) {
+  const inner = size * 0.72;
+  const core = size * 0.18;
   return (
     <View style={[stylesOrb.wrap, { width: size, height: size }]}>
       <LinearGradient
-        colors={[...gradients.purpleGlow]}
+        colors={['rgba(123,92,255,0.35)', 'rgba(85,207,255,0.12)', 'rgba(0,255,133,0.08)']}
         style={[
           stylesOrb.glow,
-          {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-          },
+          { width: size, height: size, borderRadius: size / 2 },
         ]}
       />
-      <View
-        style={[
-          stylesOrb.ring,
-          {
-            width: size * 0.78,
-            height: size * 0.78,
-            borderRadius: (size * 0.78) / 2,
-            borderColor: colors.secondary,
-          },
-        ]}
-      />
-      <View
-        style={[
-          stylesOrb.ringInner,
-          {
-            width: size * 0.52,
-            height: size * 0.52,
-            borderRadius: (size * 0.52) / 2,
-            borderColor: colors.info,
-          },
-        ]}
-      />
-      <View
-        style={[
-          stylesOrb.core,
-          {
-            width: size * 0.2,
-            height: size * 0.2,
-            borderRadius: radius.full,
-            backgroundColor: colors.white,
-          },
-        ]}
-      />
+      <LinearGradient
+        colors={[...gradients.ai]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          width: inner,
+          height: inner,
+          borderRadius: inner / 2,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <View
+          style={{
+            width: core * 2.2,
+            height: 3,
+            borderRadius: 2,
+            backgroundColor: 'rgba(255,255,255,0.85)',
+            marginBottom: 6,
+          }}
+        />
+        <View
+          style={{
+            width: core * 1.4,
+            height: 3,
+            borderRadius: 2,
+            backgroundColor: 'rgba(255,255,255,0.7)',
+          }}
+        />
+      </LinearGradient>
     </View>
   );
 }
@@ -151,7 +143,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.35,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 0 },
   },
@@ -170,15 +162,4 @@ const styles = StyleSheet.create({
 const stylesOrb = StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
   glow: { position: 'absolute' },
-  ring: {
-    position: 'absolute',
-    borderWidth: 2,
-  },
-  ringInner: {
-    position: 'absolute',
-    borderWidth: 2,
-  },
-  core: {
-    opacity: 0.95,
-  },
 });

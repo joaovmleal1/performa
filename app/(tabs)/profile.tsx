@@ -1,41 +1,39 @@
 import {
   Bell,
-  BookOpen,
-  CalendarDays,
-  CircleCheck,
-  HelpCircle,
-  Repeat2,
-  Scale,
+  CircleHelp,
+  Dumbbell,
+  Flame,
+  LogOut,
+  Settings2,
   Target,
   UserRound,
+  Utensils,
 } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { PerformaMark } from '@/components/brand/PerformaLogo';
 import {
-  AppButton,
   AppText,
   Avatar,
   Card,
   ListRow,
+  ProgressBar,
   Screen,
 } from '@/components/ui';
-import { goalLabels } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
 import { useAuthStore } from '@/stores/auth-store';
 import { colors, spacing } from '@/theme';
 
-const ICON = {
-  size: 20,
-  color: colors.textSecondary,
-  strokeWidth: 1.75,
-} as const;
-
+/** Tela 15 — Perfil */
 export default function ProfileScreen() {
   const router = useAppRouter();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const name = user?.fullName ?? user?.name ?? 'Atleta';
+  const name = user?.fullName ?? user?.name ?? 'Amanda Silva';
+  const username = user?.username ?? 'amandasilva';
+  const level = 12;
+  const xp = 1230;
+  const xpTarget = 2000;
 
   return (
     <Screen scroll>
@@ -47,70 +45,75 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.identity}>
-        <Avatar name={name} size={88} />
-        <AppText variant="h1" center style={styles.name}>
+        <Avatar name={name} size={96} />
+        <AppText variant="h1" center style={{ marginTop: spacing.lg }}>
           {name}
         </AppText>
         <AppText variant="caption" color={colors.textMuted} center>
-          @{user?.username ?? 'performa'}
+          @{username}
         </AppText>
-        <AppText variant="label" color={colors.primary} center style={styles.streak}>
-          {user?.streakDays ?? 0} dias de sequência
-        </AppText>
-        <AppButton
-          label="Ver meu perfil"
-          onPress={() => router.push('/(tabs)/progress')}
-          style={styles.cta}
-        />
       </View>
+
+      <Card style={styles.levelCard}>
+        <AppText variant="label" color={colors.secondary}>
+          Nível {level}
+        </AppText>
+        <ProgressBar
+          progress={xp / xpTarget}
+          color={colors.secondary}
+          height={6}
+          trackColor={colors.surfaceElevated}
+        />
+        <AppText variant="caption" color={colors.textMuted}>
+          {xp.toLocaleString('pt-BR')} / {xpTarget.toLocaleString('pt-BR')} XP
+        </AppText>
+      </Card>
+
+      <Card accent="green" style={styles.evoCard}>
+        <View style={styles.evoRow}>
+          <Flame size={20} color={colors.primary} strokeWidth={1.85} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <AppText variant="bodyMedium">Você está evoluindo!</AppText>
+            <AppText variant="caption" color={colors.textSecondary}>
+              Continue firme e alcance seus objetivos.
+            </AppText>
+          </View>
+        </View>
+      </Card>
 
       <Card style={styles.menu} padded={false}>
         <ListRow
-          icon={<UserRound {...ICON} />}
+          icon={<UserRound size={20} color={colors.primary} strokeWidth={1.85} />}
           title="Dados pessoais"
-          value={`${user?.weightKg ?? '—'} kg`}
           onPress={() => {}}
         />
         <ListRow
-          icon={<Target {...ICON} />}
-          title="Objetivo"
-          value={goalLabels[user?.goal ?? 'definition'] ?? '—'}
+          icon={<Target size={20} color={colors.secondary} strokeWidth={1.85} />}
+          title="Metas"
           onPress={() => {}}
         />
         <ListRow
-          icon={<Scale {...ICON} />}
-          title="Medidas"
-          value={`${user?.heightCm ?? '—'} cm`}
+          icon={<Settings2 size={20} color={colors.primary} strokeWidth={1.85} />}
+          title="Preferências"
           onPress={() => {}}
         />
         <ListRow
-          icon={<Bell {...ICON} />}
+          icon={<Dumbbell size={20} color={colors.secondary} strokeWidth={1.85} />}
+          title="Treino"
+          onPress={() => router.push('/(tabs)/workout')}
+        />
+        <ListRow
+          icon={<Utensils size={20} color={colors.primary} strokeWidth={1.85} />}
+          title="Nutrição"
+          onPress={() => router.push('/(tabs)/nutrition')}
+        />
+        <ListRow
+          icon={<Bell size={20} color={colors.secondary} strokeWidth={1.85} />}
           title="Notificações"
           onPress={() => {}}
         />
         <ListRow
-          icon={<Repeat2 {...ICON} />}
-          title="Hábitos diários"
-          onPress={() => router.push('/habits')}
-        />
-        <ListRow
-          icon={<CalendarDays {...ICON} />}
-          title="Calendário"
-          onPress={() => router.push('/calendar')}
-        />
-        <ListRow
-          icon={<BookOpen {...ICON} />}
-          title="Biblioteca de exercícios"
-          onPress={() => router.push('/exercises')}
-        />
-        <ListRow
-          icon={<CircleCheck {...ICON} />}
-          title="Certo × Errado"
-          subtitle="Técnica de execução em vídeo"
-          onPress={() => router.push('/technique')}
-        />
-        <ListRow
-          icon={<HelpCircle {...ICON} />}
+          icon={<CircleHelp size={20} color={colors.primary} strokeWidth={1.85} />}
           title="Ajuda e suporte"
           onPress={() => router.push('/ai')}
           last
@@ -122,9 +125,9 @@ export default function ProfileScreen() {
           logout();
           router.replace('/(auth)/login');
         }}
-        accessibilityRole="button"
-        style={({ pressed }) => [styles.logout, pressed && { opacity: 0.6 }]}
+        style={({ pressed }) => [styles.logout, pressed && { opacity: 0.65 }]}
       >
+        <LogOut size={18} color={colors.error} strokeWidth={1.85} />
         <AppText variant="bodyMedium" color={colors.error}>
           Sair da conta
         </AppText>
@@ -147,20 +150,10 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     fontFamily: 'Sora_800ExtraBold',
   },
-  identity: {
-    alignItems: 'center',
-    marginBottom: spacing['2xl'],
-  },
-  name: {
-    marginTop: spacing.lg,
-  },
-  streak: {
-    marginTop: spacing.sm,
-  },
-  cta: {
-    marginTop: spacing.xl,
-    width: '100%',
-  },
+  identity: { alignItems: 'center', marginBottom: spacing.xl },
+  levelCard: { gap: spacing.sm, marginBottom: spacing.md },
+  evoCard: { marginBottom: spacing.lg },
+  evoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   menu: {
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.lg,
@@ -168,8 +161,10 @@ const styles = StyleSheet.create({
   },
   logout: {
     minHeight: 52,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.sm,
     marginBottom: spacing.xl,
   },
 });

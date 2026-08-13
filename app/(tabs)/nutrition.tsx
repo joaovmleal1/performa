@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Droplets, Lock } from 'lucide-react-native';
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AIOrb } from '@/components/brand/PerformaLogo';
@@ -8,124 +8,135 @@ import {
   AppText,
   Card,
   MacroProgress,
-  ProgressBar,
   ProgressRing,
   Screen,
-  ScreenTitle,
   StatusPill,
 } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth-store';
 import { useNutritionStore } from '@/stores/nutrition-store';
 import { colors, radius, spacing } from '@/theme';
 
+type TabKey = 'resumo' | 'refeicoes' | 'macros';
+
+/** Tela 07 — Nutrição */
 export default function NutritionTabScreen() {
   const router = useRouter();
+  const [tab, setTab] = useState<TabKey>('resumo');
   const daily = useNutritionStore((s) => s.daily);
   const hasDietPlan = useNutritionStore((s) => s.hasDietPlan);
-  const addWater = useNutritionStore((s) => s.addWater);
   const user = useAuthStore((s) => s.user);
   const unlockDietBuilder = useAuthStore((s) => s.unlockDietBuilder);
-
   const dietUnlocked = Boolean(user?.dietBuilderUnlocked || hasDietPlan);
+
   const calorieProgress =
     daily.target.calories > 0 ? daily.consumed.calories / daily.target.calories : 0;
+  const remaining = Math.max(0, daily.target.calories - daily.consumed.calories);
 
   return (
     <Screen scroll>
-      <ScreenTitle title="Nutrição" subtitle="Macros, hidratação e plano do dia." />
+      <AppText variant="h1" style={styles.title}>
+        Nutrição
+      </AppText>
 
-      <Card style={styles.caloriesCard}>
-        <ProgressRing
-          progress={calorieProgress}
-          size={112}
-          value={`${daily.consumed.calories}`}
-          label="kcal"
-          color={colors.primary}
-          trackColor={colors.surfaceMedium}
-        />
-        <View style={{ flex: 1, gap: 6 }}>
-          <AppText variant="h3">Hoje</AppText>
-          <AppText variant="caption" color={colors.textMuted}>
-            Meta {daily.target.calories} kcal
-          </AppText>
-          <AppText variant="bodyMedium" color={colors.primary}>
-            Restam {Math.max(0, daily.target.calories - daily.consumed.calories)} kcal
-          </AppText>
-        </View>
-      </Card>
+      <View style={styles.tabs}>
+        {(
+          [
+            ['resumo', 'Resumo'],
+            ['refeicoes', 'Refeições'],
+            ['macros', 'Macros'],
+          ] as const
+        ).map(([key, label]) => {
+          const active = tab === key;
+          return (
+            <Pressable
+              key={key}
+              onPress={() => setTab(key)}
+              style={[styles.tab, active && styles.tabActive]}
+            >
+              <AppText
+                variant="label"
+                color={active ? colors.onPrimary : colors.textSecondary}
+              >
+                {label}
+              </AppText>
+            </Pressable>
+          );
+        })}
+      </View>
 
-      <Card style={styles.section}>
-        <AppText variant="h3">Macros</AppText>
-        <MacroProgress
-          label="Proteína"
-          current={daily.consumed.proteinG}
-          target={daily.target.proteinG}
-          color={colors.protein}
-        />
-        <MacroProgress
-          label="Carboidratos"
-          current={daily.consumed.carbsG}
-          target={daily.target.carbsG}
-          color={colors.carbs}
-        />
-        <MacroProgress
-          label="Gorduras"
-          current={daily.consumed.fatG}
-          target={daily.target.fatG}
-          color={colors.fats}
-        />
-      </Card>
-
-      <Card style={styles.section}>
-        <View style={styles.waterRow}>
-          <View style={styles.waterLeft}>
-            <Droplets size={18} color={colors.water} strokeWidth={1.85} />
-            <AppText variant="h3">Água</AppText>
-          </View>
-          <AppText variant="label" color={colors.water}>
-            {daily.waterLiters.toFixed(1)} / {daily.waterGoalLiters.toFixed(1)} L
-          </AppText>
-        </View>
-        <ProgressBar
-          progress={daily.waterGoalLiters ? daily.waterLiters / daily.waterGoalLiters : 0}
-          color={colors.water}
-          height={6}
-          trackColor={colors.surfaceMedium}
-        />
-        <Pressable
-          onPress={() => addWater(0.25)}
-          style={styles.waterBtn}
-          accessibilityRole="button"
-        >
-          <AppText variant="label" color={colors.onPrimary}>
-            + 250 ml
-          </AppText>
-        </Pressable>
-      </Card>
-
-      <Card style={styles.section}>
-        <AppText variant="h3">Refeições</AppText>
-        {daily.meals.map((meal, index) => (
-          <View
-            key={meal.id}
-            style={[
-              styles.mealRow,
-              index === daily.meals.length - 1 && { borderBottomWidth: 0 },
-            ]}
-          >
-            <View>
-              <AppText variant="bodyMedium">{meal.name}</AppText>
-              <AppText variant="caption" color={colors.textMuted}>
-                {meal.time} · {meal.items.reduce((sum, i) => sum + i.calories, 0)} kcal
+      {(tab === 'resumo' || tab === 'macros') && (
+        <Card style={styles.summary}>
+          <AppText variant="h3">Resumo do dia</AppText>
+          <View style={styles.summaryRow}>
+            <ProgressRing
+              progress={calorieProgress}
+              size={120}
+              stroke={10}
+              value={daily.consumed.calories.toLocaleString('pt-BR')}
+              label={`/ ${daily.target.calories.toLocaleString('pt-BR')} kcal`}
+              color={colors.primary}
+              trackColor={colors.surfaceElevated}
+            />
+            <View style={{ flex: 1, gap: 4 }}>
+              <AppText variant="metric" color={colors.primary}>
+                {remaining.toLocaleString('pt-BR')}
+              </AppText>
+              <AppText variant="caption" color={colors.textSecondary}>
+                kcal restantes
               </AppText>
             </View>
-            <StatusPill
-              label={meal.logged ? 'Registrada' : 'Pendente'}
-              tone={meal.logged ? 'success' : 'neutral'}
-            />
           </View>
-        ))}
-      </Card>
+        </Card>
+      )}
+
+      {(tab === 'resumo' || tab === 'macros') && (
+        <Card style={styles.section}>
+          <MacroProgress
+            label="Proteínas"
+            current={daily.consumed.proteinG}
+            target={daily.target.proteinG}
+            color={colors.protein}
+          />
+          <MacroProgress
+            label="Carboidratos"
+            current={daily.consumed.carbsG}
+            target={daily.target.carbsG}
+            color={colors.carbs}
+          />
+          <MacroProgress
+            label="Gorduras"
+            current={daily.consumed.fatG}
+            target={daily.target.fatG}
+            color={colors.fats}
+          />
+        </Card>
+      )}
+
+      {(tab === 'resumo' || tab === 'refeicoes') && (
+        <Card style={styles.section}>
+          <AppText variant="h3">Refeições</AppText>
+          {daily.meals.map((meal, index) => (
+            <View
+              key={meal.id}
+              style={[
+                styles.mealRow,
+                index === daily.meals.length - 1 && { borderBottomWidth: 0 },
+              ]}
+            >
+              <View>
+                <AppText variant="bodyMedium">{meal.name}</AppText>
+                <AppText variant="caption" color={colors.textMuted}>
+                  {meal.time} · {meal.items.reduce((sum, i) => sum + i.calories, 0)} kcal
+                </AppText>
+              </View>
+              <StatusPill
+                label={meal.logged ? 'Registrada' : 'Pendente'}
+                tone={meal.logged ? 'success' : 'neutral'}
+              />
+            </View>
+          ))}
+        </Card>
+      )}
 
       {hasDietPlan ? (
         <AppButton
@@ -133,96 +144,79 @@ export default function NutritionTabScreen() {
           onPress={() => router.push('/nutrition/meal-plan')}
           style={{ marginTop: spacing.lg }}
         />
-      ) : dietUnlocked ? (
-        <Card accent="purple" style={styles.aiCard}>
-          <View style={styles.aiHeader}>
-            <AIOrb size={48} />
-            <View style={{ flex: 1, gap: 4 }}>
-              <AppText variant="h3">Dieta com IA</AppText>
-              <AppText variant="caption" color={colors.textSecondary}>
-                Gere um plano personalizado com base na sua rotina.
-              </AppText>
-            </View>
-          </View>
-          <AppButton
-            label="Montar minha dieta"
-            variant="ai"
-            onPress={() => router.push('/nutrition/ai-diet')}
-          />
-        </Card>
       ) : (
-        <Card style={styles.aiCard}>
-          <View style={styles.aiHeader}>
-            <View style={styles.lockBubble}>
-              <Lock size={18} color={colors.textMuted} strokeWidth={1.85} />
-            </View>
-            <View style={{ flex: 1, gap: 4 }}>
-              <AppText variant="h3">Montagem de dieta</AppText>
-              <AppText variant="caption" color={colors.textSecondary}>
-                {user?.dietInterest === 'already_doing'
-                  ? 'Você já faz dieta. Libere a montagem quando quiser.'
-                  : 'Libere quando quiser montar um plano com a gente.'}
+        <Card accent="purple" style={styles.aiCard}>
+          <View style={styles.aiBadge}>
+            <AppText variant="caption" color={colors.secondary}>
+              BETA
+            </AppText>
+          </View>
+          <View style={{ alignItems: 'center', gap: spacing.md }}>
+            <AIOrb size={88} />
+            <AppText variant="h2" center>
+              Uma dieta criada para a sua{' '}
+              <AppText variant="h2" color={colors.primary}>
+                rotina
               </AppText>
-            </View>
+              .
+            </AppText>
+            <AppText variant="body" color={colors.textSecondary} center>
+              Responda algumas perguntas e o PERFORMA IA criará um plano alimentar
+              personalizado para você.
+            </AppText>
           </View>
           <AppButton
-            label="Quero montar minha dieta"
-            variant="secondary"
+            label="Criar minha dieta"
+            variant="ai"
             onPress={() => {
-              unlockDietBuilder();
+              if (!dietUnlocked) unlockDietBuilder();
               router.push('/nutrition/ai-diet');
             }}
           />
         </Card>
       )}
-
-      <AppButton
-        label="Lista de compras"
-        variant="secondary"
-        onPress={() => router.push('/nutrition/shopping-list')}
-        style={{ marginTop: spacing.md }}
-      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  caloriesCard: {
+  title: { marginTop: spacing.md, marginBottom: spacing.lg },
+  tabs: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.lg,
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
-  section: { gap: spacing.md, marginTop: spacing.lg },
-  waterRow: {
-    flexDirection: 'row',
+  tab: {
+    flex: 1,
+    minHeight: 36,
+    borderRadius: radius.full,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  waterLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  waterBtn: {
-    alignSelf: 'flex-start',
+  tabActive: {
     backgroundColor: colors.primary,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: radius.md,
+    borderColor: colors.primary,
   },
+  summary: { gap: spacing.lg },
+  summaryRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+  section: { gap: spacing.md, marginTop: spacing.lg },
   mealRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: spacing.md,
     minHeight: 54,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
-  aiCard: { gap: spacing.lg, marginTop: spacing.lg },
-  aiHeader: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  lockBubble: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.surfaceMedium,
-    alignItems: 'center',
-    justifyContent: 'center',
+  aiCard: { gap: spacing.lg, marginTop: spacing.xl },
+  aiBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.full,
+    backgroundColor: colors.secondaryMuted,
   },
 });

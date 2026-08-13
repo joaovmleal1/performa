@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { colors, gradients, radius } from '@/theme';
+import { colors, gradients, layout, radius, shadows } from '@/theme';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'ai';
 type Size = 'md' | 'lg' | 'sm';
@@ -92,8 +92,8 @@ export function AppButton({
       {variant === 'ai' ? (
         <LinearGradient
           colors={[...gradients.ai]}
-          start={{ x: 0, y: 0.5 }}
-          end={{ x: 1, y: 0.5 }}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.aiFill}
         >
           <View style={styles.aiContent}>{inner}</View>
@@ -107,7 +107,7 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: radius.lg,
+    borderRadius: radius.button,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 44,
@@ -116,19 +116,19 @@ const styles = StyleSheet.create({
   fullWidth: { width: '100%' },
   sm: { paddingVertical: 10, paddingHorizontal: 14, minHeight: 40 },
   md: { paddingVertical: 12, paddingHorizontal: 16, minHeight: 48 },
-  lg: { paddingVertical: 16, paddingHorizontal: 20, minHeight: 54 },
+  lg: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    minHeight: layout.buttonHeight,
+  },
   primary: {
     backgroundColor: colors.primary,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.28,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
+    ...shadows.glowGreen,
   },
   secondary: {
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderStrong,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -141,17 +141,14 @@ const styles = StyleSheet.create({
   aiShell: {
     paddingVertical: 0,
     paddingHorizontal: 0,
-    shadowColor: colors.secondary,
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+    ...shadows.glowPurple,
   },
   aiFill: {
     width: '100%',
-    minHeight: 54,
+    minHeight: layout.buttonHeight,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.lg,
+    borderRadius: radius.button,
   },
   aiContent: {
     paddingVertical: 16,
@@ -162,7 +159,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.88, transform: [{ scale: 0.985 }] },
   disabled: { opacity: 0.45 },
   label: {
-    fontFamily: 'Sora_600SemiBold',
+    fontFamily: 'Sora_700Bold',
     fontSize: 16,
   },
   labelOnPrimary: { color: colors.onPrimary },

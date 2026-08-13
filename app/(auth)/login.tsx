@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useRouter } from 'expo-router';
+import { Apple } from 'lucide-react-native';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Pressable, StyleSheet, View } from 'react-native';
@@ -8,8 +9,9 @@ import { PerformaLogo } from '@/components/brand/PerformaLogo';
 import { AppButton, AppText, Input, Screen } from '@/components/ui';
 import { loginSchema, type LoginInput } from '@/schemas/auth';
 import { useAuthStore } from '@/stores/auth-store';
-import { colors, spacing } from '@/theme';
+import { colors, radius, spacing } from '@/theme';
 
+/** Tela 05 — Login (spec pixel-perfect) */
 export default function LoginScreen() {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
@@ -32,52 +34,76 @@ export default function LoginScreen() {
   });
 
   return (
-    <Screen scroll>
+    <Screen scroll contentStyle={styles.content}>
       <View style={styles.top}>
-        <PerformaLogo size={72} />
+        <PerformaLogo size={64} />
+        <AppText variant="h1" style={styles.headline}>
+          Bem-vindo de volta!
+        </AppText>
       </View>
 
-      <Controller
-        control={control}
-        name="email"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            label="E-mail"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={value}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            error={formState.errors.email?.message}
-            placeholder="seu@email.com"
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="password"
-        render={({ field: { onChange, onBlur, value } }) => (
-          <Input
-            label="Senha"
-            isPassword
-            value={value}
-            onBlur={onBlur}
-            onChangeText={onChange}
-            error={formState.errors.password?.message}
-            placeholder="••••••••"
-          />
-        )}
-      />
+      <View style={styles.form}>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              label="E-mail"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              error={formState.errors.email?.message}
+              placeholder="seu@email.com"
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Input
+              label="Senha"
+              isPassword
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              error={formState.errors.password?.message}
+              placeholder="••••••••"
+            />
+          )}
+        />
 
-      <Link href="/(auth)/forgot-password" asChild>
-        <Pressable style={styles.forgot}>
-          <AppText variant="label" color={colors.primary}>
-            Esqueci minha senha
+        <Link href="/(auth)/forgot-password" asChild>
+          <Pressable style={styles.forgot}>
+            <AppText variant="label" color={colors.primary}>
+              Esqueci minha senha
+            </AppText>
+          </Pressable>
+        </Link>
+
+        <AppButton label="Entrar" loading={loading} onPress={onSubmit} />
+      </View>
+
+      <View style={styles.dividerRow}>
+        <View style={styles.line} />
+        <AppText variant="caption" color={colors.textMuted}>
+          ou continue com
+        </AppText>
+        <View style={styles.line} />
+      </View>
+
+      <View style={styles.socialRow}>
+        <Pressable style={styles.socialBtn} accessibilityLabel="Continuar com Apple">
+          <Apple size={22} color={colors.white} strokeWidth={1.85} />
+        </Pressable>
+        <Pressable style={styles.socialBtn} accessibilityLabel="Continuar com Google">
+          <AppText variant="h3" color={colors.white}>
+            G
           </AppText>
         </Pressable>
-      </Link>
-
-      <AppButton label="Entrar" loading={loading} onPress={onSubmit} />
+      </View>
 
       <AppButton
         label="Continuar como demo"
@@ -86,7 +112,7 @@ export default function LoginScreen() {
           skipToApp();
           router.replace('/(tabs)');
         }}
-        style={{ marginTop: spacing.md }}
+        style={{ marginTop: spacing.lg }}
       />
 
       <Pressable
@@ -94,7 +120,7 @@ export default function LoginScreen() {
         style={styles.register}
       >
         <AppText variant="body" color={colors.textSecondary} center>
-          Não tem conta?{' '}
+          Ainda não tem conta?{' '}
           <AppText variant="bodyMedium" color={colors.primary}>
             Criar conta
           </AppText>
@@ -105,15 +131,42 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  content: { paddingBottom: spacing['5xl'] },
   top: {
     marginTop: spacing['3xl'],
     marginBottom: spacing['3xl'],
     alignItems: 'center',
+    gap: spacing['2xl'],
   },
+  headline: { textAlign: 'center' },
+  form: { gap: spacing.md },
   forgot: {
     alignSelf: 'flex-end',
+    minHeight: 40,
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing['2xl'],
     marginBottom: spacing.xl,
-    minHeight: 44,
+  },
+  line: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.borderStrong },
+  socialRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.md,
+  },
+  socialBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surfaceLight,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   register: {

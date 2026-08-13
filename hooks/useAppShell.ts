@@ -1,13 +1,14 @@
 import { Platform, useWindowDimensions } from 'react-native';
 
-/** Largura do “phone shell” só no desktop web. No mobile, usa 100%. */
-export const APP_SHELL_MAX = 430;
+import { layout } from '@/theme';
+
+/** Shell desktop; no mobile = 100% */
+export const APP_SHELL_MAX = layout.maxContentWidth;
 
 export function useAppShell() {
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
-  /** Viewport maior que o shell → centraliza coluna de app */
-  const useShell = isWeb && width > APP_SHELL_MAX + 24;
+  const useShell = isWeb && width > APP_SHELL_MAX + 40;
   const contentWidth = useShell ? APP_SHELL_MAX : width;
 
   return {
@@ -15,7 +16,6 @@ export function useAppShell() {
     useShell,
     viewportWidth: width,
     contentWidth,
-    /** Estilo para telas (Screen) */
     screenStyle: useShell
       ? {
           width: APP_SHELL_MAX,
@@ -27,7 +27,6 @@ export function useAppShell() {
           maxWidth: '100%' as const,
           alignSelf: 'stretch' as const,
         },
-    /** Estilo da tab bar — largura explícita evita colapso no RN Web */
     tabBarStyle: useShell
       ? {
           width: APP_SHELL_MAX,

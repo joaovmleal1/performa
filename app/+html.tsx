@@ -33,7 +33,7 @@ html, body, #root {
   width: 100%;
   max-width: 100%;
   min-height: 100%;
-  background: #121217;
+  background: #080B10;
   color: #FFFFFF;
 }
 body {

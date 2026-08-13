@@ -13,10 +13,11 @@ import {
   Screen,
   ScreenProgress,
 } from '@/components/ui';
+import { useAppRouter } from '@/hooks/useAppRouter';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
 import { colors, radius, spacing } from '@/theme';
-import { useAppRouter } from '@/hooks/useAppRouter';
 
+/** Telas 06 + Descanso */
 export default function WorkoutSessionScreen() {
   const router = useRouter();
   const appRouter = useAppRouter();
@@ -40,11 +41,10 @@ export default function WorkoutSessionScreen() {
   } = useWorkoutSessionStore();
 
   const exercise = workout.exercises[exerciseIndex];
+  const nextExercise = workout.exercises[exerciseIndex + 1];
   const isDone =
     !exercise ||
-    (exerciseIndex >= workout.exercises.length - 1 &&
-      exercise.completed &&
-      !isResting);
+    (exerciseIndex >= workout.exercises.length - 1 && exercise.completed && !isResting);
 
   useEffect(() => {
     if (!isResting || restPaused) return;
@@ -68,106 +68,123 @@ export default function WorkoutSessionScreen() {
     );
   }
 
-  return (
-    <Screen scroll edges={['top', 'left', 'right', 'bottom']}>
-      <View style={styles.topBar}>
-        <View style={{ flex: 1 }}>
-          <AppText variant="caption" color={colors.primary} style={styles.eyebrow}>
-            TREINO EM ANDAMENTO
-          </AppText>
-          <AppText variant="label" color={colors.textSecondary}>
-            Exercício {exerciseIndex + 1} de {workout.exercises.length}
-          </AppText>
-        </View>
-        <Pressable
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Fechar treino"
-          style={styles.closeBtn}
-        >
-          <X size={20} color={colors.text} strokeWidth={1.85} />
-        </Pressable>
-      </View>
-      <ScreenProgress current={exerciseIndex} total={workout.exercises.length} />
-
-      <View style={styles.exerciseHeader}>
-        <AppText variant="h1">{exercise.exercise.name}</AppText>
-        <AppText variant="body" color={colors.textSecondary}>
-          Série {setIndex + 1}/{exercise.sets}
-        </AppText>
-      </View>
-
-      <ExerciseGif exercise={exercise.exercise} style={styles.gif} />
-
-      {isResting ? (
-        <Card accent="purple" style={styles.restCard}>
-          <AppText variant="h3" center>
+  if (isResting) {
+    const mm = String(Math.floor(restSecondsLeft / 60)).padStart(2, '0');
+    const ss = String(restSecondsLeft % 60).padStart(2, '0');
+    return (
+      <Screen edges={['top', 'left', 'right', 'bottom']}>
+        <View style={styles.restWrap}>
+          <AppText variant="h1" center>
             Descanso
           </AppText>
           <ProgressRing
             progress={
               exercise.restSeconds ? restSecondsLeft / exercise.restSeconds : 0
             }
-            size={140}
-            value={`${restSecondsLeft}s`}
+            size={180}
+            stroke={12}
+            value={`${mm}:${ss}`}
             color={colors.secondary}
+            trackColor={colors.surfaceElevated}
           />
+          {nextExercise ? (
+            <AppText variant="body" color={colors.textSecondary} center>
+              Próximo: {nextExercise.exercise.name}
+            </AppText>
+          ) : null}
           <View style={styles.restActions}>
+            <AppButton
+              label="-30s"
+              variant="secondary"
+              onPress={() => addRestTime(-30)}
+              style={{ flex: 1 }}
+              fullWidth={false}
+            />
             <AppButton
               label={restPaused ? 'Retomar' : 'Pausar'}
               variant="secondary"
               onPress={restPaused ? resumeRest : pauseRest}
+              style={{ flex: 1 }}
+              fullWidth={false}
             />
-            <AppButton label="+30s" variant="secondary" onPress={() => addRestTime(30)} />
-            <AppButton label="Pular descanso" onPress={skipRest} />
+            <AppButton
+              label="+30s"
+              variant="secondary"
+              onPress={() => addRestTime(30)}
+              style={{ flex: 1 }}
+              fullWidth={false}
+            />
           </View>
-        </Card>
-      ) : (
-        <Card style={styles.logger}>
-          <AppText variant="metricLg" center color={colors.primary}>
-            {currentReps}
-          </AppText>
-          <AppText variant="caption" color={colors.textMuted} center>
-            repetições · {currentWeight} kg
-          </AppText>
+          <AppButton label="Pular descanso" onPress={skipRest} />
+        </View>
+      </Screen>
+    );
+  }
 
-          <AppText variant="label" color={colors.textMuted} style={{ marginTop: spacing.lg }}>
-            Carga (kg)
+  return (
+    <Screen scroll edges={['top', 'left', 'right', 'bottom']}>
+      <View style={styles.topBar}>
+        <View style={{ flex: 1 }}>
+          <AppText variant="h1">{exercise.exercise.name}</AppText>
+          <AppText variant="body" color={colors.textSecondary}>
+            Série {setIndex + 1} de {exercise.sets}
           </AppText>
-          <NumberStepper
-            value={currentWeight}
-            min={0}
-            max={400}
-            step={2.5}
-            onChange={setWeight}
-          />
-          <AppText variant="label" color={colors.textMuted} style={{ marginTop: spacing.lg }}>
-            Repetições
-          </AppText>
-          <NumberStepper value={currentReps} min={1} max={50} onChange={setReps} />
-          <AppButton
-            label="Concluir série"
-            onPress={completeSet}
-            style={{ marginTop: spacing.xl }}
-          />
-        </Card>
-      )}
+        </View>
+        <Pressable onPress={() => router.back()} style={styles.closeBtn}>
+          <X size={20} color={colors.text} strokeWidth={1.85} />
+        </Pressable>
+      </View>
+      <ScreenProgress current={exerciseIndex} total={workout.exercises.length} />
 
-      <Card style={styles.tips}>
-        <AppText variant="h3">Como executar</AppText>
-        {exercise.exercise.instructions.map((tip) => (
-          <AppText key={tip} variant="body" color={colors.textSecondary}>
-            • {tip}
+      <ExerciseGif exercise={exercise.exercise} style={styles.gif} />
+
+      <Card style={styles.logger}>
+        <AppText variant="caption" color={colors.textMuted} center>
+          Carga
+        </AppText>
+        <AppText variant="metricLg" center>
+          {currentWeight} kg
+        </AppText>
+        <NumberStepper
+          value={currentWeight}
+          min={0}
+          max={400}
+          step={2.5}
+          onChange={setWeight}
+        />
+
+        <AppText
+          variant="caption"
+          color={colors.textMuted}
+          center
+          style={{ marginTop: spacing.xl }}
+        >
+          Repetições
+        </AppText>
+        <AppText variant="metricLg" center color={colors.primary}>
+          {currentReps}
+        </AppText>
+        <NumberStepper value={currentReps} min={1} max={50} onChange={setReps} />
+
+        {exercise.previousWeightKg != null ? (
+          <AppText variant="caption" color={colors.textMuted} center style={{ marginTop: spacing.md }}>
+            Série anterior · {exercise.previousWeightKg} kg × {exercise.reps} reps
           </AppText>
-        ))}
+        ) : null}
+
         <AppButton
-          label="Ver certo × errado em vídeo"
-          variant="secondary"
-          size="md"
-          onPress={() => appRouter.push('/technique')}
-          style={{ marginTop: spacing.md }}
+          label="Concluir série"
+          onPress={completeSet}
+          style={{ marginTop: spacing.xl }}
         />
       </Card>
+
+      <AppButton
+        label="Ver certo × errado em vídeo"
+        variant="ghost"
+        onPress={() => appRouter.push('/technique')}
+        style={{ marginTop: spacing.md }}
+      />
     </Screen>
   );
 }
@@ -175,14 +192,10 @@ export default function WorkoutSessionScreen() {
 const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: spacing.md,
     marginTop: spacing.sm,
     marginBottom: spacing.md,
-  },
-  eyebrow: {
-    letterSpacing: 1.2,
-    fontFamily: 'Sora_600SemiBold',
   },
   closeBtn: {
     width: 44,
@@ -194,24 +207,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  exerciseHeader: { gap: 4, marginTop: spacing.xl },
-  done: {
-    flex: 1,
-    justifyContent: 'center',
-    gap: spacing.lg,
-  },
   gif: {
     height: 220,
     marginTop: spacing.md,
-    backgroundColor: '#fff',
+    backgroundColor: '#0B0E14',
     borderRadius: radius.lg,
   },
-  restCard: {
-    alignItems: 'center',
-    gap: spacing.lg,
-    marginTop: spacing.xl,
-  },
-  restActions: { width: '100%', gap: spacing.sm },
   logger: { gap: spacing.sm, marginTop: spacing.xl },
-  tips: { gap: spacing.sm, marginTop: spacing.lg },
+  restWrap: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: spacing.xl,
+    paddingBottom: spacing['3xl'],
+  },
+  restActions: { flexDirection: 'row', gap: spacing.sm },
+  done: { flex: 1, justifyContent: 'center', gap: spacing.lg },
 });

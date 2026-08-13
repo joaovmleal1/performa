@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Check, Flame, Zap } from 'lucide-react-native';
+import { Check, ChevronRight, Clock, Layers } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -53,34 +53,27 @@ type WorkoutCardProps = {
   onStart: () => void;
 };
 
-/** Card “Treino de hoje” — board 04/05, com orb de IA */
 export function WorkoutCard({ workout, onStart }: WorkoutCardProps) {
   return (
     <Card accent="purple" style={styles.workout}>
-      <View style={styles.row}>
-        <AIOrb size={52} />
-        <View style={{ flex: 1, gap: 2 }}>
-          <AppText variant="caption" color={colors.secondary}>
-            Treino de hoje
-          </AppText>
-          <AppText variant="h2">{workout.name}</AppText>
-        </View>
-      </View>
+      <AppText variant="caption" color={colors.secondary}>
+        Treino de hoje
+      </AppText>
+      <AppText variant="h2">{workout.name}</AppText>
       <View style={styles.metaRow}>
         <View style={styles.meta}>
-          <Flame size={14} color={colors.primary} strokeWidth={1.85} />
-          <AppText variant="caption">{workout.estimatedMinutes} min</AppText>
+          <Layers size={14} color={colors.textSecondary} strokeWidth={1.85} />
+          <AppText variant="caption" color={colors.textSecondary}>
+            {workout.exercises.length} exercícios
+          </AppText>
         </View>
         <View style={styles.meta}>
-          <Zap size={14} color={colors.secondary} strokeWidth={1.85} />
-          <AppText variant="caption">{workout.exercises.length} exercícios</AppText>
+          <Clock size={14} color={colors.textSecondary} strokeWidth={1.85} />
+          <AppText variant="caption" color={colors.textSecondary}>
+            {workout.estimatedMinutes} min
+          </AppText>
         </View>
       </View>
-      {(workout.muscleFocus?.length ?? 0) > 0 ? (
-        <AppText variant="caption" color={colors.textMuted}>
-          {(workout.muscleFocus ?? []).join(' • ')}
-        </AppText>
-      ) : null}
       <AppButton label="Iniciar treino" onPress={onStart} size="md" />
     </Card>
   );
@@ -125,19 +118,18 @@ export function ExerciseCard({
         <View style={{ flex: 1, gap: 2 }}>
           <AppText variant="bodyMedium">{name}</AppText>
           <AppText variant="caption" color={colors.textMuted}>
-            {sets}×{reps}
-            {previousWeightKg != null ? ` · anterior ${previousWeightKg} kg` : ''}
-            {suggestedWeightKg != null ? ` · sugestão ${suggestedWeightKg} kg` : ''}
+            {sets} séries • {reps} reps
+            {previousWeightKg != null ? ` · ant. ${previousWeightKg} kg` : ''}
+            {suggestedWeightKg != null ? ` · sug. ${suggestedWeightKg} kg` : ''}
           </AppText>
         </View>
-        <View
-          style={[
-            styles.check,
-            completed && { backgroundColor: colors.primary, borderColor: colors.primary },
-          ]}
-        >
-          {completed ? <Check size={14} color={colors.onPrimary} strokeWidth={3} /> : null}
-        </View>
+        {completed ? (
+          <View style={styles.checkOn}>
+            <Check size={14} color={colors.onPrimary} strokeWidth={3} />
+          </View>
+        ) : (
+          <ChevronRight size={18} color={colors.textMuted} strokeWidth={1.85} />
+        )}
       </View>
     </Card>
   );
@@ -152,7 +144,7 @@ export function AIInsightCard({ title, message }: InsightProps) {
   return (
     <Card accent="purple" style={styles.insight}>
       <View style={styles.insightHeader}>
-        <AIOrb size={36} />
+        <AIOrb size={32} />
         <AppText variant="caption" color={colors.secondary}>
           {title}
         </AppText>
@@ -172,24 +164,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   workout: { gap: spacing.md },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   metaRow: { flexDirection: 'row', gap: 16 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   exercise: { padding: 12 },
   exerciseRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   thumb: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: radius.md,
-    backgroundColor: colors.surfaceMedium,
+    backgroundColor: colors.surfaceElevated,
   },
-  thumbMedia: { backgroundColor: '#fff' },
-  check: {
+  thumbMedia: { backgroundColor: '#0B0E14' },
+  checkOn: {
     width: 22,
     height: 22,
     borderRadius: 11,
-    borderWidth: 2,
-    borderColor: colors.border,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

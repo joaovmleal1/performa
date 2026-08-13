@@ -12,13 +12,13 @@ export const spacing = {
   '6xl': 64,
 } as const;
 
-/** Controles sm/md; cards lg–xl (board ~16–20); sheets xl+ */
 export const radius = {
   sm: 8,
   md: 12,
   lg: 16,
   xl: 20,
   '2xl': 24,
+  button: 14,
   full: 999,
 } as const;
 
@@ -28,9 +28,11 @@ export const hitSlop = {
 } as const;
 
 export const layout = {
-  screenPadding: spacing.lg,
+  screenPadding: spacing.xl, // 20px — spec 20–24
   cardPadding: spacing.lg,
-  bottomNavHeight: 72,
+  bottomNavHeight: 80,
   minTouchTarget: 44,
   headerHeight: 56,
+  maxContentWidth: 390,
+  buttonHeight: 56,
 } as const;

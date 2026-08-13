@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   avatar: {
-    backgroundColor: colors.surfaceLight,
+    backgroundColor: colors.surfaceElevated,
     borderColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',

@@ -33,7 +33,11 @@ export function Input({
 
   return (
     <View style={styles.wrap}>
-      {label ? <AppText variant="label" style={styles.label}>{label}</AppText> : null}
+      {label ? (
+        <AppText variant="label" color={colors.textSecondary} style={styles.label}>
+          {label}
+        </AppText>
+      ) : null}
       <View
         style={[
           styles.field,
@@ -65,25 +69,29 @@ export function Input({
             accessibilityLabel={secure ? 'Mostrar senha' : 'Ocultar senha'}
           >
             {secure ? (
-              <Eye size={20} color={colors.textMuted} />
+              <Eye size={20} color={colors.textMuted} strokeWidth={1.85} />
             ) : (
-              <EyeOff size={20} color={colors.textMuted} />
+              <EyeOff size={20} color={colors.textMuted} strokeWidth={1.85} />
             )}
           </Pressable>
         ) : null}
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {!error && hint ? <AppText variant="caption" muted>{hint}</AppText> : null}
+      {!error && hint ? (
+        <AppText variant="caption" color={colors.textMuted}>
+          {hint}
+        </AppText>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: { gap: spacing.xs, width: '100%' },
-  label: { color: colors.textSecondary, marginBottom: 2 },
+  label: { marginBottom: 2 },
   field: {
     minHeight: 52,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     backgroundColor: colors.surfaceLight,
     borderWidth: 1,
     borderColor: colors.border,
@@ -94,10 +102,6 @@ const styles = StyleSheet.create({
   },
   focused: {
     borderColor: colors.primary,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 0 },
   },
   errorBorder: {
     borderColor: colors.error,
@@ -107,7 +111,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.white,
     fontFamily: 'Sora_400Regular',
-    fontSize: 16,
+    fontSize: 15,
     paddingVertical: 12,
   },
   error: {

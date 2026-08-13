@@ -34,9 +34,9 @@ export default function RegisterScreen() {
       <View style={styles.top}>
         <PerformaLogo size={56} showWordmark={false} />
         <AppText variant="h1" style={{ marginTop: spacing.xl }}>
-          Criar conta
+          Crie sua conta
         </AppText>
-        <AppText variant="body" muted style={{ marginTop: spacing.sm }}>
+        <AppText variant="body" color={colors.textSecondary} style={{ marginTop: spacing.sm }}>
           Comece sua jornada no PERFORMA.
         </AppText>
       </View>

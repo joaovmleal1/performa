@@ -1,10 +1,12 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { AppButton, AppText, Card, Screen } from '@/components/ui';
+import { AIOrb } from '@/components/brand/PerformaLogo';
+import { AppButton, AppText, ProgressRing, Screen } from '@/components/ui';
 import { useNutritionStore } from '@/stores/nutrition-store';
 import { colors, spacing } from '@/theme';
 
+/** Tela — dieta pronta */
 export default function AiResultScreen() {
   const router = useRouter();
   const dietPlan = useNutritionStore((s) => s.dietPlan);
@@ -22,43 +24,73 @@ export default function AiResultScreen() {
     );
   }
 
+  const calories = dietPlan.targets?.calories ?? dietPlan.dailyCalories ?? 2100;
+  const protein = dietPlan.targets?.proteinG ?? dietPlan.macros?.proteinG ?? 150;
+  const carbs = dietPlan.targets?.carbsG ?? dietPlan.macros?.carbsG ?? 200;
+  const fat = dietPlan.targets?.fatG ?? dietPlan.macros?.fatG ?? 70;
+
   return (
     <Screen scroll>
-      <AppText variant="h1">{dietPlan.title}</AppText>
-      <AppText variant="body" muted style={{ marginTop: spacing.sm, marginBottom: spacing.xl }}>
-        Plano gerado em {dietPlan.createdAt}
+      <View style={styles.hero}>
+        <AIOrb size={72} />
+        <AppText variant="h1" center style={{ marginTop: spacing.lg }}>
+          Sua dieta está pronta! 🎉
+        </AppText>
+        <AppText variant="body" color={colors.textSecondary} center style={{ marginTop: spacing.sm }}>
+          Seu plano foi criado com base no seu objetivo, rotina e preferências.
+        </AppText>
+      </View>
+
+      <AppText variant="metricLg" center color={colors.primary} style={{ marginTop: spacing['2xl'] }}>
+        {calories.toLocaleString('pt-BR')}
+      </AppText>
+      <AppText variant="caption" color={colors.textMuted} center>
+        kcal diárias
       </AppText>
 
-      <Card accent="green" style={styles.targets}>
-        <AppText variant="caption" muted>
-          Meta diária
-        </AppText>
-        <AppText variant="metric" color={colors.primary}>
-          {dietPlan.targets?.calories ?? dietPlan.dailyCalories ?? 0} kcal
-        </AppText>
-        <View style={styles.macroRow}>
-          <AppText variant="label">
-            P {dietPlan.targets?.proteinG ?? dietPlan.macros?.proteinG ?? 0}g
-          </AppText>
-          <AppText variant="label">
-            C {dietPlan.targets?.carbsG ?? dietPlan.macros?.carbsG ?? 0}g
-          </AppText>
-          <AppText variant="label">
-            G {dietPlan.targets?.fatG ?? dietPlan.macros?.fatG ?? 0}g
+      <View style={styles.rings}>
+        <View style={styles.ringItem}>
+          <ProgressRing
+            progress={1}
+            size={88}
+            value={`${protein}g`}
+            color={colors.protein}
+            trackColor={colors.surfaceElevated}
+          />
+          <AppText variant="caption" color={colors.textSecondary} center>
+            Proteínas
           </AppText>
         </View>
-      </Card>
+        <View style={styles.ringItem}>
+          <ProgressRing
+            progress={1}
+            size={88}
+            value={`${carbs}g`}
+            color={colors.carbs}
+            trackColor={colors.surfaceElevated}
+          />
+          <AppText variant="caption" color={colors.textSecondary} center>
+            Carboidratos
+          </AppText>
+        </View>
+        <View style={styles.ringItem}>
+          <ProgressRing
+            progress={1}
+            size={88}
+            value={`${fat}g`}
+            color={colors.fats}
+            trackColor={colors.surfaceElevated}
+          />
+          <AppText variant="caption" color={colors.textSecondary} center>
+            Gorduras
+          </AppText>
+        </View>
+      </View>
 
       <AppButton
         label="Ver plano completo"
         onPress={() => router.replace('/nutrition/meal-plan')}
-        style={{ marginTop: spacing.xl }}
-      />
-      <AppButton
-        label="Ir para nutrição"
-        variant="secondary"
-        onPress={() => router.replace('/(tabs)/nutrition')}
-        style={{ marginTop: spacing.sm }}
+        style={{ marginTop: spacing['2xl'] }}
       />
     </Screen>
   );
@@ -66,10 +98,12 @@ export default function AiResultScreen() {
 
 const styles = StyleSheet.create({
   empty: { flex: 1, justifyContent: 'center', gap: spacing.lg },
-  targets: { gap: spacing.sm },
-  macroRow: {
+  hero: { alignItems: 'center', marginTop: spacing.xl },
+  rings: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: spacing.sm,
+    marginTop: spacing['2xl'],
+    gap: spacing.sm,
   },
+  ringItem: { flex: 1, alignItems: 'center', gap: spacing.sm },
 });

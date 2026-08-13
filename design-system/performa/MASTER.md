@@ -1,74 +1,57 @@
 # PERFORMA Design System — Source of Truth
 
-> Manual de Identidade Visual oficial. Dark-only premium fitness.
+> Manual alinhado a `/design/reference/` e ao brief pixel-perfect.
 
 ## Brand
 
 - **Name:** PERFORMA
 - **Tagline:** TREINO • NUTRIÇÃO • RESULTADOS
-- **Tom:** confiante, motivador, direto
-- **Símbolo:** “P” geométrico em dois blocos inclinados (green + green dark)
+- **Tom:** confiante, motivador, direto, dark premium fitness + technology
 
 ## Colors
 
-| Token | Hex | Usage |
-|-------|-----|--------|
-| `primary` / PERFORMA Green | `#00FF85` | CTA, active, progress, success |
-| `primaryDark` | `#00805F` | Bloco inferior do símbolo |
-| `primarySoft` | `#5AFFAD` | Success soft |
-| `secondary` / PERFORMA Purple | `#7B5CFF` | AI, insights, carbs |
-| `info` | `#5C8CFF` | Info + gradiente AI |
-| `background` | `#121217` | Fundo do app |
-| `surfaceDark` | `#18181F` | Elevado / tab bar |
-| `surfaceMedium` | `#202027` | Cards, inputs |
-| `surfaceLight` | `#2A2A33` | Superfície clara |
-| `border` | `#33333D` | Contornos 1px |
-| `text` | `#FFFFFF` | Texto primário |
-| `textSecondary` | `#A9A9B2` | Texto secundário |
-| `textMuted` | `#6F707A` | Labels / terciário |
-| `warning` | `#FFCA3A` | Avisos / gorduras |
-| `error` | `#FF4D57` | Erro |
+| Token | Hex / valor |
+|-------|-------------|
+| background | `#080B10` |
+| backgroundAlt | `#0B0E14` |
+| surfaceDark | `#101319` |
+| cards | `#12161D` / `#161A22` |
+| elevated | `#1A1E27` |
+| border | `rgba(255,255,255,0.09)` |
+| borderStrong | `rgba(255,255,255,0.14)` |
+| primary | `#00FF85` |
+| onPrimary | `#07100B` |
+| secondary / AI | `#7B5CFF` |
+| text | `#FFFFFF` |
+| textSecondary | `#A4A6AF` |
+| textMuted | `#6F727C` |
+| warning | `#FFC83D` |
+| error | `#FF4D57` |
 
-### Gradientes
+### Gradiente AI
 
-- **AI / Inteligência:** `#7B5CFF` → `#5C8CFF`
+`#7B5CFF → #55CFFF → #00FF85`
 
 ## Typography
 
 - **Family:** Sora
-- Display: ExtraBold
-- H1/H2: Bold
-- H3: SemiBold
-- Body: Regular · Labels: Medium
-- Metrics: Bold / ExtraBold
-- Wordmark: ExtraBold italic, letter-spacing amplo
+- H1 ~30px Bold · H2 24 · H3 18 · Body 15 · Metrics 40–56 Bold
 
-## Spacing (8pt)
+## Spacing (4pt)
 
 4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64
 
+Screen padding: **20–24px**
+
 ## Radius
 
-- Controles: **8–12px** (`sm`/`md`)
-- Cards / CTAs: **16–20px** (`lg`/`xl`) — superfície `#2A2A33`
-- Sheets: 16–20
-- full: 999 (só quando interação exigir)
+- Controles: 12
+- Cards: 16–20
+- Botões: 14–16
+- Pills: 999
 
-## Icons
+## Bottom nav
 
-- Outline, stroke **1.75–2**
-- Ativo: `#00FF85`
-
-## Motion
-
-- Micro 150–300ms
-- Glow verde só em CTA primary
-- Gradiente roxo→ciano em superfícies de IA
-
-## Anti-patterns
-
-- Tema claro
-- Emoji como ícone primário
-- Glow excessivo
-- Cards sem borda `#33333D`
-- Inter / Roboto / system fonts
+- Altura ~76–88
+- Inactive `#777A84`
+- Active `#00FF85` (+ glow leve no ícone)

@@ -56,7 +56,7 @@ export function ProgressRing({
       <View style={styles.center}>
         {value ? <AppText variant="label">{value}</AppText> : null}
         {label ? (
-          <AppText variant="caption" muted center>
+          <AppText variant="caption" color={colors.textMuted} center>
             {label}
           </AppText>
         ) : null}
@@ -117,7 +117,7 @@ export function MacroProgress({
     <View style={{ gap: 6 }}>
       <View style={styles.macroRow}>
         <AppText variant="label">{label}</AppText>
-        <AppText variant="caption" muted>
+        <AppText variant="caption" color={colors.textMuted}>
           {current}
           {unit} / {target}
           {unit}

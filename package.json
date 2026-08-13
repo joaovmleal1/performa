@@ -49,8 +49,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0 || true",
     "download:exercises": "node scripts/download-exercises.js",
     "export:web": "expo export -p web",
+    "capture:ui": "node scripts/capture-ui.mjs",
     "deploy:vercel": "vercel --prod"
   },
   "private": true

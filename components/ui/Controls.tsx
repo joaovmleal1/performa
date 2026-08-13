@@ -34,7 +34,7 @@ export function RadioGroup({ options, value, onChange }: Props) {
             <View style={{ flex: 1 }}>
               <AppText variant="bodyMedium">{option.label}</AppText>
               {option.description ? (
-                <AppText variant="caption" muted>
+                <AppText variant="caption" color={colors.textMuted}>
                   {option.description}
                 </AppText>
               ) : null}
@@ -144,15 +144,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     padding: spacing.lg,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceMedium,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceLight,
     borderWidth: 1,
     borderColor: colors.border,
-    minHeight: 56,
+    minHeight: 64,
   },
   itemSelected: {
     borderColor: colors.primary,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: 'rgba(0,255,133,0.06)',
   },
   radio: {
     width: 22,
