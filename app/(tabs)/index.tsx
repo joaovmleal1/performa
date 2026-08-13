@@ -1,6 +1,7 @@
 import { Droplets, Flame } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { TechniquePromoCard } from '@/components/technique/TechniquePromoCard';
 import {
   AIInsightCard,
   AppText,
@@ -39,6 +40,10 @@ export default function DashboardScreen() {
       <Greeting name={firstName} />
 
       <WorkoutCard workout={mockTodayWorkout} onStart={handleStartWorkout} />
+
+      <View style={styles.technique}>
+        <TechniquePromoCard />
+      </View>
 
       <View style={styles.row}>
         <MetricCard
@@ -121,6 +126,7 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
+  technique: { marginTop: spacing.lg },
   row: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg },
   section: { gap: spacing.md, marginTop: spacing.lg },
   waterRow: {

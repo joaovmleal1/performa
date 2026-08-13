@@ -15,6 +15,7 @@ import {
 } from '@/components/ui';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
 import { colors, radius, spacing } from '@/theme';
+import { useAppRouter } from '@/hooks/useAppRouter';
 
 export default function WorkoutSessionScreen() {
   const router = useRouter();

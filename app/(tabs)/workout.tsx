@@ -1,6 +1,7 @@
 import { Flag } from 'lucide-react-native';
 import { StyleSheet, View } from 'react-native';
 
+import { TechniquePromoCard } from '@/components/technique/TechniquePromoCard';
 import {
   AppButton,
   AppText,
@@ -36,6 +37,10 @@ export default function WorkoutTabScreen() {
       <ScreenTitle title="Treino" subtitle="Foque em uma série de cada vez." />
 
       <WorkoutCard workout={workout} onStart={handleStart} />
+
+      <View style={styles.technique}>
+        <TechniquePromoCard />
+      </View>
 
       {plan ? (
         <Card accent="purple" style={styles.prepCard}>
@@ -88,17 +93,12 @@ export default function WorkoutTabScreen() {
           />
         ))}
       </View>
-
-      <AppButton
-        label="Técnica de execução"
-        variant="secondary"
-        onPress={() => router.push('/technique')}
-      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  technique: { marginTop: spacing.lg },
   prepCard: { gap: spacing.md, marginTop: spacing.lg },
   prepHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   phaseList: { gap: 6 },

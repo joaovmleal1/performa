@@ -2,6 +2,7 @@ import {
   Bell,
   BookOpen,
   CalendarDays,
+  CircleCheck,
   HelpCircle,
   Repeat2,
   Scale,
@@ -103,6 +104,12 @@ export default function ProfileScreen() {
           onPress={() => router.push('/exercises')}
         />
         <ListRow
+          icon={<CircleCheck {...ICON} />}
+          title="Certo × Errado"
+          subtitle="Técnica de execução em vídeo"
+          onPress={() => router.push('/technique')}
+        />
+        <ListRow
           icon={<HelpCircle {...ICON} />}
           title="Ajuda e suporte"
           onPress={() => router.push('/ai')}
@@ -152,7 +159,7 @@ const styles = StyleSheet.create({
   },
   cta: {
     marginTop: spacing.xl,
-    maxWidth: 280,
+    width: '100%',
   },
   menu: {
     paddingVertical: spacing.xs,

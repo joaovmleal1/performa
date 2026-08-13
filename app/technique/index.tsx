@@ -56,16 +56,24 @@ export default function TechniqueLibraryScreen() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return formCatalog.filter((lesson) => {
-      const matchesQuery =
-        !q ||
-        lesson.name.toLowerCase().includes(q) ||
-        lesson.summary.toLowerCase().includes(q) ||
-        formMuscleLabels[lesson.muscleGroup].toLowerCase().includes(q);
-      const matchesMuscle = muscle === 'all' || lesson.muscleGroup === muscle;
-      const matchesType = formType === 'all' || lesson.formType === formType;
-      return matchesQuery && matchesMuscle && matchesType;
-    });
+    const rank: Record<FormType, number> = {
+      both: 0,
+      correct: 1,
+      incorrect: 2,
+      guide: 3,
+    };
+    return formCatalog
+      .filter((lesson) => {
+        const matchesQuery =
+          !q ||
+          lesson.name.toLowerCase().includes(q) ||
+          lesson.summary.toLowerCase().includes(q) ||
+          formMuscleLabels[lesson.muscleGroup].toLowerCase().includes(q);
+        const matchesMuscle = muscle === 'all' || lesson.muscleGroup === muscle;
+        const matchesType = formType === 'all' || lesson.formType === formType;
+        return matchesQuery && matchesMuscle && matchesType;
+      })
+      .sort((a, b) => rank[a.formType] - rank[b.formType] || a.name.localeCompare(b.name, 'pt-BR'));
   }, [query, muscle, formType]);
 
   const openFilters = () => {
@@ -89,7 +97,7 @@ export default function TechniqueLibraryScreen() {
 
   return (
     <Screen padded={false}>
-      <ScreenHeader title="Técnica" showBack />
+      <ScreenHeader title="Certo × Errado" showBack />
 
       <View style={styles.content}>
         <FlatList
@@ -104,7 +112,7 @@ export default function TechniqueLibraryScreen() {
             <View style={styles.headerBlock}>
               <View style={styles.titleRow}>
                 <AppText variant="body" muted style={{ flex: 1 }}>
-                  Como fazer e como não fazer
+                  Vídeos de técnica: execução correta e erros comuns
                 </AppText>
                 <AppText variant="caption" color={colors.primary}>
                   {filtered.length} vídeos
