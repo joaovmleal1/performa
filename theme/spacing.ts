@@ -12,6 +12,7 @@ export const spacing = {
   '6xl': 64,
 } as const;
 
+/** Cantos do manual: 8–12px em cards/controles; lg só para sheets */
 export const radius = {
   sm: 8,
   md: 12,

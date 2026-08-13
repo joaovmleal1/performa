@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors } from '@/theme';
 
+const ICON_STROKE = 1.85;
+
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
 
@@ -16,7 +18,7 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: colors.tabInactive,
         tabBarStyle: {
           backgroundColor: colors.backgroundElevated,
-          borderTopColor: colors.borderSubtle,
+          borderTopColor: colors.border,
           borderTopWidth: StyleSheet.hairlineWidth,
           height: 62 + Math.max(insets.bottom, 8),
           paddingTop: 8,
@@ -25,6 +27,7 @@ export default function TabsLayout() {
         tabBarLabelStyle: {
           fontFamily: 'Sora_500Medium',
           fontSize: 11,
+          letterSpacing: 0.2,
         },
         tabBarHideOnKeyboard: true,
       }}
@@ -33,35 +36,45 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Início',
-          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Home color={color} size={size} strokeWidth={ICON_STROKE} />
+          ),
         }}
       />
       <Tabs.Screen
         name="workout"
         options={{
           title: 'Treino',
-          tabBarIcon: ({ color, size }) => <Dumbbell color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Dumbbell color={color} size={size} strokeWidth={ICON_STROKE} />
+          ),
         }}
       />
       <Tabs.Screen
         name="nutrition"
         options={{
           title: 'Nutrição',
-          tabBarIcon: ({ color, size }) => <Apple color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <Apple color={color} size={size} strokeWidth={ICON_STROKE} />
+          ),
         }}
       />
       <Tabs.Screen
         name="progress"
         options={{
           title: 'Progresso',
-          tabBarIcon: ({ color, size }) => <LineChart color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <LineChart color={color} size={size} strokeWidth={ICON_STROKE} />
+          ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => (
+            <User color={color} size={size} strokeWidth={ICON_STROKE} />
+          ),
         }}
       />
     </Tabs>

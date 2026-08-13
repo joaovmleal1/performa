@@ -1,6 +1,7 @@
 import { Droplets, Flame } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { PerformaMark } from '@/components/brand/PerformaLogo';
 import {
   AIInsightCard,
   AppText,
@@ -45,6 +46,12 @@ export default function DashboardScreen() {
   return (
     <Screen scroll>
       <View style={styles.header}>
+        <View style={styles.brandRow}>
+          <PerformaMark size={36} />
+          <AppText variant="caption" color={colors.primary} style={styles.brandTag}>
+            TREINO • NUTRIÇÃO • RESULTADOS
+          </AppText>
+        </View>
         <AppText variant="h1">Olá, {firstName}!</AppText>
         <AppText variant="body" muted>
           Pronta para superar seus limites hoje?
@@ -184,7 +191,9 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: spacing.xs, marginBottom: spacing.xl, marginTop: spacing.md },
+  header: { gap: spacing.sm, marginBottom: spacing.xl, marginTop: spacing.md },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.xs },
+  brandTag: { letterSpacing: 1.1, fontFamily: 'Sora_500Medium' },
   row: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg },
   section: { gap: spacing.md, marginTop: spacing.lg },
   waterRow: {
@@ -211,7 +220,7 @@ const styles = StyleSheet.create({
   barTrack: {
     flex: 1,
     width: '70%',
-    backgroundColor: colors.borderSubtle,
+    backgroundColor: colors.surfaceLight,
     borderRadius: 8,
     justifyContent: 'flex-end',
     overflow: 'hidden',

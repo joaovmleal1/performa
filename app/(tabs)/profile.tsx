@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { PerformaMark } from '@/components/brand/PerformaLogo';
 import {
   AppButton,
   AppText,
@@ -21,12 +22,16 @@ export default function ProfileScreen() {
   return (
     <Screen scroll>
       <View style={styles.header}>
+        <PerformaMark size={40} />
         <Avatar name={name} size={72} />
         <AppText variant="h1" style={{ marginTop: spacing.md }}>
           {name}
         </AppText>
         <AppText variant="body" muted>
           @{user?.username ?? 'performa'}
+        </AppText>
+        <AppText variant="caption" color={colors.primary} style={{ letterSpacing: 1.2, marginTop: 4 }}>
+          TREINO • NUTRIÇÃO • RESULTADOS
         </AppText>
       </View>
 

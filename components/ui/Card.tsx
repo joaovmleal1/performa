@@ -58,10 +58,10 @@ export function Card({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceMedium,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     overflow: 'hidden',
   },
   padded: {
@@ -69,17 +69,17 @@ const styles = StyleSheet.create({
   },
   glowGreen: {
     shadowColor: colors.primary,
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
+    shadowOpacity: 0.16,
+    shadowRadius: 14,
     shadowOffset: { width: 0, height: 0 },
-    borderColor: 'rgba(0,255,133,0.22)',
+    borderColor: 'rgba(0,255,133,0.28)',
   },
   glowPurple: {
     shadowColor: colors.secondary,
-    shadowOpacity: 0.22,
-    shadowRadius: 16,
+    shadowOpacity: 0.2,
+    shadowRadius: 14,
     shadowOffset: { width: 0, height: 0 },
-    borderColor: 'rgba(123,92,255,0.28)',
+    borderColor: 'rgba(123,92,255,0.32)',
   },
   pressed: { opacity: 0.92, transform: [{ scale: 0.99 }] },
 });

@@ -145,9 +145,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: spacing.lg,
     borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceMedium,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     minHeight: 56,
   },
   itemSelected: {
@@ -173,10 +173,10 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMedium,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
   },
   chipSelected: {
     backgroundColor: colors.primary,
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
   stepBtn: {
     width: 56,
     height: 56,
-    borderRadius: 16,
-    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMedium,
     borderWidth: 1,
     borderColor: colors.border,
     alignItems: 'center',
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 4,
-    backgroundColor: colors.borderSubtle,
+    backgroundColor: colors.surfaceLight,
     borderRadius: radius.full,
     overflow: 'hidden',
   },

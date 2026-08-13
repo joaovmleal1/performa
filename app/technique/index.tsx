@@ -7,7 +7,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   FlatList,
   Modal,
@@ -323,12 +323,12 @@ function TechniqueCard({
 function statusFor(formType: FormType): {
   tone: 'ok' | 'danger' | 'neutral';
   bg: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 } {
   if (formType === 'incorrect') {
     return {
       tone: 'danger',
-      bg: '#FF4D6A',
+      bg: colors.error,
       icon: <X size={12} color="#fff" strokeWidth={3} />,
     };
   }

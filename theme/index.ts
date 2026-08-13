@@ -3,7 +3,7 @@ export * from './typography';
 export * from './spacing';
 export * from './motion';
 
-import { colors } from './colors';
+import { colors, gradients } from './colors';
 import { typography, fontFamily } from './typography';
 import { spacing, radius, layout, hitSlop } from './spacing';
 import { duration, easing, pressScale } from './motion';
@@ -23,8 +23,9 @@ export const tokens = {
     dangerMuted: colors.errorMuted,
     fat: colors.fats,
     blackSoft: colors.backgroundElevated,
-    surfaceElevated: colors.surfaceHover,
+    surfaceElevated: colors.surfaceElevated,
   },
+  gradients,
   spacing,
   radius,
   typography,
@@ -33,6 +34,7 @@ export const tokens = {
 
 export const theme = {
   colors,
+  gradients,
   typography,
   fontFamily,
   spacing,

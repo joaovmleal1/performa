@@ -1,5 +1,6 @@
 import { TextStyle } from 'react-native';
 
+/** Tipografia oficial: Sora (Google Fonts) */
 export const fontFamily = {
   regular: 'Sora_400Regular',
   medium: 'Sora_500Medium',
@@ -50,17 +51,17 @@ export const typography = {
   } satisfies TextStyle,
   caption: {
     fontFamily: fontFamily.regular,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
   } satisfies TextStyle,
   metric: {
-    fontFamily: fontFamily.semibold,
+    fontFamily: fontFamily.bold,
     fontSize: 28,
     lineHeight: 34,
     letterSpacing: -0.4,
   } satisfies TextStyle,
   metricLg: {
-    fontFamily: fontFamily.bold,
+    fontFamily: fontFamily.extrabold,
     fontSize: 40,
     lineHeight: 46,
     letterSpacing: -0.8,
@@ -69,6 +70,13 @@ export const typography = {
     fontFamily: fontFamily.semibold,
     fontSize: 16,
     lineHeight: 20,
+  } satisfies TextStyle,
+  wordmark: {
+    fontFamily: fontFamily.extrabold,
+    fontSize: 28,
+    lineHeight: 32,
+    letterSpacing: 2.4,
+    fontStyle: 'italic',
   } satisfies TextStyle,
 } as const;
 

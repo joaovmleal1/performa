@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { BookOpen, Send, Settings, Sparkles } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -17,7 +18,7 @@ import { router } from 'expo-router';
 import { AppText, ScreenHeader } from '@/components/ui';
 import { useAIStore } from '@/stores/ai-store';
 import { useSettingsStore } from '@/stores/settings-store';
-import { colors, radius, spacing } from '@/theme';
+import { colors, gradients, radius, spacing } from '@/theme';
 
 export default function AIScreen() {
   const insets = useSafeAreaInsets();
@@ -111,7 +112,7 @@ export default function AIScreen() {
               ) : null}
               <AppText
                 variant="body"
-                color={msg.role === 'user' ? '#fff' : colors.text}
+                color={msg.role === 'user' ? colors.onPrimary : colors.text}
                 style={styles.bubbleText}
               >
                 {msg.content}
@@ -130,7 +131,7 @@ export default function AIScreen() {
               ) : null}
               <AppText
                 variant="caption"
-                color={msg.role === 'user' ? 'rgba(255,255,255,0.65)' : colors.textMuted}
+                color={msg.role === 'user' ? 'rgba(10,10,13,0.55)' : colors.textMuted}
                 style={styles.bubbleTime}
               >
                 {new Date(msg.createdAt).toLocaleTimeString('pt-BR', {
@@ -164,11 +165,24 @@ export default function AIScreen() {
             returnKeyType="send"
           />
           <Pressable
-            style={[styles.sendBtn, (!input.trim() || isTyping) && styles.sendBtnDisabled]}
             onPress={() => handleSend()}
             disabled={!input.trim() || isTyping}
+            style={[styles.sendBtnShell, (!input.trim() || isTyping) && styles.sendBtnDisabled]}
           >
-            <Send size={18} color={input.trim() && !isTyping ? '#fff' : colors.textMuted} />
+            {input.trim() && !isTyping ? (
+              <LinearGradient
+                colors={[...gradients.ai]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.sendBtn}
+              >
+                <Send size={18} color={colors.white} strokeWidth={1.85} />
+              </LinearGradient>
+            ) : (
+              <View style={[styles.sendBtn, { backgroundColor: colors.surfaceMedium }]}>
+                <Send size={18} color={colors.textMuted} strokeWidth={1.85} />
+              </View>
+            )}
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -221,7 +235,7 @@ const styles = StyleSheet.create({
   },
   aiBubble: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceMedium,
     borderWidth: 1,
     borderColor: colors.border,
   },
@@ -252,23 +266,24 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceMedium,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
     fontSize: 15,
+    fontFamily: 'Sora_400Regular',
     color: colors.text,
     maxHeight: 100,
     borderWidth: 1,
     borderColor: colors.border,
   },
+  sendBtnShell: { borderRadius: radius.md, overflow: 'hidden' },
   sendBtn: {
     width: 44,
     height: 44,
     borderRadius: radius.md,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendBtnDisabled: { backgroundColor: colors.surface },
+  sendBtnDisabled: { opacity: 0.7 },
 });

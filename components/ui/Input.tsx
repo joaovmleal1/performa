@@ -84,9 +84,9 @@ const styles = StyleSheet.create({
   field: {
     minHeight: 52,
     borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceMedium,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     paddingHorizontal: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
@@ -94,6 +94,10 @@ const styles = StyleSheet.create({
   },
   focused: {
     borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 0 },
   },
   errorBorder: {
     borderColor: colors.error,
