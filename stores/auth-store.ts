@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { buildPeriodization } from '@/lib/periodization';
 import { mockUser } from '@/data/mock';
+import { coachBuildPeriodization } from '@/services/coach-agent';
 import type { PeriodizationPlan, UserProfile } from '@/types';
 
 type AuthState = {
@@ -98,10 +98,11 @@ export const useAuthStore = create<AuthState>()(
           partial.competitionName &&
           partial.competitionDate
         ) {
-          periodization = buildPeriodization({
+          periodization = coachBuildPeriodization({
             sport: partial.preparationSport,
             competitionName: partial.competitionName,
             competitionDate: partial.competitionDate,
+            user: current,
           });
         }
 
@@ -138,7 +139,7 @@ export const useAuthStore = create<AuthState>()(
       },
       activatePreparationMode: (input) => {
         const current = get().user ?? mockUser;
-        const periodization = buildPeriodization(input);
+        const periodization = coachBuildPeriodization({ ...input, user: current });
         set({
           user: withNames(
             {

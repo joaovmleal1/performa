@@ -89,6 +89,8 @@ export interface PeriodizationPlan {
   totalWeeks: number;
   phases: PeriodizationPhase[];
   createdAt: string;
+  /** Notas do Coach Especialista (RAG sobre cânone + estudos) */
+  coachNotes?: string[];
 }
 
 export interface UserProfile {

@@ -57,6 +57,16 @@ theme/               # tokens de cor, tipografia, spacing
 types/               # entidades do domínio
 ```
 
+## Coach Especialista
+
+Agente de suporte e periodização em `/ai` (`services/coach-agent.ts`), com RAG local sobre:
+
+- cânone interno (EF / fisioterapia esportiva / musculação)
+- *Guida Completa Massa Muscolare* (Brunaccioni / V Athlete–InVictus)
+- *Allenamento a Casa* (Fisico Spartano, via Dhoze)
+
+Chunks em `data/knowledge/`. A periodização do modo preparação (`/preparation`) usa o mesmo motor.
+
 ## Fluxo
 
 Splash → Onboarding → Login → Avaliação inicial → Tabs

@@ -174,9 +174,9 @@ export default function DashboardScreen() {
         accessibilityLabel="Abrir PERFORMA AI"
         style={{ marginTop: spacing.md }}
       >
-        <AppText variant="h3">PERFORMA AI</AppText>
+        <AppText variant="h3">Coach Especialista</AppText>
         <AppText variant="caption" muted>
-          Perguntas sobre treino, nutrição e evolução
+          Periodização, musculação e suporte com base científica
         </AppText>
       </Card>
     </Screen>

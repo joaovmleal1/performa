@@ -1,159 +1,195 @@
-import { useRef, useState } from 'react';
+import { BookOpen, Send, Sparkles } from 'lucide-react-native';
+import { useEffect, useRef, useState } from 'react';
 import {
-  FlatList,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
+  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 
-import { AIOrb } from '@/components/brand/PerformaLogo';
-import { AppText, Input, ScreenHeader } from '@/components/ui';
+import { AppText, ScreenHeader } from '@/components/ui';
 import { useAIStore } from '@/stores/ai-store';
 import { colors, radius, spacing } from '@/theme';
 
-const SUGGESTIONS = [
-  'Estou consumindo proteína suficiente?',
-  'Qual foi minha evolução no supino?',
-  'Posso trocar arroz por batata?',
-  'Como está meu volume semanal?',
-];
-
-export default function AIChatScreen() {
+export default function AIScreen() {
   const insets = useSafeAreaInsets();
-  const listRef = useRef<FlatList>(null);
-  const [draft, setDraft] = useState('');
+  const [input, setInput] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
   const messages = useAIStore((s) => s.messages);
   const isTyping = useAIStore((s) => s.isTyping);
   const send = useAIStore((s) => s.send);
+  const suggestions = useAIStore((s) => s.suggestions());
 
-  const handleSend = async (text?: string) => {
-    const value = (text ?? draft).trim();
-    if (!value) return;
-    setDraft('');
-    await send(value);
-    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+  useEffect(() => {
+    scrollRef.current?.scrollToEnd({ animated: true });
+  }, [messages, isTyping]);
+
+  const handleSend = (text?: string) => {
+    const msg = (text ?? input).trim();
+    if (!msg || isTyping) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setInput('');
+    void send(msg);
   };
 
+  const showEmptyHints = messages.length <= 1;
+
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={8}
-    >
-      <View style={[styles.flex, { backgroundColor: colors.background, paddingBottom: insets.bottom }]}>
-        <ScreenHeader title="PERFORMA AI" showBack />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <ScreenHeader title="Coach Especialista" showBack />
+      <AppText variant="caption" muted style={styles.subtitle}>
+        EF · Fisioterapia · Musculação · Periodização
+      </AppText>
 
-        <View style={styles.hero}>
-          <AIOrb size={72} />
-          <AppText variant="caption" muted center>
-            Sugestões com base nos seus dados. Não substitui profissional de saúde.
-          </AppText>
-        </View>
-
-        <FlatList
-          ref={listRef}
-          data={messages}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
-          ListHeaderComponent={
-            <View style={styles.suggestions}>
-              {SUGGESTIONS.map((item) => (
-                <Pressable
-                  key={item}
-                  style={styles.suggestion}
-                  onPress={() => handleSend(item)}
-                >
-                  <AppText variant="caption">{item}</AppText>
-                </Pressable>
-              ))}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          ref={scrollRef}
+          style={styles.chat}
+          contentContainerStyle={styles.chatContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {showEmptyHints ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIcon}>
+                <BookOpen size={28} color={colors.primary} />
+              </View>
+              <AppText variant="h3">Base científica ativa</AppText>
+              <AppText variant="caption" muted style={styles.emptyText}>
+                Literatura de educação física, fisioterapia e musculação + estudos InVictus/V Athlete
+                e treino em casa (Dhoze). Peça periodização, técnica ou suporte.
+              </AppText>
+              <View style={styles.suggestions}>
+                {suggestions.map((s) => (
+                  <Pressable
+                    key={s}
+                    style={({ pressed }) => [styles.suggestionChip, pressed && { opacity: 0.7 }]}
+                    onPress={() => handleSend(s)}
+                  >
+                    <AppText variant="bodyMedium">{s}</AppText>
+                  </Pressable>
+                ))}
+              </View>
             </View>
-          }
-          renderItem={({ item }) => (
+          ) : null}
+
+          {messages.map((msg) => (
             <View
-              style={[
-                styles.bubble,
-                item.role === 'user' ? styles.userBubble : styles.aiBubble,
-              ]}
+              key={msg.id}
+              style={[styles.bubble, msg.role === 'user' ? styles.userBubble : styles.aiBubble]}
             >
+              {msg.role === 'assistant' ? (
+                <View style={styles.aiLabel}>
+                  <Sparkles size={12} color={colors.primary} />
+                  <AppText variant="caption" color={colors.primary}>
+                    Coach
+                  </AppText>
+                </View>
+              ) : null}
               <AppText
                 variant="body"
-                color={item.role === 'user' ? colors.onPrimary : colors.white}
+                color={msg.role === 'user' ? '#fff' : colors.text}
+                style={styles.bubbleText}
               >
-                {item.content}
+                {msg.content}
+              </AppText>
+              {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 ? (
+                <View style={styles.sourcesBox}>
+                  <AppText variant="caption" muted style={styles.sourcesTitle}>
+                    Fontes consultadas
+                  </AppText>
+                  {msg.sources.slice(0, 4).map((src) => (
+                    <AppText key={src} variant="caption" muted>
+                      · {src}
+                    </AppText>
+                  ))}
+                </View>
+              ) : null}
+              <AppText
+                variant="caption"
+                color={msg.role === 'user' ? 'rgba(255,255,255,0.65)' : colors.textMuted}
+                style={styles.bubbleTime}
+              >
+                {new Date(msg.createdAt).toLocaleTimeString('pt-BR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </AppText>
             </View>
-          )}
-          ListFooterComponent={
-            isTyping ? (
-              <AppText variant="caption" muted style={{ marginTop: spacing.sm }}>
-                PERFORMA AI está pensando…
-              </AppText>
-            ) : null
-          }
-        />
+          ))}
 
-        <View style={styles.composer}>
-          <View style={{ flex: 1 }}>
-            <Input
-              placeholder="Pergunte sobre treino, dieta ou progresso"
-              value={draft}
-              onChangeText={setDraft}
-              onSubmitEditing={() => handleSend()}
-              returnKeyType="send"
-            />
-          </View>
+          {isTyping ? (
+            <View style={[styles.bubble, styles.aiBubble, styles.typingBubble]}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <AppText variant="caption" muted>
+                Consultando a base científica...
+              </AppText>
+            </View>
+          ) : null}
+        </ScrollView>
+
+        <View style={[styles.inputBar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+          <TextInput
+            style={styles.input}
+            value={input}
+            onChangeText={setInput}
+            placeholder="Pergunte sobre treino, técnica ou periodização..."
+            placeholderTextColor={colors.textMuted}
+            multiline
+            maxLength={500}
+            onSubmitEditing={() => handleSend()}
+            returnKeyType="send"
+          />
           <Pressable
-            style={[styles.send, (!draft.trim() || isTyping) && styles.sendDisabled]}
-            disabled={!draft.trim() || isTyping}
+            style={[styles.sendBtn, (!input.trim() || isTyping) && styles.sendBtnDisabled]}
             onPress={() => handleSend()}
-            accessibilityRole="button"
-            accessibilityLabel="Enviar"
+            disabled={!input.trim() || isTyping}
           >
-            <AppText variant="label" color={colors.onPrimary}>
-              Enviar
-            </AppText>
+            <Send size={18} color={input.trim() && !isTyping ? '#fff' : colors.textMuted} />
           </Pressable>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  hero: {
+  container: { flex: 1, backgroundColor: colors.background },
+  subtitle: { paddingHorizontal: spacing.lg, marginBottom: spacing.sm },
+  chat: { flex: 1 },
+  chatContent: { padding: spacing.lg, paddingBottom: spacing.sm, gap: spacing.sm },
+  emptyState: { alignItems: 'center', paddingTop: spacing.lg, paddingHorizontal: spacing.sm, gap: spacing.sm },
+  emptyIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.lg,
+    backgroundColor: colors.primaryMuted,
     alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
+    justifyContent: 'center',
     marginBottom: spacing.sm,
   },
-  list: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-    gap: spacing.sm,
-  },
-  suggestions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  suggestion: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: radius.full,
-    backgroundColor: colors.secondaryMuted,
+  emptyText: { textAlign: 'center', marginBottom: spacing.md },
+  suggestions: { width: '100%', gap: spacing.sm },
+  suggestionChip: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(123,92,255,0.35)',
+    borderColor: colors.border,
   },
   bubble: {
-    maxWidth: '88%',
-    padding: spacing.md,
+    maxWidth: '90%',
     borderRadius: radius.lg,
+    padding: spacing.md,
   },
   userBubble: {
     alignSelf: 'flex-end',
@@ -163,25 +199,52 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
   },
-  composer: {
+  aiLabel: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 },
+  bubbleText: { lineHeight: 21 },
+  sourcesBox: {
+    marginTop: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    gap: 2,
+  },
+  sourcesTitle: {
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    marginBottom: 2,
+  },
+  bubbleTime: { marginTop: 6, alignSelf: 'flex-end' },
+  typingBubble: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  inputBar: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: spacing.sm,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.borderSubtle,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    gap: spacing.sm,
   },
-  send: {
-    height: 52,
-    paddingHorizontal: 16,
+  input: {
+    flex: 1,
+    backgroundColor: colors.surface,
     borderRadius: radius.md,
-    backgroundColor: colors.secondary,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: colors.text,
+    maxHeight: 100,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  sendBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendDisabled: { opacity: 0.45 },
+  sendBtnDisabled: { backgroundColor: colors.surface },
 });
