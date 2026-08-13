@@ -36,7 +36,7 @@ export default function DashboardScreen() {
 
   return (
     <Screen scroll>
-      <Greeting name={firstName} subtitle="Seu treino e nutrição de hoje." />
+      <Greeting name={firstName} />
 
       <WorkoutCard workout={mockTodayWorkout} onStart={handleStartWorkout} />
 

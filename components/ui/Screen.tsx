@@ -55,11 +55,8 @@ const styles = StyleSheet.create({
     width: '100%',
     ...(Platform.OS === 'web'
       ? ({
-          maxWidth: 520,
+          maxWidth: 430,
           alignSelf: 'center',
-          borderLeftWidth: StyleSheet.hairlineWidth,
-          borderRightWidth: StyleSheet.hairlineWidth,
-          borderColor: colors.border,
         } as object)
       : null),
   },

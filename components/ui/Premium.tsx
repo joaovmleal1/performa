@@ -92,6 +92,10 @@ export function SectionHeading({
   );
 }
 
+/**
+ * Linha de menu no estilo do board:
+ * ícone outline sem caixa colorida · texto · valor · chevron
+ */
 export function ListRow({
   icon,
   title,
@@ -112,8 +116,8 @@ export function ListRow({
   const content = (
     <>
       {icon ? <View style={styles.rowIcon}>{icon}</View> : null}
-      <View style={{ flex: 1, gap: 2 }}>
-        <AppText variant="bodyMedium" color={destructive ? colors.error : colors.text}>
+      <View style={styles.rowCopy}>
+        <AppText variant="body" color={destructive ? colors.error : colors.text}>
           {title}
         </AppText>
         {subtitle ? (
@@ -123,16 +127,12 @@ export function ListRow({
         ) : null}
       </View>
       {value ? (
-        <AppText variant="label" color={colors.textSecondary}>
+        <AppText variant="label" color={colors.textMuted}>
           {value}
         </AppText>
       ) : null}
-      {onPress ? (
-        <ChevronRight
-          size={18}
-          color={destructive ? colors.error : colors.textMuted}
-          strokeWidth={1.85}
-        />
+      {onPress && !destructive ? (
+        <ChevronRight size={18} color={colors.textMuted} strokeWidth={1.75} />
       ) : null}
     </>
   );
@@ -213,7 +213,7 @@ export function IconTile({
       accessibilityLabel={title}
       style={({ pressed }) => [styles.legacyTile, pressed && styles.rowPressed, style]}
     >
-      <View style={styles.legacyIcon}>{icon}</View>
+      {icon}
       <View style={{ flex: 1, gap: 2 }}>
         <AppText variant="bodyMedium">{title}</AppText>
         {subtitle ? (
@@ -222,7 +222,7 @@ export function IconTile({
           </AppText>
         ) : null}
       </View>
-      <ChevronRight size={18} color={colors.textMuted} strokeWidth={1.85} />
+      <ChevronRight size={18} color={colors.textMuted} strokeWidth={1.75} />
     </Pressable>
   );
 }
@@ -248,8 +248,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   listRow: {
-    minHeight: 56,
-    paddingVertical: spacing.md,
+    minHeight: 52,
+    paddingVertical: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
@@ -259,14 +259,12 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   rowIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceMedium,
+    width: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowPressed: { opacity: 0.7 },
+  rowCopy: { flex: 1, gap: 2 },
+  rowPressed: { opacity: 0.65 },
   pill: {
     alignSelf: 'flex-start',
     borderRadius: radius.full,
@@ -281,19 +279,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    padding: spacing.md,
-    minHeight: 72,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surfaceLight,
-  },
-  legacyIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceMedium,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: spacing.md,
+    minHeight: 56,
   },
 });

@@ -120,14 +120,24 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
     .map((p) => p[0])
     .join('')
     .toUpperCase();
+  const fontSize = size >= 72 ? 28 : size >= 56 ? 20 : 14;
   return (
     <View
       style={[
         styles.avatar,
-        { width: size, height: size, borderRadius: size / 2 },
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          borderWidth: size >= 64 ? 2 : 1.5,
+        },
       ]}
     >
-      <AppText variant="label" tone="onPrimary">
+      <AppText
+        variant="label"
+        color={colors.primary}
+        style={{ fontSize, lineHeight: fontSize + 4, fontFamily: 'Sora_700Bold' }}
+      >
         {initials}
       </AppText>
     </View>
@@ -165,7 +175,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   avatar: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.surfaceLight,
+    borderColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

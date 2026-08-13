@@ -3,7 +3,6 @@ import {
   BookOpen,
   CalendarDays,
   HelpCircle,
-  LogOut,
   Repeat2,
   Scale,
   Target,
@@ -11,6 +10,7 @@ import {
 } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { PerformaMark } from '@/components/brand/PerformaLogo';
 import {
   AppButton,
   AppText,
@@ -18,12 +18,17 @@ import {
   Card,
   ListRow,
   Screen,
-  ScreenTitle,
 } from '@/components/ui';
 import { goalLabels } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
 import { useAuthStore } from '@/stores/auth-store';
 import { colors, spacing } from '@/theme';
+
+const ICON = {
+  size: 20,
+  color: colors.textSecondary,
+  strokeWidth: 1.75,
+} as const;
 
 export default function ProfileScreen() {
   const router = useAppRouter();
@@ -33,67 +38,73 @@ export default function ProfileScreen() {
 
   return (
     <Screen scroll>
-      <ScreenTitle title="Perfil" />
+      <View style={styles.brandRow}>
+        <PerformaMark size={28} />
+        <AppText variant="label" style={styles.brandWord}>
+          PERFORMA
+        </AppText>
+      </View>
 
-      <Card style={styles.identity}>
-        <Avatar name={name} size={72} />
-        <AppText variant="h2" center>
+      <View style={styles.identity}>
+        <Avatar name={name} size={88} />
+        <AppText variant="h1" center style={styles.name}>
           {name}
         </AppText>
         <AppText variant="caption" color={colors.textMuted} center>
-          @{user?.username ?? 'performa'} · {user?.streakDays ?? 0} dias de sequência
+          @{user?.username ?? 'performa'}
+        </AppText>
+        <AppText variant="label" color={colors.primary} center style={styles.streak}>
+          {user?.streakDays ?? 0} dias de sequência
         </AppText>
         <AppButton
           label="Ver meu perfil"
-          variant="secondary"
           size="md"
           onPress={() => router.push('/(tabs)/progress')}
+          style={styles.cta}
         />
-      </Card>
+      </View>
 
-      <Card style={styles.group}>
+      <Card style={styles.menu}>
         <ListRow
-          icon={<UserRound size={18} color={colors.primary} strokeWidth={1.85} />}
+          icon={<UserRound {...ICON} />}
           title="Dados pessoais"
           value={`${user?.weightKg ?? '—'} kg`}
           onPress={() => {}}
         />
         <ListRow
-          icon={<Target size={18} color={colors.primary} strokeWidth={1.85} />}
+          icon={<Target {...ICON} />}
           title="Objetivo"
           value={goalLabels[user?.goal ?? 'definition'] ?? '—'}
+          onPress={() => {}}
         />
         <ListRow
-          icon={<Scale size={18} color={colors.secondary} strokeWidth={1.85} />}
+          icon={<Scale {...ICON} />}
           title="Medidas"
           value={`${user?.heightCm ?? '—'} cm`}
+          onPress={() => {}}
         />
         <ListRow
-          icon={<Bell size={18} color={colors.info} strokeWidth={1.85} />}
+          icon={<Bell {...ICON} />}
           title="Notificações"
           onPress={() => {}}
-          last
         />
-      </Card>
-
-      <Card style={styles.group}>
         <ListRow
-          icon={<Repeat2 size={18} color={colors.primary} strokeWidth={1.85} />}
+          icon={<Repeat2 {...ICON} />}
           title="Hábitos diários"
           onPress={() => router.push('/habits')}
         />
         <ListRow
-          icon={<CalendarDays size={18} color={colors.secondary} strokeWidth={1.85} />}
+          icon={<CalendarDays {...ICON} />}
           title="Calendário"
           onPress={() => router.push('/calendar')}
         />
         <ListRow
-          icon={<BookOpen size={18} color={colors.info} strokeWidth={1.85} />}
+          icon={<BookOpen {...ICON} />}
           title="Biblioteca de exercícios"
           onPress={() => router.push('/exercises')}
         />
         <ListRow
-          icon={<HelpCircle size={18} color={colors.primary} strokeWidth={1.85} />}
+          icon={<HelpCircle {...ICON} />}
           title="Ajuda e suporte"
           onPress={() => router.push('/ai')}
           last
@@ -106,9 +117,8 @@ export default function ProfileScreen() {
           router.replace('/(auth)/login');
         }}
         accessibilityRole="button"
-        style={({ pressed }) => [styles.logout, pressed && { opacity: 0.65 }]}
+        style={({ pressed }) => [styles.logout, pressed && { opacity: 0.6 }]}
       >
-        <LogOut size={18} color={colors.error} strokeWidth={1.85} />
         <AppText variant="bodyMedium" color={colors.error}>
           Sair da conta
         </AppText>
@@ -118,22 +128,42 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  identity: {
+  brandRow: {
+    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: spacing.xl,
+    marginTop: spacing.md,
+    marginBottom: spacing['2xl'],
   },
-  group: {
+  brandWord: {
+    letterSpacing: 2,
+    color: colors.white,
+    fontStyle: 'italic',
+    fontFamily: 'Sora_800ExtraBold',
+  },
+  identity: {
+    alignItems: 'center',
+    marginBottom: spacing['2xl'],
+  },
+  name: {
+    marginTop: spacing.lg,
+  },
+  streak: {
+    marginTop: spacing.sm,
+  },
+  cta: {
+    marginTop: spacing.xl,
+    maxWidth: 280,
+  },
+  menu: {
     paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.lg,
     marginBottom: spacing.lg,
   },
   logout: {
     minHeight: 52,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
     marginBottom: spacing.xl,
   },
 });

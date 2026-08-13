@@ -85,7 +85,7 @@ export default function ProgressScreen() {
         {mockPRs.map((pr, index) => (
           <ListRow
             key={pr.id}
-            icon={<Trophy size={17} color={colors.warning} strokeWidth={1.85} />}
+            icon={<Trophy size={18} color={colors.textSecondary} strokeWidth={1.75} />}
             title={pr.exerciseName}
             subtitle={pr.date}
             value={`${pr.weightKg} kg × ${pr.reps}`}
