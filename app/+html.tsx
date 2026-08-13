@@ -29,11 +29,12 @@ export default function Root({ children }: { children: ReactNode }) {
 }
 
 const responsiveBackground = `
+/* Shell desktop: gutters escuros; tab bar nunca solta no canto */
 html, body, #root {
   width: 100%;
   max-width: 100%;
   min-height: 100%;
-  background: #080B10;
+  background: #080B10 !important;
   color: #FFFFFF;
 }
 body {
@@ -51,14 +52,4 @@ body {
 *:focus-visible {
   outline: 2px solid #00FF85;
   outline-offset: 2px;
-}
-/* Tab bar no mobile web: nunca colapsar numa caixinha central */
-@media (max-width: 454px) {
-  [role="tablist"],
-  nav[class*="tab"] {
-    width: 100% !important;
-    max-width: 100% !important;
-    left: 0 !important;
-    right: 0 !important;
-  }
 }`

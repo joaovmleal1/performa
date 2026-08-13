@@ -33,6 +33,6 @@ export const layout = {
   bottomNavHeight: 80,
   minTouchTarget: 44,
   headerHeight: 56,
-  maxContentWidth: 390,
+  maxContentWidth: 430,
   buttonHeight: 56,
 } as const;
