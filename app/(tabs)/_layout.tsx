@@ -7,9 +7,9 @@ import { colors } from '@/theme';
 
 const ICON_STROKE = 1.75;
 
-function TabLabel({ label, color }: { label: string; color: string }) {
+function TabLabel({ label, color }: { label: string; color: string | undefined }) {
   return (
-    <Text numberOfLines={1} style={[styles.label, { color }]}>
+    <Text numberOfLines={1} style={[styles.label, { color: color ?? colors.tabInactive }]}>
       {label}
     </Text>
   );
@@ -53,7 +53,9 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Início',
-          tabBarLabel: ({ color }) => <TabLabel label="Início" color={color} />,
+          tabBarLabel: ({ color }) => (
+            <TabLabel label="Início" color={String(color)} />
+          ),
           tabBarIcon: ({ color }) => (
             <Home color={color} size={22} strokeWidth={ICON_STROKE} />
           ),
@@ -63,7 +65,9 @@ export default function TabsLayout() {
         name="workout"
         options={{
           title: 'Treino',
-          tabBarLabel: ({ color }) => <TabLabel label="Treino" color={color} />,
+          tabBarLabel: ({ color }) => (
+            <TabLabel label="Treino" color={String(color)} />
+          ),
           tabBarIcon: ({ color }) => (
             <Dumbbell color={color} size={22} strokeWidth={ICON_STROKE} />
           ),
@@ -73,7 +77,9 @@ export default function TabsLayout() {
         name="nutrition"
         options={{
           title: 'Nutrição',
-          tabBarLabel: ({ color }) => <TabLabel label="Nutrição" color={color} />,
+          tabBarLabel: ({ color }) => (
+            <TabLabel label="Nutrição" color={String(color)} />
+          ),
           tabBarIcon: ({ color }) => (
             <Apple color={color} size={22} strokeWidth={ICON_STROKE} />
           ),
@@ -83,7 +89,9 @@ export default function TabsLayout() {
         name="progress"
         options={{
           title: 'Progresso',
-          tabBarLabel: ({ color }) => <TabLabel label="Progresso" color={color} />,
+          tabBarLabel: ({ color }) => (
+            <TabLabel label="Progresso" color={String(color)} />
+          ),
           tabBarIcon: ({ color }) => (
             <LineChart color={color} size={22} strokeWidth={ICON_STROKE} />
           ),
@@ -93,7 +101,9 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarLabel: ({ color }) => <TabLabel label="Perfil" color={color} />,
+          tabBarLabel: ({ color }) => (
+            <TabLabel label="Perfil" color={String(color)} />
+          ),
           tabBarIcon: ({ color }) => (
             <User color={color} size={22} strokeWidth={ICON_STROKE} />
           ),
