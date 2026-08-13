@@ -62,5 +62,9 @@ types/               # entidades do domínio
 Splash → Onboarding → Login → Avaliação inicial → Tabs
 (Início / Treino / Nutrição / Progresso / Perfil)
 
-Nutrição → Dieta IA → Entrevista → Geração → Resultado → Plano
-Treino → Sessão com séries, carga e descanso
+Na avaliação inicial perguntamos:
+- se a pessoa **já faz dieta**, **quer montar com o PERFORMA** ou **agora não** (desbloqueia a montagem em Nutrição)
+- se quer ativar o **modo preparação** (esporte/competição → periodização completa)
+
+Nutrição → Dieta IA (se desbloqueada) → Entrevista → Geração → Resultado → Plano  
+Treino → Sessão com séries, carga e descanso · Modo preparação em `/preparation`
