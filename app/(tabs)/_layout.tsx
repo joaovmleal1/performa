@@ -31,29 +31,20 @@ function TabLabel({
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
-  const { useShell, shellLeft } = useAppShell();
+  const { useShell, shellLeft, tabBarStyle: shellTabBar } = useAppShell();
   const bottomPad = Math.max(insets.bottom, 10);
 
-  const shellTabBar =
-    Platform.OS === 'web'
-      ? useShell
-        ? ({
-            position: 'absolute',
-            left: shellLeft,
-            width: APP_SHELL_MAX,
-            maxWidth: APP_SHELL_MAX,
-            right: 'auto',
-            marginLeft: 0,
-            marginRight: 0,
-            alignSelf: 'flex-start',
-          } as const)
-        : ({
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            width: '100%',
-            maxWidth: '100%',
-          } as const)
+  const webShellTweaks =
+    Platform.OS === 'web' && useShell
+      ? ({
+          left: shellLeft,
+          width: APP_SHELL_MAX,
+          maxWidth: APP_SHELL_MAX,
+          right: 'auto' as const,
+          marginLeft: 0,
+          marginRight: 0,
+          alignSelf: 'flex-start' as const,
+        } as const)
       : {};
 
   return (
@@ -79,6 +70,7 @@ export default function TabsLayout() {
           elevation: 0,
           shadowOpacity: 0,
           ...shellTabBar,
+          ...webShellTweaks,
         },
         tabBarItemStyle: {
           flex: 1,

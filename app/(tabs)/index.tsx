@@ -39,7 +39,7 @@ export default function DashboardScreen() {
   };
 
   return (
-    <Screen scroll>
+    <Screen scroll tabBarInset>
       <View style={styles.helloRow}>
         <View style={{ flex: 1, gap: 4 }}>
           <AppText variant="h1">Olá, {firstName}! 👋</AppText>

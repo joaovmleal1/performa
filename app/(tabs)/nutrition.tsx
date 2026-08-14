@@ -33,7 +33,7 @@ export default function NutritionTabScreen() {
   const remaining = Math.max(0, daily.target.calories - daily.consumed.calories);
 
   return (
-    <Screen scroll>
+    <Screen scroll tabBarInset>
       <AppText variant="h1" style={styles.title}>
         Nutrição
       </AppText>

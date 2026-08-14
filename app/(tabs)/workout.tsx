@@ -25,7 +25,7 @@ export default function WorkoutTabScreen() {
   };
 
   return (
-    <Screen scroll>
+    <Screen scroll tabBarInset>
       <View style={styles.header}>
         <AppText variant="caption" color={colors.textMuted}>
           Treino de hoje

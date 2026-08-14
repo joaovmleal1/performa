@@ -24,7 +24,7 @@ export default function ProgressScreen() {
   const delta = latest && first ? latest.weightKg - first.weightKg : -5.2;
 
   return (
-    <Screen scroll>
+    <Screen scroll tabBarInset>
       <AppText variant="h1" style={styles.title}>
         Progresso
       </AppText>

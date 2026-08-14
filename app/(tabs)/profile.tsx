@@ -36,7 +36,7 @@ export default function ProfileScreen() {
   const xpTarget = 2000;
 
   return (
-    <Screen scroll>
+    <Screen scroll tabBarInset>
       <View style={styles.brandRow}>
         <PerformaMark size={28} />
         <AppText variant="label" style={styles.brandWord}>
