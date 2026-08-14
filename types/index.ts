@@ -177,6 +177,33 @@ export interface LoggedSet {
   completedAt: string;
 }
 
+/** Exercício concluído com carga anotada por série */
+export interface CompletedExerciseLog {
+  exerciseId: string;
+  exerciseName: string;
+  sets: LoggedSet[];
+}
+
+/** Sessão de treino salva para mapear progressão de carga */
+export interface CompletedWorkoutSession {
+  id: string;
+  workoutId: string;
+  workoutName: string;
+  completedAt: string;
+  exercises: CompletedExerciseLog[];
+}
+
+/** Resumo de progresso de carga de um exercício */
+export interface ExerciseLoadHistoryEntry {
+  date: string;
+  sessionId: string;
+  sets: LoggedSet[];
+  /** Melhor carga da sessão (kg) */
+  topWeightKg: number;
+  /** Volume aproximado: Σ(peso × reps) */
+  volumeKg: number;
+}
+
 export interface MacroTargets {
   calories: number;
   proteinG: number;

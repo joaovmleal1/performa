@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui';
 import { mockPRs, mockWeightHistory } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
+import { useLiftHistoryStore } from '@/stores/lift-history-store';
 import { colors, radius, spacing } from '@/theme';
 
 type TabKey = 'geral' | 'treinos' | 'medidas' | 'fotos';
@@ -19,9 +20,15 @@ type TabKey = 'geral' | 'treinos' | 'medidas' | 'fotos';
 export default function ProgressScreen() {
   const router = useAppRouter();
   const [tab, setTab] = useState<TabKey>('geral');
+  const sessions = useLiftHistoryStore((s) => s.sessions);
+  const personalBests = useMemo(
+    () => useLiftHistoryStore.getState().getPersonalBests(),
+    [sessions],
+  );
   const latest = mockWeightHistory[mockWeightHistory.length - 1];
   const first = mockWeightHistory[0];
   const delta = latest && first ? latest.weightKg - first.weightKg : -5.2;
+  const completedWorkouts = sessions.length;
 
   return (
     <Screen scroll tabBarInset>
@@ -90,7 +97,7 @@ export default function ProgressScreen() {
       <View style={styles.row}>
         <MetricCard
           label="Treinos"
-          value="24"
+          value={String(completedWorkouts || 24)}
           hint="concluídos"
           accent="green"
         />
@@ -127,17 +134,60 @@ export default function ProgressScreen() {
       )}
 
       {tab === 'treinos' && (
-        <Card style={styles.section}>
-          <AppText variant="h3">Recordes</AppText>
-          {mockPRs.map((pr) => (
-            <View key={pr.id} style={styles.measureRow}>
-              <AppText variant="body">{pr.exerciseName}</AppText>
-              <AppText variant="label" color={colors.textSecondary}>
-                {pr.weightKg} kg × {pr.reps}
+        <>
+          <Card style={styles.section}>
+            <AppText variant="h3">Progressão de carga</AppText>
+            <AppText variant="caption" color={colors.textMuted}>
+              Cargas anotadas por série nos treinos concluídos.
+            </AppText>
+            {sessions.length === 0 ? (
+              <AppText variant="body" color={colors.textSecondary}>
+                Complete um treino anotando o peso de cada série para ver a evolução aqui.
               </AppText>
-            </View>
-          ))}
-        </Card>
+            ) : (
+              sessions.slice(0, 6).map((session) => (
+                <View key={session.id} style={styles.sessionBlock}>
+                  <View style={styles.measureRow}>
+                    <AppText variant="bodyMedium">{session.workoutName}</AppText>
+                    <AppText variant="caption" color={colors.textMuted}>
+                      {formatDate(session.completedAt.slice(0, 10))}
+                    </AppText>
+                  </View>
+                  {session.exercises.map((ex) => (
+                    <View key={`${session.id}-${ex.exerciseId}`} style={styles.loadRow}>
+                      <AppText variant="caption" color={colors.textSecondary} style={{ flex: 1 }}>
+                        {ex.exerciseName}
+                      </AppText>
+                      <AppText variant="caption" color={colors.primary}>
+                        {ex.sets
+                          .map((s) => `${formatKg(s.weightKg)}×${s.reps}`)
+                          .join(' · ')}
+                      </AppText>
+                    </View>
+                  ))}
+                </View>
+              ))
+            )}
+          </Card>
+
+          <Card style={styles.section}>
+            <AppText variant="h3">Recordes</AppText>
+            {(personalBests.length ? personalBests : mockPRs.map((pr) => ({
+              exerciseId: pr.id,
+              exerciseName: pr.exerciseName,
+              weightKg: pr.weightKg,
+              reps: pr.reps ?? 1,
+              date: pr.date,
+            }))).map((pr) => (
+              <View key={pr.exerciseId} style={styles.measureRow}>
+                <AppText variant="body">{pr.exerciseName}</AppText>
+                <AppText variant="label" color={colors.textSecondary}>
+                  {formatKg(pr.weightKg)} kg × {pr.reps}
+                </AppText>
+              </View>
+            ))}
+          </Card>
+        </>
       )}
 
       <View style={styles.actions}>
@@ -187,4 +237,21 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   actions: { gap: spacing.sm, marginTop: spacing.xl, marginBottom: spacing['2xl'] },
+  sessionBlock: { gap: 4, paddingBottom: spacing.sm },
+  loadRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: 2,
+  },
 });
+
+function formatKg(kg: number) {
+  return Number.isInteger(kg) ? String(kg) : String(Math.round(kg * 10) / 10);
+}
+
+function formatDate(isoDate: string) {
+  const [y, m, d] = isoDate.split('-');
+  if (!y || !m || !d) return isoDate;
+  return `${d}/${m}/${y}`;
+}

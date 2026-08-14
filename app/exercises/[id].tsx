@@ -1,16 +1,23 @@
 import { useLocalSearchParams } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { ExerciseGif } from '@/components/exercises/ExerciseGif';
 import { AppText, Card, Screen, ScreenHeader } from '@/components/ui';
 import { resolveExercise } from '@/data/exercises';
 import { equipmentLabels, mockExerciseHistory, muscleGroupLabels } from '@/data/mock';
+import { useLiftHistoryStore } from '@/stores/lift-history-store';
 import { colors, radius, spacing } from '@/theme';
 
 export default function ExerciseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const exercise = resolveExercise(id);
-  const history =
+  const sessions = useLiftHistoryStore((s) => s.sessions);
+  const liveHistory = useMemo(
+    () => (id ? useLiftHistoryStore.getState().getExerciseHistory(id) : []),
+    [id, sessions],
+  );
+  const mockHistory =
     (id && (mockExerciseHistory[id] || mockExerciseHistory[exercise?.id ?? ''])) || [];
 
   if (!exercise) {
@@ -73,18 +80,45 @@ export default function ExerciseDetailScreen() {
       </Card>
 
       <Card style={styles.section}>
-        <AppText variant="h3">Seu histórico</AppText>
-        {history.length === 0 ? (
+        <AppText variant="h3">Progressão de carga</AppText>
+        <AppText variant="caption" muted>
+          Cada série anotada no treino entra aqui.
+        </AppText>
+        {liveHistory.length === 0 && mockHistory.length === 0 ? (
           <AppText muted>Ainda sem registros neste exercício.</AppText>
         ) : (
-          history.map((entry) => (
-            <View key={`${entry.date}-${entry.weightKg}`} style={styles.historyRow}>
-              <AppText variant="bodyMedium">{entry.date}</AppText>
-              <AppText variant="label" color={colors.primary}>
-                {entry.sets}×{entry.reps} · {entry.weightKg} kg
-              </AppText>
-            </View>
-          ))
+          <>
+            {liveHistory.map((entry) => (
+              <View key={entry.sessionId} style={styles.historyBlock}>
+                <View style={styles.historyRow}>
+                  <AppText variant="bodyMedium">{formatDate(entry.date)}</AppText>
+                  <AppText variant="label" color={colors.primary}>
+                    topo {formatKg(entry.topWeightKg)} kg
+                  </AppText>
+                </View>
+                {entry.sets.map((set) => (
+                  <View key={set.setNumber} style={styles.setLine}>
+                    <AppText variant="caption" color={colors.textMuted}>
+                      Série {set.setNumber}
+                    </AppText>
+                    <AppText variant="caption" color={colors.textSecondary}>
+                      {formatKg(set.weightKg)} kg × {set.reps}
+                    </AppText>
+                  </View>
+                ))}
+              </View>
+            ))}
+            {liveHistory.length === 0
+              ? mockHistory.map((entry) => (
+                  <View key={`${entry.date}-${entry.weightKg}`} style={styles.historyRow}>
+                    <AppText variant="bodyMedium">{formatDate(entry.date)}</AppText>
+                    <AppText variant="label" color={colors.primary}>
+                      {entry.sets}×{entry.reps} · {entry.weightKg} kg
+                    </AppText>
+                  </View>
+                ))
+              : null}
+          </>
         )}
       </Card>
     </Screen>
@@ -99,6 +133,16 @@ function Pill({ label }: { label: string }) {
       </AppText>
     </View>
   );
+}
+
+function formatKg(kg: number) {
+  return Number.isInteger(kg) ? String(kg) : String(Math.round(kg * 10) / 10);
+}
+
+function formatDate(isoDate: string) {
+  const [y, m, d] = isoDate.split('-');
+  if (!y || !m || !d) return isoDate;
+  return `${d}/${m}/${y}`;
 }
 
 const styles = StyleSheet.create({
@@ -121,10 +165,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryMuted,
   },
   section: { gap: spacing.sm, marginBottom: spacing.lg },
+  historyBlock: {
+    gap: 4,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
   historyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: spacing.xs,
+  },
+  setLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: spacing.sm,
   },
 });

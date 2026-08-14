@@ -10,6 +10,7 @@ import {
 import { getExerciseGifUrl } from '@/data/exercises';
 import { mockTodayWorkout } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
+import { useLiftHistoryStore } from '@/stores/lift-history-store';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
 import { colors, spacing } from '@/theme';
 
@@ -17,6 +18,7 @@ import { colors, spacing } from '@/theme';
 export default function WorkoutTabScreen() {
   const router = useAppRouter();
   const startSession = useWorkoutSessionStore((s) => s.startSession);
+  const sessions = useLiftHistoryStore((s) => s.sessions);
   const workout = mockTodayWorkout;
 
   const handleStart = () => {
@@ -37,20 +39,30 @@ export default function WorkoutTabScreen() {
       </View>
 
       <View style={styles.list}>
-        {workout.exercises.map((item) => (
-          <ExerciseCard
-            key={item.exerciseId}
-            name={item.exercise.name}
-            sets={item.sets}
-            reps={item.reps}
-            suggestedWeightKg={item.suggestedWeightKg}
-            previousWeightKg={item.previousWeightKg}
-            completed={item.completed}
-            color={item.exercise.thumbnailColor ?? '#161A22'}
-            gifUrl={getExerciseGifUrl(item.exercise)}
-            onPress={() => router.push(`/exercises/${item.exerciseId}`)}
-          />
-        ))}
+        {workout.exercises.map((item) => {
+          const history = useLiftHistoryStore.getState();
+          const lastSets = history.getLastSetsForExercise(item.exerciseId);
+          const lastTop = lastSets.length
+            ? lastSets.reduce((max, s) => Math.max(max, s.weightKg), 0)
+            : item.previousWeightKg;
+          const suggested =
+            history.getSuggestedWeight(item.exerciseId) ?? item.suggestedWeightKg;
+
+          return (
+            <ExerciseCard
+              key={`${item.exerciseId}-${sessions.length}`}
+              name={item.exercise.name}
+              sets={item.sets}
+              reps={item.reps}
+              suggestedWeightKg={suggested}
+              previousWeightKg={lastTop}
+              completed={item.completed}
+              color={item.exercise.thumbnailColor ?? '#161A22'}
+              gifUrl={getExerciseGifUrl(item.exercise)}
+              onPress={() => router.push(`/exercises/${item.exerciseId}`)}
+            />
+          );
+        })}
       </View>
 
       <AppButton label="Iniciar treino" onPress={handleStart} />

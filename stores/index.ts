@@ -6,5 +6,6 @@ export {
   getEvaluationTotalSteps,
 } from './evaluation-store';
 export { useWorkoutSessionStore } from './workout-store';
+export { useLiftHistoryStore } from './lift-history-store';
 export { useNutritionStore, DIET_INTERVIEW_STEPS } from './nutrition-store';
 export { useHabitsStore } from './habits-store';

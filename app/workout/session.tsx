@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
-import { X } from 'lucide-react-native';
+import { Check, X } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ExerciseGif } from '@/components/exercises/ExerciseGif';
+import { WeightLogger } from '@/components/workout/WeightLogger';
 import {
   AppButton,
   AppText,
@@ -14,10 +15,11 @@ import {
   ScreenProgress,
 } from '@/components/ui';
 import { useAppRouter } from '@/hooks/useAppRouter';
+import { useLiftHistoryStore } from '@/stores/lift-history-store';
 import { useWorkoutSessionStore } from '@/stores/workout-store';
 import { colors, radius, spacing } from '@/theme';
 
-/** Telas 06 + Descanso */
+/** Telas 06 + Descanso — anotação de carga por série */
 export default function WorkoutSessionScreen() {
   const router = useRouter();
   const appRouter = useAppRouter();
@@ -29,6 +31,8 @@ export default function WorkoutSessionScreen() {
     currentReps,
     isResting,
     restSecondsLeft,
+    logs,
+    sessionFinished,
     setWeight,
     setReps,
     completeSet,
@@ -40,11 +44,12 @@ export default function WorkoutSessionScreen() {
     restPaused,
   } = useWorkoutSessionStore();
 
+  const getLastWeightForSet = useLiftHistoryStore((s) => s.getLastWeightForSet);
+  const getLastSetsForExercise = useLiftHistoryStore((s) => s.getLastSetsForExercise);
+
   const exercise = workout.exercises[exerciseIndex];
   const nextExercise = workout.exercises[exerciseIndex + 1];
-  const isDone =
-    !exercise ||
-    (exerciseIndex >= workout.exercises.length - 1 && exercise.completed && !isResting);
+  const isDone = sessionFinished || !exercise;
 
   useEffect(() => {
     if (!isResting || restPaused) return;
@@ -52,16 +57,40 @@ export default function WorkoutSessionScreen() {
     return () => clearInterval(id);
   }, [isResting, restPaused, tickRest]);
 
-  if (!exercise || isDone) {
+  if (isDone) {
+    const loggedExercises = workout.exercises
+      .map((ex) => ({
+        name: ex.exercise.name,
+        sets: logs[ex.exerciseId] ?? [],
+      }))
+      .filter((ex) => ex.sets.length > 0);
+
     return (
-      <Screen>
+      <Screen scroll edges={['top', 'left', 'right', 'bottom']}>
         <View style={styles.done}>
           <AppText variant="h1" center>
             Treino concluído!
           </AppText>
           <AppText variant="body" color={colors.textSecondary} center>
-            Ótimo trabalho. Seu progresso foi registrado.
+            Cargas registradas. A progressão fica salva no histórico de cada exercício.
           </AppText>
+
+          {loggedExercises.map((ex) => (
+            <Card key={ex.name} style={styles.summaryCard}>
+              <AppText variant="h3">{ex.name}</AppText>
+              {ex.sets.map((set) => (
+                <View key={set.setNumber} style={styles.summaryRow}>
+                  <AppText variant="body" color={colors.textSecondary}>
+                    Série {set.setNumber}
+                  </AppText>
+                  <AppText variant="label" color={colors.primary}>
+                    {formatLoad(set.weightKg)} kg × {set.reps}
+                  </AppText>
+                </View>
+              ))}
+            </Card>
+          ))}
+
           <AppButton label="Voltar" onPress={() => router.back()} />
         </View>
       </Screen>
@@ -121,6 +150,11 @@ export default function WorkoutSessionScreen() {
     );
   }
 
+  const completedSets = logs[exercise.exerciseId] ?? [];
+  const lastSessionSets = getLastSetsForExercise(exercise.exerciseId);
+  const lastSameSet = getLastWeightForSet(exercise.exerciseId, setIndex + 1);
+  const lastSameSetReps = lastSessionSets.find((s) => s.setNumber === setIndex + 1)?.reps;
+
   return (
     <Screen scroll edges={['top', 'left', 'right', 'bottom']}>
       <View style={styles.topBar}>
@@ -138,20 +172,74 @@ export default function WorkoutSessionScreen() {
 
       <ExerciseGif exercise={exercise.exercise} style={styles.gif} />
 
+      <Card style={styles.setMap}>
+        <AppText variant="h3">Mapa de séries</AppText>
+        <AppText variant="caption" color={colors.textMuted}>
+          Anote a carga de cada série para acompanhar a progressão.
+        </AppText>
+        {Array.from({ length: exercise.sets }).map((_, i) => {
+          const setNumber = i + 1;
+          const logged = completedSets.find((s) => s.setNumber === setNumber);
+          const prev = lastSessionSets.find((s) => s.setNumber === setNumber);
+          const isCurrent = setNumber === setIndex + 1;
+
+          return (
+            <View
+              key={setNumber}
+              style={[styles.setRow, isCurrent && styles.setRowActive]}
+            >
+              <View style={styles.setLeft}>
+                <View
+                  style={[
+                    styles.setBadge,
+                    logged && styles.setBadgeDone,
+                    isCurrent && styles.setBadgeCurrent,
+                  ]}
+                >
+                  {logged ? (
+                    <Check size={14} color={colors.onPrimary} strokeWidth={2.4} />
+                  ) : (
+                    <AppText
+                      variant="caption"
+                      color={isCurrent ? colors.onPrimary : colors.textSecondary}
+                    >
+                      {setNumber}
+                    </AppText>
+                  )}
+                </View>
+                <View style={{ flex: 1, gap: 2 }}>
+                  <AppText variant="bodyMedium">
+                    Série {setNumber}
+                    {isCurrent ? ' · agora' : ''}
+                  </AppText>
+                  {prev ? (
+                    <AppText variant="caption" color={colors.textMuted}>
+                      Último treino · {formatLoad(prev.weightKg)} kg × {prev.reps}
+                    </AppText>
+                  ) : (
+                    <AppText variant="caption" color={colors.textMuted}>
+                      Sem histórico nesta série
+                    </AppText>
+                  )}
+                </View>
+              </View>
+              <AppText
+                variant="label"
+                color={logged ? colors.primary : colors.textMuted}
+              >
+                {logged
+                  ? `${formatLoad(logged.weightKg)} kg × ${logged.reps}`
+                  : isCurrent
+                    ? `${formatLoad(currentWeight)} kg`
+                    : '—'}
+              </AppText>
+            </View>
+          );
+        })}
+      </Card>
+
       <Card style={styles.logger}>
-        <AppText variant="caption" color={colors.textMuted} center>
-          Carga
-        </AppText>
-        <AppText variant="metricLg" center>
-          {currentWeight} kg
-        </AppText>
-        <NumberStepper
-          value={currentWeight}
-          min={0}
-          max={400}
-          step={2.5}
-          onChange={setWeight}
-        />
+        <WeightLogger value={currentWeight} onChange={setWeight} />
 
         <AppText
           variant="caption"
@@ -166,9 +254,25 @@ export default function WorkoutSessionScreen() {
         </AppText>
         <NumberStepper value={currentReps} min={1} max={50} onChange={setReps} />
 
-        {exercise.previousWeightKg != null ? (
-          <AppText variant="caption" color={colors.textMuted} center style={{ marginTop: spacing.md }}>
-            Série anterior · {exercise.previousWeightKg} kg × {exercise.reps} reps
+        {lastSameSet != null ? (
+          <AppText
+            variant="caption"
+            color={colors.textMuted}
+            center
+            style={{ marginTop: spacing.md }}
+          >
+            Referência · série {setIndex + 1} no último treino:{' '}
+            {formatLoad(lastSameSet)} kg
+            {lastSameSetReps != null ? ` × ${lastSameSetReps}` : ''}
+          </AppText>
+        ) : exercise.previousWeightKg != null ? (
+          <AppText
+            variant="caption"
+            color={colors.textMuted}
+            center
+            style={{ marginTop: spacing.md }}
+          >
+            Sugestão · {formatLoad(exercise.suggestedWeightKg)} kg
           </AppText>
         ) : null}
 
@@ -187,6 +291,10 @@ export default function WorkoutSessionScreen() {
       />
     </Screen>
   );
+}
+
+function formatLoad(kg: number) {
+  return Number.isInteger(kg) ? String(kg) : String(Math.round(kg * 10) / 10);
 }
 
 const styles = StyleSheet.create({
@@ -208,12 +316,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   gif: {
-    height: 220,
+    height: 180,
     marginTop: spacing.md,
     backgroundColor: '#0B0E14',
     borderRadius: radius.lg,
   },
-  logger: { gap: spacing.sm, marginTop: spacing.xl },
+  setMap: { gap: spacing.sm, marginTop: spacing.lg },
+  setRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  setRowActive: {
+    backgroundColor: colors.surfaceLight,
+    marginHorizontal: -spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    borderBottomWidth: 0,
+  },
+  setLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, flex: 1 },
+  setBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: radius.full,
+    backgroundColor: colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  setBadgeDone: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  setBadgeCurrent: {
+    backgroundColor: colors.secondary,
+    borderColor: colors.secondary,
+  },
+  logger: { gap: spacing.sm, marginTop: spacing.lg },
   restWrap: {
     flex: 1,
     justifyContent: 'center',
@@ -221,5 +365,11 @@ const styles = StyleSheet.create({
     paddingBottom: spacing['3xl'],
   },
   restActions: { flexDirection: 'row', gap: spacing.sm },
-  done: { flex: 1, justifyContent: 'center', gap: spacing.lg },
+  done: { gap: spacing.lg, paddingVertical: spacing.xl },
+  summaryCard: { gap: spacing.sm },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 });
