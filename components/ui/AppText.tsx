@@ -59,7 +59,7 @@ export function AppText({
 }: Props) {
   const resolvedColor =
     color ??
-    (tone ? toneColor[tone] : muted ? colors.textSecondary : colors.text);
+    (tone ? toneColor[tone] : muted ? colors.textMuted : colors.text);
 
   return (
     <Text

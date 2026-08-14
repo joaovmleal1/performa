@@ -58,6 +58,41 @@ export type CookingTime =
   | 'love_cooking';
 export type BudgetLevel = 'economic' | 'mid' | 'intermediate' | 'flexible';
 
+export type DietInterest = 'already_doing' | 'want_with_us' | 'not_now';
+
+export type TrainingMode = 'general' | 'preparation';
+
+export type PeriodizationPhaseKind =
+  | 'base'
+  | 'build'
+  | 'intensification'
+  | 'peak'
+  | 'taper'
+  | 'competition';
+
+export interface PeriodizationPhase {
+  id: string;
+  kind: PeriodizationPhaseKind;
+  name: string;
+  weeks: number;
+  focus: string;
+  volume: 'low' | 'moderate' | 'high';
+  intensity: 'low' | 'moderate' | 'high';
+  notes: string[];
+}
+
+export interface PeriodizationPlan {
+  id: string;
+  sport: string;
+  competitionName: string;
+  competitionDate: string;
+  totalWeeks: number;
+  phases: PeriodizationPhase[];
+  createdAt: string;
+  /** Notas do Coach Especialista (RAG sobre cânone + estudos) */
+  coachNotes?: string[];
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -77,6 +112,16 @@ export interface UserProfile {
   preferredDuration?: SessionDuration;
   restrictions: string[];
   streakDays: number;
+  /** Já faz dieta / quer montar com o PERFORMA / agora não */
+  dietInterest?: DietInterest;
+  /** Desbloqueia a montagem de dieta na aba Nutrição */
+  dietBuilderUnlocked?: boolean;
+  /** Modo preparação para esporte/competição */
+  preparationMode?: boolean;
+  preparationSport?: string;
+  competitionName?: string;
+  competitionDate?: string;
+  periodization?: PeriodizationPlan | null;
   onboardingCompleted?: boolean;
   assessmentCompleted?: boolean;
   evaluationCompleted?: boolean;
@@ -92,6 +137,11 @@ export interface Exercise {
   instructions: string[];
   commonMistakes: string[];
   thumbnailColor?: string;
+  /** Google Drive file id for the exercise GIF */
+  driveFileId?: string;
+  /** Direct URL to the execution GIF */
+  gifUrl?: string;
+  sourceFolder?: string;
   restSecondsDefault?: number;
   defaultSets?: number;
   defaultReps?: number;
@@ -110,6 +160,27 @@ export interface WorkoutExercise {
   completed: boolean;
   notes?: string;
   order?: number;
+  /** Decisão do Coach para carga por série nesta sessão */
+  coachLoad?: ExerciseLoadCoachPlan;
+}
+
+export type LoadAction = 'increase' | 'hold' | 'decrease' | 'start';
+
+export interface SetLoadDecision {
+  setNumber: number;
+  previousWeightKg: number | null;
+  suggestedWeightKg: number;
+  deltaKg: number;
+  action: LoadAction;
+  rationale: string;
+}
+
+/** Plano de carga individual gerado pelo agente Coach */
+export interface ExerciseLoadCoachPlan {
+  exerciseId: string;
+  sets: SetLoadDecision[];
+  summary: string;
+  provider: 'coach-local' | 'coach-cloud';
 }
 
 export interface WorkoutPlan {
@@ -125,6 +196,33 @@ export interface LoggedSet {
   weightKg: number;
   reps: number;
   completedAt: string;
+}
+
+/** Exercício concluído com carga anotada por série */
+export interface CompletedExerciseLog {
+  exerciseId: string;
+  exerciseName: string;
+  sets: LoggedSet[];
+}
+
+/** Sessão de treino salva para mapear progressão de carga */
+export interface CompletedWorkoutSession {
+  id: string;
+  workoutId: string;
+  workoutName: string;
+  completedAt: string;
+  exercises: CompletedExerciseLog[];
+}
+
+/** Resumo de progresso de carga de um exercício */
+export interface ExerciseLoadHistoryEntry {
+  date: string;
+  sessionId: string;
+  sets: LoggedSet[];
+  /** Melhor carga da sessão (kg) */
+  topWeightKg: number;
+  /** Volume aproximado: Σ(peso × reps) */
+  volumeKg: number;
 }
 
 export interface MacroTargets {
@@ -261,6 +359,11 @@ export interface EvaluationAnswers {
   environment?: TrainingEnvironment;
   sessionDurationMin?: SessionDuration;
   restrictions?: string[];
+  dietInterest?: DietInterest;
+  preparationMode?: boolean;
+  preparationSport?: string;
+  competitionName?: string;
+  competitionDate?: string;
 }
 
 export type AssessmentAnswers = EvaluationAnswers & { restrictions?: string | string[] };

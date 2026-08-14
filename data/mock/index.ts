@@ -1,9 +1,9 @@
+import { exerciseCatalog, resolveExercise } from '@/data/exercises';
 import type {
   AIInsight,
   BodyMeasurement,
   DailyNutrition,
   DietPlan,
-  Exercise,
   Habit,
   PersonalRecord,
   UserProfile,
@@ -28,8 +28,13 @@ export const mockUser: UserProfile = {
   sessionDurationMin: 60,
   restrictions: [],
   streakDays: 7,
+  dietInterest: 'want_with_us',
+  dietBuilderUnlocked: true,
+  preparationMode: false,
+  periodization: null,
   onboardingCompleted: true,
   assessmentCompleted: true,
+  evaluationCompleted: true,
   units: { weight: 'kg', height: 'cm' },
 };
 
@@ -42,198 +47,8 @@ export const goalLabels: Record<string, string> = {
   health: 'Saúde e bem-estar',
 };
 
-export const mockExercises: Exercise[] = [
-  {
-    id: 'ex_bench',
-    name: 'Supino reto',
-    muscleGroup: 'chest',
-    secondaryMuscles: ['triceps', 'shoulders'],
-    equipment: 'barbell',
-    instructions: [
-      'Deite no banco com os pés firmes no chão.',
-      'Segure a barra na largura dos ombros.',
-      'Desça controlando até o peito e empurre para cima.',
-    ],
-    commonMistakes: ['Arquear excessivamente as costas', 'Descer a barra no pescoço'],
-    thumbnailColor: '#3D2A55',
-  },
-  {
-    id: 'ex_incline',
-    name: 'Supino inclinado',
-    muscleGroup: 'chest',
-    secondaryMuscles: ['shoulders', 'triceps'],
-    equipment: 'dumbbell',
-    instructions: [
-      'Ajuste o banco em 30–45°.',
-      'Empurre os halteres para cima alinhados ao peito superior.',
-    ],
-    commonMistakes: ['Inclinação muito alta', 'Abrir demais os cotovelos'],
-    thumbnailColor: '#2A3D55',
-  },
-  {
-    id: 'ex_row',
-    name: 'Remada curvada',
-    muscleGroup: 'back',
-    secondaryMuscles: ['biceps'],
-    equipment: 'barbell',
-    instructions: [
-      'Incline o tronco mantendo a coluna neutra.',
-      'Puxe a barra em direção ao abdômen.',
-    ],
-    commonMistakes: ['Usar impulso do tronco', 'Arredondar as costas'],
-    thumbnailColor: '#2A553D',
-  },
-  {
-    id: 'ex_ohp',
-    name: 'Desenvolvimento',
-    muscleGroup: 'shoulders',
-    secondaryMuscles: ['triceps'],
-    equipment: 'dumbbell',
-    instructions: [
-      'Empurre os halteres acima da cabeça sem travar os cotovelos.',
-      'Controle a descida até a linha das orelhas.',
-    ],
-    commonMistakes: ['Arquear a lombar', 'Subir os ombros'],
-    thumbnailColor: '#553D2A',
-  },
-  {
-    id: 'ex_lateral',
-    name: 'Elevação lateral',
-    muscleGroup: 'shoulders',
-    secondaryMuscles: [],
-    equipment: 'dumbbell',
-    instructions: [
-      'Eleve os braços até a linha dos ombros com leve flexão de cotovelo.',
-    ],
-    commonMistakes: ['Usar impulso', 'Subir acima da linha dos ombros'],
-    thumbnailColor: '#553A55',
-  },
-  {
-    id: 'ex_triceps',
-    name: 'Tríceps na polia',
-    muscleGroup: 'triceps',
-    secondaryMuscles: [],
-    equipment: 'cable',
-    instructions: [
-      'Mantenha os cotovelos fixos ao lado do corpo e estenda os braços.',
-    ],
-    commonMistakes: ['Abrir os cotovelos', 'Inclinar o tronco'],
-    thumbnailColor: '#2A4555',
-  },
-  {
-    id: 'ex_biceps',
-    name: 'Rosca direta',
-    muscleGroup: 'biceps',
-    secondaryMuscles: [],
-    equipment: 'barbell',
-    instructions: [
-      'Flexione os cotovelos sem balançar o corpo.',
-      'Controle a descida completa.',
-    ],
-    commonMistakes: ['Usar impulso', 'Abrir os cotovelos'],
-    thumbnailColor: '#453D2A',
-  },
-  {
-    id: 'ex_squat',
-    name: 'Agachamento livre',
-    muscleGroup: 'legs',
-    secondaryMuscles: ['glutes', 'abs'],
-    equipment: 'barbell',
-    instructions: [
-      'Posicione a barra no trapézio e abra os pés na largura dos ombros.',
-      'Desça até as coxas ficarem paralelas ao chão e suba empurrando o chão.',
-    ],
-    commonMistakes: ['Joelho caindo para dentro', 'Subir o calcanhar'],
-    thumbnailColor: '#2F4A3A',
-  },
-  {
-    id: 'ex_rdl',
-    name: 'Levantamento terra romeno',
-    muscleGroup: 'legs',
-    secondaryMuscles: ['glutes', 'back'],
-    equipment: 'barbell',
-    instructions: [
-      'Com joelhos levemente flexionados, empurre o quadril para trás.',
-      'Desça a barra próxima às pernas e volte contraindo glúteos.',
-    ],
-    commonMistakes: ['Arredondar a lombar', 'Flexionar demais os joelhos'],
-    thumbnailColor: '#3A4A2F',
-  },
-  {
-    id: 'ex_hip_thrust',
-    name: 'Hip thrust',
-    muscleGroup: 'glutes',
-    secondaryMuscles: ['legs'],
-    equipment: 'barbell',
-    instructions: [
-      'Apoie as costas no banco e a barra sobre o quadril.',
-      'Empurre o quadril para cima até alinhar tronco e coxas.',
-    ],
-    commonMistakes: ['Hiperextender a lombar', 'Não completar a extensão'],
-    thumbnailColor: '#4A2F3A',
-  },
-  {
-    id: 'ex_pulldown',
-    name: 'Puxada frontal',
-    muscleGroup: 'back',
-    secondaryMuscles: ['biceps'],
-    equipment: 'cable',
-    instructions: [
-      'Puxe a barra em direção ao peito mantendo o peito aberto.',
-      'Controle a subida sem soltar os ombros.',
-    ],
-    commonMistakes: ['Usar impulso do tronco', 'Encolher os ombros'],
-    thumbnailColor: '#2F3A4A',
-  },
-  {
-    id: 'ex_crunch',
-    name: 'Abdominal crunch',
-    muscleGroup: 'abs',
-    secondaryMuscles: [],
-    equipment: 'bodyweight',
-    instructions: [
-      'Deite com joelhos flexionados e eleve o tronco sem puxar o pescoço.',
-    ],
-    commonMistakes: ['Puxar a cabeça', 'Usar impulso das pernas'],
-    thumbnailColor: '#3A3A4A',
-  },
-  {
-    id: 'ex_bike',
-    name: 'Bike ergométrica',
-    muscleGroup: 'cardio',
-    secondaryMuscles: ['legs'],
-    equipment: 'machine',
-    instructions: [
-      'Mantenha cadência constante e postura ereta por 15–20 minutos.',
-    ],
-    commonMistakes: ['Inclinar demais o tronco', 'Cadência irregular'],
-    thumbnailColor: '#2A4A55',
-  },
-  {
-    id: 'ex_pushup',
-    name: 'Flexão de braço',
-    muscleGroup: 'chest',
-    secondaryMuscles: ['triceps', 'shoulders'],
-    equipment: 'bodyweight',
-    instructions: [
-      'Corpo alinhado, desça o peito próximo ao chão e empurre para cima.',
-    ],
-    commonMistakes: ['Quadril caindo', 'Abrir demais os cotovelos'],
-    thumbnailColor: '#4A3A2A',
-  },
-  {
-    id: 'ex_lunges',
-    name: 'Afundo caminhando',
-    muscleGroup: 'legs',
-    secondaryMuscles: ['glutes'],
-    equipment: 'dumbbell',
-    instructions: [
-      'Dê um passo à frente e desça até o joelho de trás quase tocar o chão.',
-    ],
-    commonMistakes: ['Joelho passar muito da ponta do pé', 'Tronco inclinado'],
-    thumbnailColor: '#3A552A',
-  },
-];
+/** Biblioteca completa de exercícios com GIFs de execução (Google Drive). */
+export const mockExercises = exerciseCatalog;
 
 export const muscleGroupLabels: Record<string, string> = {
   chest: 'Peito',
@@ -332,7 +147,13 @@ export const mockExerciseHistory: Record<
   ],
 };
 
-const byId = Object.fromEntries(mockExercises.map((e) => [e.id, e]));
+function mustExercise(id: string) {
+  const exercise = resolveExercise(id);
+  if (!exercise) {
+    throw new Error(`Exercício não encontrado: ${id}`);
+  }
+  return exercise;
+}
 
 export const mockTodayWorkout: WorkoutPlan = {
   id: 'workout_superiores_a',
@@ -342,7 +163,7 @@ export const mockTodayWorkout: WorkoutPlan = {
   exercises: [
     {
       exerciseId: 'ex_bench',
-      exercise: byId.ex_bench,
+      exercise: mustExercise('ex_bench'),
       sets: 4,
       reps: 12,
       restSeconds: 60,
@@ -352,7 +173,7 @@ export const mockTodayWorkout: WorkoutPlan = {
     },
     {
       exerciseId: 'ex_incline',
-      exercise: byId.ex_incline,
+      exercise: mustExercise('ex_incline'),
       sets: 3,
       reps: 10,
       restSeconds: 60,
@@ -362,7 +183,7 @@ export const mockTodayWorkout: WorkoutPlan = {
     },
     {
       exerciseId: 'ex_row',
-      exercise: byId.ex_row,
+      exercise: mustExercise('ex_row'),
       sets: 4,
       reps: 10,
       restSeconds: 75,
@@ -372,7 +193,7 @@ export const mockTodayWorkout: WorkoutPlan = {
     },
     {
       exerciseId: 'ex_ohp',
-      exercise: byId.ex_ohp,
+      exercise: mustExercise('ex_ohp'),
       sets: 3,
       reps: 10,
       restSeconds: 60,
@@ -382,7 +203,7 @@ export const mockTodayWorkout: WorkoutPlan = {
     },
     {
       exerciseId: 'ex_lateral',
-      exercise: byId.ex_lateral,
+      exercise: mustExercise('ex_lateral'),
       sets: 3,
       reps: 15,
       restSeconds: 45,
@@ -392,7 +213,7 @@ export const mockTodayWorkout: WorkoutPlan = {
     },
     {
       exerciseId: 'ex_triceps',
-      exercise: byId.ex_triceps,
+      exercise: mustExercise('ex_triceps'),
       sets: 3,
       reps: 12,
       restSeconds: 45,
@@ -402,7 +223,7 @@ export const mockTodayWorkout: WorkoutPlan = {
     },
     {
       exerciseId: 'ex_biceps',
-      exercise: byId.ex_biceps,
+      exercise: mustExercise('ex_biceps'),
       sets: 3,
       reps: 12,
       restSeconds: 45,

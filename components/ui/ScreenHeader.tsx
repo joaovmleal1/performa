@@ -33,7 +33,7 @@ export function ScreenHeader({
             onPress={() => (onBack ? onBack() : router.back())}
             style={styles.back}
           >
-            <ChevronLeft color={colors.white} size={24} />
+            <ChevronLeft color={colors.white} size={24} strokeWidth={1.85} />
           </Pressable>
         ) : (
           <View style={styles.backPlaceholder} />
@@ -70,6 +70,10 @@ const styles = StyleSheet.create({
     height: layout.minTouchTarget,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: colors.surfaceMedium,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   backPlaceholder: { width: layout.minTouchTarget },
   center: { flex: 1, paddingHorizontal: spacing.sm },

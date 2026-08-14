@@ -1,8 +1,10 @@
+import { Image } from 'expo-image';
 import { Search } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText, Chip, Input, Screen, ScreenHeader } from '@/components/ui';
+import { getExerciseGifUrl } from '@/data/exercises';
 import {
   equipmentLabels,
   mockExercises,
@@ -22,8 +24,9 @@ export default function ExerciseLibraryScreen() {
   const [equipment, setEquipment] = useState<Equipment | 'all'>('all');
 
   const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
     return mockExercises.filter((ex) => {
-      const matchesQuery = ex.name.toLowerCase().includes(query.trim().toLowerCase());
+      const matchesQuery = !q || ex.name.toLowerCase().includes(q);
       const matchesMuscle = muscle === 'all' || ex.muscleGroup === muscle;
       const matchesEquipment = equipment === 'all' || ex.equipment === equipment;
       return matchesQuery && matchesMuscle && matchesEquipment;
@@ -40,6 +43,10 @@ export default function ExerciseLibraryScreen() {
           onChangeText={setQuery}
           leftIcon={<Search size={18} color={colors.textMuted} />}
         />
+
+        <AppText variant="caption" muted>
+          {filtered.length} exercícios com GIF de execução
+        </AppText>
 
         <AppText variant="label" muted style={styles.filterLabel}>
           Grupo muscular
@@ -84,31 +91,40 @@ export default function ExerciseLibraryScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
+          initialNumToRender={16}
+          windowSize={8}
           ListEmptyComponent={
             <AppText muted center>
               Nenhum exercício encontrado.
             </AppText>
           }
-          renderItem={({ item }) => (
-            <Pressable
-              style={styles.row}
-              onPress={() => router.push(`/exercises/${item.id}`)}
-              accessibilityRole="button"
-            >
-              <View
-                style={[
-                  styles.thumb,
-                  { backgroundColor: item.thumbnailColor ?? colors.surface },
-                ]}
-              />
-              <View style={{ flex: 1 }}>
-                <AppText variant="bodyMedium">{item.name}</AppText>
-                <AppText variant="caption" muted>
-                  {muscleGroupLabels[item.muscleGroup]} · {equipmentLabels[item.equipment]}
-                </AppText>
-              </View>
-            </Pressable>
-          )}
+          renderItem={({ item }) => {
+            const gif =
+              getExerciseGifUrl(item) ??
+              item.gifUrl ??
+              `/exercises/${item.id}.gif`;
+            return (
+              <Pressable
+                style={styles.row}
+                onPress={() => router.push(`/exercises/${item.id}`)}
+                accessibilityRole="button"
+              >
+                <Image
+                  source={{ uri: gif }}
+                  style={styles.thumb}
+                  contentFit="contain"
+                  cachePolicy="memory-disk"
+                  recyclingKey={item.id}
+                />
+                <View style={{ flex: 1 }}>
+                  <AppText variant="bodyMedium">{item.name}</AppText>
+                  <AppText variant="caption" muted>
+                    {muscleGroupLabels[item.muscleGroup]} · {equipmentLabels[item.equipment]}
+                  </AppText>
+                </View>
+              </Pressable>
+            );
+          }}
         />
       </View>
     </Screen>
@@ -143,8 +159,9 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSubtle,
   },
   thumb: {
-    width: 48,
-    height: 48,
+    width: 64,
+    height: 64,
     borderRadius: radius.md,
+    backgroundColor: '#fff',
   },
 });

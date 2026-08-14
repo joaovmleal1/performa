@@ -1,19 +1,24 @@
 import { useLocalSearchParams } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { ExerciseGif } from '@/components/exercises/ExerciseGif';
 import { AppText, Card, Screen, ScreenHeader } from '@/components/ui';
-import {
-  equipmentLabels,
-  mockExerciseHistory,
-  mockExercises,
-  muscleGroupLabels,
-} from '@/data/mock';
+import { resolveExercise } from '@/data/exercises';
+import { equipmentLabels, mockExerciseHistory, muscleGroupLabels } from '@/data/mock';
+import { useLiftHistoryStore } from '@/stores/lift-history-store';
 import { colors, radius, spacing } from '@/theme';
 
 export default function ExerciseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const exercise = mockExercises.find((e) => e.id === id);
-  const history = (id && mockExerciseHistory[id]) || [];
+  const exercise = resolveExercise(id);
+  const sessions = useLiftHistoryStore((s) => s.sessions);
+  const liveHistory = useMemo(
+    () => (id ? useLiftHistoryStore.getState().getExerciseHistory(id) : []),
+    [id, sessions],
+  );
+  const mockHistory =
+    (id && (mockExerciseHistory[id] || mockExerciseHistory[exercise?.id ?? ''])) || [];
 
   if (!exercise) {
     return (
@@ -30,16 +35,10 @@ export default function ExerciseDetailScreen() {
     <Screen scroll>
       <ScreenHeader title={exercise.name} showBack />
 
-      <View
-        style={[
-          styles.hero,
-          { backgroundColor: exercise.thumbnailColor ?? colors.surface },
-        ]}
-      >
-        <AppText variant="caption" color={colors.white}>
-          Vídeo / GIF em breve
-        </AppText>
-      </View>
+      <AppText variant="label" muted style={styles.gifLabel}>
+        Execução
+      </AppText>
+      <ExerciseGif exercise={exercise} style={styles.hero} contentFit="contain" />
 
       <View style={styles.meta}>
         <Pill label={muscleGroupLabels[exercise.muscleGroup]} />
@@ -47,7 +46,10 @@ export default function ExerciseDetailScreen() {
       </View>
 
       <Card style={styles.section}>
-        <AppText variant="h3">Instruções</AppText>
+        <AppText variant="h3">Passo a passo</AppText>
+        <AppText variant="caption" muted>
+          Acompanhe o GIF de execução acima:
+        </AppText>
         {exercise.instructions.map((step, index) => (
           <AppText key={step} variant="body" muted>
             {index + 1}. {step}
@@ -78,18 +80,45 @@ export default function ExerciseDetailScreen() {
       </Card>
 
       <Card style={styles.section}>
-        <AppText variant="h3">Seu histórico</AppText>
-        {history.length === 0 ? (
+        <AppText variant="h3">Progressão de carga</AppText>
+        <AppText variant="caption" muted>
+          Cada série anotada no treino entra aqui.
+        </AppText>
+        {liveHistory.length === 0 && mockHistory.length === 0 ? (
           <AppText muted>Ainda sem registros neste exercício.</AppText>
         ) : (
-          history.map((entry) => (
-            <View key={`${entry.date}-${entry.weightKg}`} style={styles.historyRow}>
-              <AppText variant="bodyMedium">{entry.date}</AppText>
-              <AppText variant="label" color={colors.primary}>
-                {entry.sets}×{entry.reps} · {entry.weightKg} kg
-              </AppText>
-            </View>
-          ))
+          <>
+            {liveHistory.map((entry) => (
+              <View key={entry.sessionId} style={styles.historyBlock}>
+                <View style={styles.historyRow}>
+                  <AppText variant="bodyMedium">{formatDate(entry.date)}</AppText>
+                  <AppText variant="label" color={colors.primary}>
+                    topo {formatKg(entry.topWeightKg)} kg
+                  </AppText>
+                </View>
+                {entry.sets.map((set) => (
+                  <View key={set.setNumber} style={styles.setLine}>
+                    <AppText variant="caption" color={colors.textMuted}>
+                      Série {set.setNumber}
+                    </AppText>
+                    <AppText variant="caption" color={colors.textSecondary}>
+                      {formatKg(set.weightKg)} kg × {set.reps}
+                    </AppText>
+                  </View>
+                ))}
+              </View>
+            ))}
+            {liveHistory.length === 0
+              ? mockHistory.map((entry) => (
+                  <View key={`${entry.date}-${entry.weightKg}`} style={styles.historyRow}>
+                    <AppText variant="bodyMedium">{formatDate(entry.date)}</AppText>
+                    <AppText variant="label" color={colors.primary}>
+                      {entry.sets}×{entry.reps} · {entry.weightKg} kg
+                    </AppText>
+                  </View>
+                ))
+              : null}
+          </>
         )}
       </Card>
     </Screen>
@@ -106,13 +135,22 @@ function Pill({ label }: { label: string }) {
   );
 }
 
+function formatKg(kg: number) {
+  return Number.isInteger(kg) ? String(kg) : String(Math.round(kg * 10) / 10);
+}
+
+function formatDate(isoDate: string) {
+  const [y, m, d] = isoDate.split('-');
+  if (!y || !m || !d) return isoDate;
+  return `${d}/${m}/${y}`;
+}
+
 const styles = StyleSheet.create({
+  gifLabel: { marginBottom: spacing.xs },
   hero: {
-    height: 180,
-    borderRadius: radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 280,
     marginBottom: spacing.lg,
+    backgroundColor: '#fff',
   },
   meta: {
     flexDirection: 'row',
@@ -127,10 +165,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryMuted,
   },
   section: { gap: spacing.sm, marginBottom: spacing.lg },
+  historyBlock: {
+    gap: 4,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
   historyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: spacing.xs,
+  },
+  setLine: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: spacing.sm,
   },
 });

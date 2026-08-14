@@ -1,0 +1,5 @@
+# Keep deploy small — GIFs load from Google Drive in production
+public/exercises/
+.expo/
+dist/
+node_modules/

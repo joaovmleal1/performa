@@ -18,6 +18,7 @@ export const radius = {
   lg: 16,
   xl: 20,
   '2xl': 24,
+  button: 14,
   full: 999,
 } as const;
 
@@ -27,9 +28,11 @@ export const hitSlop = {
 } as const;
 
 export const layout = {
-  screenPadding: spacing.lg,
+  screenPadding: spacing.xl, // 20px — spec 20–24
   cardPadding: spacing.lg,
-  bottomNavHeight: 72,
+  bottomNavHeight: 80,
   minTouchTarget: 44,
   headerHeight: 56,
+  maxContentWidth: 430,
+  buttonHeight: 56,
 } as const;

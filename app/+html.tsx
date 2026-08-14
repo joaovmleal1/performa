@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 // do not have access to the DOM or browser APIs.
 export default function Root({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -29,11 +29,40 @@ export default function Root({ children }: { children: ReactNode }) {
 }
 
 const responsiveBackground = `
-body {
-  background-color: #fff;
+html, body, #root {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh !important;
+  background: #080B10 !important;
+  color: #FFFFFF !important;
 }
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #000;
+body {
+  margin: 0;
+  overscroll-behavior: none;
+}
+#root, #root > div, #root > div > div {
+  background: #080B10 !important;
+  min-height: 100%;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+*:focus-visible {
+  outline: 2px solid #00FF85;
+  outline-offset: 2px;
+}
+@media (min-width: 480px) {
+  [role="tablist"] {
+    left: 50% !important;
+    right: auto !important;
+    width: 430px !important;
+    max-width: 430px !important;
+    transform: translateX(-50%) !important;
   }
-}`;
+}`

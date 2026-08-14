@@ -1,4 +1,5 @@
-import { colors } from '@/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -7,8 +8,10 @@ import {
   Text,
   ViewStyle,
   TextStyle,
+  View,
 } from 'react-native';
-import * as Haptics from 'expo-haptics';
+
+import { colors, gradients, layout, radius, shadows } from '@/theme';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'ai';
 type Size = 'md' | 'lg' | 'sm';
@@ -40,6 +43,26 @@ export function AppButton({
 }: Props) {
   const isDisabled = disabled || loading;
 
+  const inner = loading ? (
+    <ActivityIndicator
+      color={variant === 'primary' || variant === 'ai' ? colors.onPrimary : colors.white}
+    />
+  ) : (
+    <Text
+      style={[
+        styles.label,
+        variant === 'primary' && styles.labelOnPrimary,
+        variant === 'secondary' && styles.labelSecondary,
+        variant === 'ghost' && styles.labelGhost,
+        variant === 'danger' && styles.labelDanger,
+        variant === 'ai' && styles.labelAi,
+        textStyle,
+      ]}
+    >
+      {label}
+    </Text>
+  );
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -60,30 +83,23 @@ export function AppButton({
         variant === 'secondary' && styles.secondary,
         variant === 'ghost' && styles.ghost,
         variant === 'danger' && styles.danger,
-        variant === 'ai' && styles.ai,
+        variant === 'ai' && styles.aiShell,
         pressed && !isDisabled && styles.pressed,
         isDisabled && styles.disabled,
         style,
       ]}
     >
-      {loading ? (
-        <ActivityIndicator
-          color={variant === 'primary' || variant === 'ai' ? colors.onPrimary : colors.white}
-        />
-      ) : (
-        <Text
-          style={[
-            styles.label,
-            variant === 'primary' && styles.labelOnPrimary,
-            variant === 'secondary' && styles.labelSecondary,
-            variant === 'ghost' && styles.labelGhost,
-            variant === 'danger' && styles.labelDanger,
-            variant === 'ai' && styles.labelOnPrimary,
-            textStyle,
-          ]}
+      {variant === 'ai' ? (
+        <LinearGradient
+          colors={[...gradients.ai]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.aiFill}
         >
-          {label}
-        </Text>
+          <View style={styles.aiContent}>{inner}</View>
+        </LinearGradient>
+      ) : (
+        inner
       )}
     </Pressable>
   );
@@ -91,27 +107,28 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: 14,
+    borderRadius: radius.button,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 44,
+    overflow: 'hidden',
   },
   fullWidth: { width: '100%' },
   sm: { paddingVertical: 10, paddingHorizontal: 14, minHeight: 40 },
-  md: { paddingVertical: 12, paddingHorizontal: 16, minHeight: 44 },
-  lg: { paddingVertical: 16, paddingHorizontal: 20, minHeight: 54 },
+  md: { paddingVertical: 12, paddingHorizontal: 16, minHeight: 48 },
+  lg: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    minHeight: layout.buttonHeight,
+  },
   primary: {
     backgroundColor: colors.primary,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
+    ...shadows.glowGreen,
   },
   secondary: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.borderStrong,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -121,21 +138,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.error,
   },
-  ai: {
-    backgroundColor: colors.secondary,
-    shadowColor: colors.secondary,
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+  aiShell: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    ...shadows.glowPurple,
+  },
+  aiFill: {
+    width: '100%',
+    minHeight: layout.buttonHeight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.button,
+  },
+  aiContent: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pressed: { opacity: 0.88, transform: [{ scale: 0.985 }] },
   disabled: { opacity: 0.45 },
   label: {
-    fontFamily: 'Sora_600SemiBold',
+    fontFamily: 'Sora_700Bold',
     fontSize: 16,
   },
   labelOnPrimary: { color: colors.onPrimary },
   labelSecondary: { color: colors.white },
   labelGhost: { color: colors.primary },
   labelDanger: { color: colors.error },
+  labelAi: { color: colors.white },
 });

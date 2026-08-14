@@ -1,59 +1,112 @@
+/**
+ * PERFORMA — tokens oficiais (source of truth visual)
+ * Backgrounds mais profundos; cards #12161D/#161A22; borders em rgba.
+ */
 export const colors = {
-  background: '#121217',
-  backgroundElevated: '#18181F',
-  surface: '#2A2A33',
-  surfaceHover: '#32323C',
-  surfacePressed: '#24242C',
-  surfaceMuted: '#1E1E26',
-  border: '#3A3A45',
-  borderSubtle: '#2F2F38',
-  overlay: 'rgba(8, 8, 12, 0.72)',
+  // Surfaces
+  background: '#080B10',
+  backgroundAlt: '#0B0E14',
+  backgroundElevated: '#101319',
+  surfaceDark: '#101319',
+  surfaceMedium: '#12161D',
+  surfaceLight: '#161A22',
+  surface: '#12161D',
+  surfaceHover: '#1A1E27',
+  surfacePressed: '#0E1218',
+  surfaceMuted: '#101319',
+  surfaceElevated: '#1A1E27',
+  surfaceHighlight: '#1F2430',
 
+  // Borders
+  border: 'rgba(255,255,255,0.09)',
+  borderSubtle: 'rgba(255,255,255,0.06)',
+  borderStrong: 'rgba(255,255,255,0.14)',
+  overlay: 'rgba(8, 11, 16, 0.78)',
+
+  // Brand primaries
   primary: '#00FF85',
-  primaryMuted: 'rgba(0, 255, 133, 0.16)',
-  primaryPressed: '#00D970',
-  primaryGlow: 'rgba(0, 255, 133, 0.28)',
-  onPrimary: '#0A0A0D',
+  primaryDark: '#00E875',
+  primarySoft: '#25FF8E',
+  primaryMuted: 'rgba(0, 255, 133, 0.14)',
+  primaryPressed: '#00E070',
+  primaryGlow: 'rgba(0, 255, 133, 0.15)',
+  onPrimary: '#07100B',
 
+  // Brand secondary (AI / insights)
   secondary: '#7B5CFF',
-  secondaryMuted: 'rgba(123, 92, 255, 0.18)',
+  secondarySoft: '#8A5CFF',
+  secondaryBright: '#995FFF',
+  secondaryMuted: 'rgba(123, 92, 255, 0.16)',
   secondaryPressed: '#6A4AE6',
-  secondaryGlow: 'rgba(123, 92, 255, 0.3)',
+  secondaryGlow: 'rgba(123, 92, 255, 0.18)',
   onSecondary: '#FFFFFF',
 
+  // Text
   white: '#FFFFFF',
   text: '#FFFFFF',
-  textSecondary: '#B0B0BC',
-  textMuted: '#7A7A88',
-  textDisabled: '#555561',
+  textSecondary: '#A4A6AF',
+  textMuted: '#6F727C',
+  textDisabled: '#555861',
 
+  // Feedback
   success: '#00FF85',
-  warning: '#FFB020',
-  error: '#FF4D6A',
-  errorMuted: 'rgba(255, 77, 106, 0.14)',
-  info: '#5B8CFF',
+  successDark: '#00E875',
+  successSoft: '#25FF8E',
+  warning: '#FFC83D',
+  error: '#FF4D57',
+  errorMuted: 'rgba(255, 77, 87, 0.14)',
+  info: '#55CFFF',
 
-  protein: '#00FF85',
-  carbs: '#7B5CFF',
-  fats: '#FF8A4C',
-  water: '#5B8CFF',
+  // Domain accents (spec nutrição)
+  protein: '#7B5CFF',
+  carbs: '#00FF85',
+  fats: '#FFC83D',
+  water: '#55CFFF',
+  fat: '#FFC83D',
 
   chartLine: '#7B5CFF',
-  chartFill: 'rgba(123, 92, 255, 0.18)',
+  chartFill: 'rgba(123, 92, 255, 0.16)',
   streak: '#00FF85',
-  disabled: '#3E3E48',
+  disabled: '#3A3E48',
 
   tabActive: '#00FF85',
-  tabInactive: '#7A7A88',
+  tabInactive: '#777A84',
 
-  // Compatibility aliases
-  fat: '#FF8A4C',
-  primarySoft: 'rgba(0, 255, 133, 0.12)',
-  borderStrong: '#4A4A58',
-  skeleton: '#2F2F38',
-  skeletonHighlight: '#3A3A45',
-  surfaceHighlight: '#3A3A46',
-  surfaceElevated: '#32323C',
+  skeleton: '#161A22',
+  skeletonHighlight: '#1A1E27',
 } as const;
 
 export type ColorToken = keyof typeof colors;
+
+/** Gradientes oficiais da marca */
+export const gradients = {
+  ai: ['#7B5CFF', '#55CFFF', '#00FF85'] as const,
+  aiSoft: ['#7B5CFF', '#55CFFF'] as const,
+  primaryFade: ['rgba(0,255,133,0.18)', 'rgba(0,255,133,0)'] as const,
+  hero: ['rgba(8,11,16,0)', '#080B10'] as const,
+  purpleGlow: ['rgba(123,92,255,0.28)', 'rgba(85,207,255,0.08)'] as const,
+} as const;
+
+export const shadows = {
+  card: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.3,
+    shadowRadius: 30,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+  glowGreen: {
+    shadowColor: '#00FF85',
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 4,
+  },
+  glowPurple: {
+    shadowColor: '#7B5CFF',
+    shadowOpacity: 0.18,
+    shadowRadius: 26,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 4,
+  },
+} as const;

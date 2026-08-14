@@ -49,14 +49,15 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
+    <GestureHandlerRootView style={{ flex: 1, width: '100%', backgroundColor: colors.background }}>
       <QueryClientProvider client={queryClient}>
         <StatusBar style="light" />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
+            contentStyle: { backgroundColor: colors.background, flex: 1 },
             animation: 'fade',
+            animationDuration: 180,
           }}
         >
           <Stack.Screen name="index" />
@@ -65,6 +66,8 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="workout/session" options={{ animation: 'slide_from_bottom' }} />
           <Stack.Screen name="exercises" />
+          <Stack.Screen name="technique" />
+          <Stack.Screen name="preparation" />
           <Stack.Screen name="nutrition" />
           <Stack.Screen name="habits/index" />
           <Stack.Screen name="calendar/index" />

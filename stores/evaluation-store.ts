@@ -10,16 +10,36 @@ type EvaluationState = {
   back: () => void;
   patch: (partial: EvaluationAnswers) => void;
   reset: () => void;
+  totalSteps: () => number;
 };
 
-export const EVALUATION_TOTAL_STEPS = 8;
+/** Passos fixos: 0–7 perfil/treino, 8 dieta, 9 modo preparação. +1 se preparação ativa. */
+export const EVALUATION_FIXED_STEPS = 10;
 
-export const useEvaluationStore = create<EvaluationState>((set) => ({
+export function getEvaluationTotalSteps(answers: EvaluationAnswers): number {
+  return answers.preparationMode ? EVALUATION_FIXED_STEPS + 1 : EVALUATION_FIXED_STEPS;
+}
+
+/** @deprecated use getEvaluationTotalSteps(answers) — mantido para imports existentes */
+export const EVALUATION_TOTAL_STEPS = EVALUATION_FIXED_STEPS;
+
+export const useEvaluationStore = create<EvaluationState>((set, get) => ({
   step: 0,
   answers: {},
   setStep: (step) => set({ step }),
-  next: () => set((s) => ({ step: Math.min(s.step + 1, EVALUATION_TOTAL_STEPS - 1) })),
+  next: () =>
+    set((s) => ({
+      step: Math.min(s.step + 1, getEvaluationTotalSteps(s.answers) - 1),
+    })),
   back: () => set((s) => ({ step: Math.max(s.step - 1, 0) })),
-  patch: (partial) => set((s) => ({ answers: { ...s.answers, ...partial } })),
+  patch: (partial) =>
+    set((s) => {
+      const answers = { ...s.answers, ...partial };
+      // Se desligar preparação, volta do passo extra se necessário
+      const total = getEvaluationTotalSteps(answers);
+      const step = Math.min(s.step, total - 1);
+      return { answers, step };
+    }),
   reset: () => set({ step: 0, answers: {} }),
+  totalSteps: () => getEvaluationTotalSteps(get().answers),
 }));

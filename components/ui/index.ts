@@ -21,6 +21,17 @@ export {
 export { NumberStepper as Stepper } from './Controls';
 export { ScreenProgress as ProgressIndicator } from './Controls';
 export { RadioOption } from './RadioOption';
+export { OptionCard } from './OptionCard';
 export { MealCard, NutritionCard } from './MealCards';
 export { Logo, ChartCard, EmptyState, Skeleton, Avatar } from './Misc';
 export { Tabs, SegmentedControl } from './Tabs';
+export {
+  Greeting,
+  ScreenTitle,
+  PageHeading,
+  SectionHeading,
+  IconTile,
+  ListRow,
+  StatusPill,
+} from './Premium';
+

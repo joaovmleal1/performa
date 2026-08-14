@@ -3,12 +3,12 @@ export * from './typography';
 export * from './spacing';
 export * from './motion';
 
-import { colors } from './colors';
+import { colors, gradients, shadows } from './colors';
 import { typography, fontFamily } from './typography';
 import { spacing, radius, layout, hitSlop } from './spacing';
 import { duration, easing, pressScale } from './motion';
 
-/** Compatibility aliases used by older component drafts */
+/** Compatibility aliases */
 export const tokens = {
   colors: {
     ...colors,
@@ -23,8 +23,10 @@ export const tokens = {
     dangerMuted: colors.errorMuted,
     fat: colors.fats,
     blackSoft: colors.backgroundElevated,
-    surfaceElevated: colors.surfaceHover,
+    surfaceElevated: colors.surfaceElevated,
   },
+  gradients,
+  shadows,
   spacing,
   radius,
   typography,
@@ -33,6 +35,8 @@ export const tokens = {
 
 export const theme = {
   colors,
+  gradients,
+  shadows,
   typography,
   fontFamily,
   spacing,

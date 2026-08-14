@@ -1,7 +1,10 @@
-import { colors, spacing } from '@/theme';
-import { Dumbbell, Flame, Zap } from 'lucide-react-native';
+import { Image } from 'expo-image';
+import { Check, ChevronRight, Clock, Layers } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+
+import { AIOrb } from '@/components/brand/PerformaLogo';
+import { colors, radius, spacing } from '@/theme';
 import type { WorkoutPlan } from '@/types';
 import { AppButton } from './AppButton';
 import { AppText } from './AppText';
@@ -19,7 +22,7 @@ export function MetricCard({ label, value, hint, accent = 'default', icon }: Met
   return (
     <Card style={styles.metric}>
       <View style={styles.metricTop}>
-        <AppText variant="caption" muted>
+        <AppText variant="caption" color={colors.textMuted}>
           {label}
         </AppText>
         {icon}
@@ -37,7 +40,7 @@ export function MetricCard({ label, value, hint, accent = 'default', icon }: Met
         {value}
       </AppText>
       {hint ? (
-        <AppText variant="caption" muted>
+        <AppText variant="caption" color={colors.textSecondary}>
           {hint}
         </AppText>
       ) : null}
@@ -52,31 +55,25 @@ type WorkoutCardProps = {
 
 export function WorkoutCard({ workout, onStart }: WorkoutCardProps) {
   return (
-    <Card glow="purple" style={styles.workout}>
-      <View style={styles.row}>
-        <View style={styles.iconBubble}>
-          <Dumbbell size={20} color={colors.secondary} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <AppText variant="caption" muted>
-            Treino de hoje
-          </AppText>
-          <AppText variant="h2">{workout.name}</AppText>
-        </View>
-      </View>
+    <Card accent="purple" style={styles.workout}>
+      <AppText variant="caption" color={colors.secondary}>
+        Treino de hoje
+      </AppText>
+      <AppText variant="h2">{workout.name}</AppText>
       <View style={styles.metaRow}>
         <View style={styles.meta}>
-          <Flame size={14} color={colors.primary} />
-          <AppText variant="caption">{workout.estimatedMinutes} min</AppText>
+          <Layers size={14} color={colors.textSecondary} strokeWidth={1.85} />
+          <AppText variant="caption" color={colors.textSecondary}>
+            {workout.exercises.length} exercícios
+          </AppText>
         </View>
         <View style={styles.meta}>
-          <Zap size={14} color={colors.secondary} />
-          <AppText variant="caption">{workout.exercises.length} exercícios</AppText>
+          <Clock size={14} color={colors.textSecondary} strokeWidth={1.85} />
+          <AppText variant="caption" color={colors.textSecondary}>
+            {workout.estimatedMinutes} min
+          </AppText>
         </View>
       </View>
-      <AppText variant="caption" muted>
-        {(workout.muscleFocus ?? []).join(' • ')}
-      </AppText>
       <AppButton label="Iniciar treino" onPress={onStart} size="md" />
     </Card>
   );
@@ -88,8 +85,10 @@ type ExerciseCardProps = {
   reps: number;
   suggestedWeightKg?: number;
   previousWeightKg?: number;
+  coachTag?: string;
   completed?: boolean;
   color: string;
+  gifUrl?: string;
   onPress?: () => void;
 };
 
@@ -99,28 +98,41 @@ export function ExerciseCard({
   reps,
   suggestedWeightKg,
   previousWeightKg,
+  coachTag,
   completed,
   color,
+  gifUrl,
   onPress,
 }: ExerciseCardProps) {
   return (
     <Card onPress={onPress} style={styles.exercise} padded={false}>
       <View style={styles.exerciseRow}>
-        <View style={[styles.thumb, { backgroundColor: color }]} />
+        {gifUrl ? (
+          <Image
+            source={{ uri: gifUrl }}
+            style={[styles.thumb, styles.thumbMedia]}
+            contentFit="contain"
+            cachePolicy="memory-disk"
+          />
+        ) : (
+          <View style={[styles.thumb, { backgroundColor: color }]} />
+        )}
         <View style={{ flex: 1, gap: 2 }}>
           <AppText variant="bodyMedium">{name}</AppText>
-          <AppText variant="caption" muted>
-            {sets}×{reps}
-            {previousWeightKg != null ? ` · anterior ${previousWeightKg} kg` : ''}
-            {suggestedWeightKg != null ? ` · sugestão ${suggestedWeightKg} kg` : ''}
+          <AppText variant="caption" color={colors.textMuted}>
+            {sets} séries • {reps} reps
+            {previousWeightKg != null ? ` · ant. ${previousWeightKg} kg` : ''}
+            {suggestedWeightKg != null ? ` · sug. ${suggestedWeightKg} kg` : ''}
+            {coachTag ? ` · ${coachTag}` : ''}
           </AppText>
         </View>
-        <View
-          style={[
-            styles.check,
-            completed && { backgroundColor: colors.primary, borderColor: colors.primary },
-          ]}
-        />
+        {completed ? (
+          <View style={styles.checkOn}>
+            <Check size={14} color={colors.onPrimary} strokeWidth={3} />
+          </View>
+        ) : (
+          <ChevronRight size={18} color={colors.textMuted} strokeWidth={1.85} />
+        )}
       </View>
     </Card>
   );
@@ -133,52 +145,51 @@ type InsightProps = {
 
 export function AIInsightCard({ title, message }: InsightProps) {
   return (
-    <Card glow="purple" style={styles.insight}>
-      <View style={styles.insightBadge}>
+    <Card accent="purple" style={styles.insight}>
+      <View style={styles.insightHeader}>
+        <AIOrb size={32} />
         <AppText variant="caption" color={colors.secondary}>
           {title}
         </AppText>
       </View>
-      <AppText variant="body">{message}</AppText>
+      <AppText variant="body" color={colors.textSecondary}>
+        {message}
+      </AppText>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  metric: { flex: 1, gap: 6, minHeight: 110 },
+  metric: { flex: 1, gap: 6, minHeight: 108 },
   metricTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   workout: { gap: spacing.md },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  iconBubble: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.secondaryMuted,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   metaRow: { flexDirection: 'row', gap: 16 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   exercise: { padding: 12 },
   exerciseRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  thumb: { width: 48, height: 48, borderRadius: 12 },
-  check: {
+  thumb: {
+    width: 52,
+    height: 52,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceElevated,
+  },
+  thumbMedia: { backgroundColor: '#0B0E14' },
+  checkOn: {
     width: 22,
     height: 22,
     borderRadius: 11,
-    borderWidth: 2,
-    borderColor: colors.border,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   insight: { gap: 10 },
-  insightBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    backgroundColor: colors.secondaryMuted,
+  insightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
 });

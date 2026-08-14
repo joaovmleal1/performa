@@ -1,4 +1,4 @@
-import { colors, radius, spacing } from '@/theme';
+import { colors, radius, shadows, spacing } from '@/theme';
 import React from 'react';
 import { Pressable, StyleSheet, View, ViewStyle } from 'react-native';
 
@@ -10,9 +10,9 @@ type Props = {
   onPress?: () => void;
   padded?: boolean;
   glow?: Glow;
-  /** Alias de glow — 'green' | 'purple' */
   accent?: 'green' | 'purple';
   accessibilityLabel?: string;
+  elevated?: boolean;
 };
 
 export function Card({
@@ -23,6 +23,7 @@ export function Card({
   glow,
   accent,
   accessibilityLabel,
+  elevated,
 }: Props) {
   const resolvedGlow: Glow = glow ?? (accent ? accent : 'none');
 
@@ -30,6 +31,7 @@ export function Card({
     <View
       style={[
         styles.card,
+        elevated && styles.elevated,
         padded && styles.padded,
         resolvedGlow === 'green' && styles.glowGreen,
         resolvedGlow === 'purple' && styles.glowPurple,
@@ -58,28 +60,26 @@ export function Card({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surfaceLight,
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
     overflow: 'hidden',
+  },
+  elevated: {
+    backgroundColor: colors.surfaceElevated,
+    ...shadows.card,
   },
   padded: {
     padding: spacing.lg,
   },
   glowGreen: {
-    shadowColor: colors.primary,
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 0 },
-    borderColor: 'rgba(0,255,133,0.22)',
+    borderColor: 'rgba(0,255,133,0.35)',
+    ...shadows.glowGreen,
   },
   glowPurple: {
-    shadowColor: colors.secondary,
-    shadowOpacity: 0.22,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 0 },
-    borderColor: 'rgba(123,92,255,0.28)',
+    borderColor: 'rgba(123,92,255,0.4)',
+    ...shadows.glowPurple,
   },
   pressed: { opacity: 0.92, transform: [{ scale: 0.99 }] },
 });

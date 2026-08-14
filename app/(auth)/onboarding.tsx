@@ -1,12 +1,12 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { ArrowRight } from 'lucide-react-native';
 import { useCallback, useRef, useState } from 'react';
 import {
   FlatList,
   ImageBackground,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  Platform,
   Pressable,
   StyleSheet,
   useWindowDimensions,
@@ -22,6 +22,7 @@ import { colors, radius, spacing } from '@/theme';
 type Slide = {
   key: string;
   title: string;
+  highlight: string;
   subtitle: string;
   image: string;
 };
@@ -29,39 +30,38 @@ type Slide = {
 const slides: Slide[] = [
   {
     key: '1',
-    title: 'Seu melhor\ncomeça agora',
-    subtitle: 'Treino, nutrição e evolução no mesmo lugar.',
+    title: 'Seu ',
+    highlight: 'melhor',
+    subtitle: ' começa agora',
     image:
       'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1200&q=80',
   },
   {
     key: '2',
-    title: 'Treinos feitos\npara você',
-    subtitle: 'Planos personalizados com progressão inteligente de cargas.',
+    title: 'Treinos feitos ',
+    highlight: 'para você',
+    subtitle: '',
     image:
       'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80',
   },
   {
     key: '3',
-    title: 'Nutrição que\nacompanha sua rotina',
-    subtitle: 'Refeições, macros e dieta com IA alinhadas ao seu objetivo.',
+    title: 'Nutrição que acompanha ',
+    highlight: 'sua rotina',
+    subtitle: '',
     image:
       'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80',
   },
 ];
 
-const PHONE_MAX = 430;
-
+/** Telas 02–04 — Onboarding com highlight verde + fotografia full-bleed */
 export default function OnboardingScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
   const [index, setIndex] = useState(0);
-  const [frameHeight, setFrameHeight] = useState(windowHeight);
   const listRef = useRef<FlatList<Slide>>(null);
-
-  const frameWidth = Math.min(windowWidth, PHONE_MAX);
   const isLast = index === slides.length - 1;
 
   const finish = useCallback(() => {
@@ -70,10 +70,8 @@ export default function OnboardingScreen() {
   }, [completeOnboarding, router]);
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const next = Math.round(e.nativeEvent.contentOffset.x / Math.max(frameWidth, 1));
-    if (next !== index && next >= 0 && next < slides.length) {
-      setIndex(next);
-    }
+    const next = Math.round(e.nativeEvent.contentOffset.x / Math.max(width, 1));
+    if (next !== index && next >= 0 && next < slides.length) setIndex(next);
   };
 
   const goNext = () => {
@@ -86,178 +84,100 @@ export default function OnboardingScreen() {
 
   return (
     <View style={styles.screen}>
-      <View
-        style={[styles.phoneFrame, { width: frameWidth }]}
-        onLayout={(e) => setFrameHeight(e.nativeEvent.layout.height)}
-      >
-        <FlatList
-          ref={listRef}
-          style={styles.list}
-          data={slides}
-          horizontal
-          pagingEnabled
-          bounces={false}
-          decelerationRate="fast"
-          showsHorizontalScrollIndicator={false}
-          onScroll={onScroll}
-          scrollEventThrottle={16}
-          keyExtractor={(item) => item.key}
-          getItemLayout={(_, i) => ({
-            length: frameWidth,
-            offset: frameWidth * i,
-            index: i,
-          })}
-          renderItem={({ item }) => (
-            <View style={{ width: frameWidth, height: frameHeight }}>
-              <ImageBackground
-                source={{ uri: item.image }}
+      <FlatList
+        ref={listRef}
+        data={slides}
+        horizontal
+        pagingEnabled
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        keyExtractor={(item) => item.key}
+        getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
+        renderItem={({ item }) => (
+          <View style={{ width, flex: 1 }}>
+            <ImageBackground source={{ uri: item.image }} style={StyleSheet.absoluteFill} resizeMode="cover">
+              <LinearGradient
+                colors={['rgba(8,11,16,0.45)', 'rgba(8,11,16,0.15)', 'rgba(8,11,16,0.55)', colors.background]}
+                locations={[0, 0.35, 0.62, 1]}
                 style={StyleSheet.absoluteFill}
-                resizeMode="cover"
-              >
-                <LinearGradient
-                  colors={[
-                    'rgba(18,18,23,0.35)',
-                    'rgba(18,18,23,0.12)',
-                    'rgba(18,18,23,0.78)',
-                    colors.background,
-                  ]}
-                  locations={[0, 0.28, 0.58, 1]}
-                  style={StyleSheet.absoluteFill}
-                />
-              </ImageBackground>
+              />
+            </ImageBackground>
 
-              <View
-                style={[
-                  styles.topBar,
-                  { paddingTop: Math.max(insets.top, spacing.lg) },
-                ]}
-              >
-                <View style={styles.brandRow}>
-                  <PerformaMark size={28} />
-                  <AppText variant="label" style={styles.brandWord}>
-                    PERFORMA
-                  </AppText>
-                </View>
-                <Pressable
-                  onPress={finish}
-                  hitSlop={12}
-                  accessibilityRole="button"
-                  accessibilityLabel="Pular onboarding"
-                  style={styles.skipBtn}
-                >
-                  <AppText variant="label" color={colors.textSecondary}>
-                    Pular
-                  </AppText>
-                </Pressable>
-              </View>
-
-              <View
-                style={[
-                  styles.bottomContent,
-                  {
-                    paddingBottom:
-                      Math.max(insets.bottom, spacing.lg) + 120,
-                  },
-                ]}
-              >
-                <AppText variant="display" style={styles.title}>
-                  {item.title}
-                </AppText>
-                <AppText
-                  variant="body"
-                  color={colors.textSecondary}
-                  style={styles.subtitle}
-                >
-                  {item.subtitle}
+            <View style={[styles.topBar, { paddingTop: Math.max(insets.top, spacing.lg) }]}>
+              <View style={styles.brandRow}>
+                <PerformaMark size={26} />
+                <AppText variant="label" style={styles.brandWord}>
+                  PERFORMA
                 </AppText>
               </View>
+              <Pressable onPress={finish} hitSlop={12} style={styles.skipBtn}>
+                <AppText variant="label" color={colors.textSecondary}>
+                  Pular
+                </AppText>
+              </Pressable>
             </View>
-          )}
-        />
 
-        <View
-          style={[
-            styles.footer,
-            { paddingBottom: Math.max(insets.bottom, spacing.lg) },
-          ]}
-        >
-          <ProgressDots total={slides.length} index={index} />
-          <AppButton
-            label={isLast ? 'Começar' : 'Próximo'}
+            <View
+              style={[
+                styles.copy,
+                { paddingBottom: Math.max(insets.bottom, spacing.lg) + 140 },
+              ]}
+            >
+              <AppText variant="display">
+                {item.title}
+                <AppText variant="display" color={colors.primary}>
+                  {item.highlight}
+                </AppText>
+                {item.subtitle}
+              </AppText>
+            </View>
+          </View>
+        )}
+      />
+
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+        <ProgressDots total={slides.length} index={index} />
+        {isLast ? (
+          <AppButton label="Começar" onPress={goNext} />
+        ) : (
+          <Pressable
             onPress={goNext}
-            accessibilityLabel={isLast ? 'Começar' : 'Próximo slide'}
-          />
-        </View>
+            style={styles.roundCta}
+            accessibilityRole="button"
+            accessibilityLabel="Próximo"
+          >
+            <ArrowRight size={24} color={colors.onPrimary} strokeWidth={2.4} />
+          </Pressable>
+        )}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.backgroundElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  phoneFrame: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: colors.background,
-    overflow: 'hidden',
-    ...(Platform.OS === 'web'
-      ? ({
-          maxWidth: PHONE_MAX,
-          maxHeight: 860,
-          borderRadius: radius.xl,
-          marginVertical: spacing.lg,
-          boxShadow: '0 24px 80px rgba(0,0,0,0.55)',
-        } as object)
-      : null),
-  },
-  list: {
-    flex: 1,
-  },
+  screen: { flex: 1, backgroundColor: colors.background },
   topBar: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 2,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing['2xl'],
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  brandWord: {
-    letterSpacing: 1.6,
-    color: colors.white,
-  },
-  skipBtn: {
-    minHeight: 44,
-    minWidth: 44,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  bottomContent: {
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  brandWord: { letterSpacing: 1.6, color: colors.white },
+  skipBtn: { minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' },
+  copy: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: spacing.xl,
-  },
-  title: {
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    marginTop: spacing.sm,
-    maxWidth: 340,
-    lineHeight: 24,
+    paddingHorizontal: spacing['2xl'],
   },
   footer: {
     position: 'absolute',
@@ -265,8 +185,20 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 3,
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: spacing['2xl'],
     gap: spacing.lg,
     alignItems: 'center',
+  },
+  roundCta: {
+    width: 64,
+    height: 64,
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 0 },
   },
 });

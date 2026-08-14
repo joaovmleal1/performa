@@ -1,77 +1,57 @@
 # PERFORMA Design System — Source of Truth
 
-> Brand tokens from the official UI board. Dark-only premium fitness product.
+> Manual alinhado a `/design/reference/` e ao brief pixel-perfect.
 
 ## Brand
 
 - **Name:** PERFORMA
-- **Concept:** Treino + Nutrição + Inteligência + Resultados
-- **Tagline:** Muito mais que um aplicativo de treino. Seu companheiro completo para transformar corpo, mente e hábitos.
-- **Sub-brand:** TREINO • NUTRIÇÃO • RESULTADOS
+- **Tagline:** TREINO • NUTRIÇÃO • RESULTADOS
+- **Tom:** confiante, motivador, direto, dark premium fitness + technology
 
 ## Colors
 
-| Token | Hex | Usage |
-|-------|-----|--------|
-| `performanceGreen` | `#00FF85` | CTA, active, progress, success |
-| `electricPurple` | `#7B5CFF` | AI, insights, nutrition accents |
-| `background` | `#121217` | App background |
-| `surface` | `#2A2A33` | Cards, inputs |
-| `surfaceElevated` | `#32323C` | Elevated cards |
-| `surfaceMuted` | `#1C1C24` | Subtle panels |
-| `border` | `#3A3A45` | Dividers, outlines |
-| `borderSubtle` | `#2F2F38` | Soft separators |
-| `white` | `#FFFFFF` | Primary text |
-| `textSecondary` | `#A0A0AB` | Secondary text |
-| `textMuted` | `#6B6B76` | Tertiary / labels |
-| `disabled` | `#4A4A55` | Disabled controls |
-| `overlay` | `rgba(0,0,0,0.6)` | Modals |
-| `danger` | `#FF4D6A` | Destructive |
-| `warning` | `#FFB020` | Warnings / fats accent |
-| `info` | `#4DA3FF` | Info |
+| Token | Hex / valor |
+|-------|-------------|
+| background | `#080B10` |
+| backgroundAlt | `#0B0E14` |
+| surfaceDark | `#101319` |
+| cards | `#12161D` / `#161A22` |
+| elevated | `#1A1E27` |
+| border | `rgba(255,255,255,0.09)` |
+| borderStrong | `rgba(255,255,255,0.14)` |
+| primary | `#00FF85` |
+| onPrimary | `#07100B` |
+| secondary / AI | `#7B5CFF` |
+| text | `#FFFFFF` |
+| textSecondary | `#A4A6AF` |
+| textMuted | `#6F727C` |
+| warning | `#FFC83D` |
+| error | `#FF4D57` |
+
+### Gradiente AI
+
+`#7B5CFF → #55CFFF → #00FF85`
 
 ## Typography
 
 - **Family:** Sora
-- Display: ExtraBold 32–40
-- H1: Bold 28
-- H2: Bold 22
-- H3: SemiBold 18
-- Body: Regular 16
-- Label: Medium 14
-- Caption: Regular 12
-- Metric: SemiBold/Bold (tabular feel)
+- H1 ~30px Bold · H2 24 · H3 18 · Body 15 · Metrics 40–56 Bold
 
-## Spacing (8pt)
+## Spacing (4pt)
 
 4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64
 
+Screen padding: **20–24px**
+
 ## Radius
 
-- sm: 8
-- md: 12
-- lg: 16
-- xl: 20
-- full: 999
+- Controles: 12
+- Cards: 16–20
+- Botões: 14–16
+- Pills: 999
 
-## Motion
+## Bottom nav
 
-- Micro: 150–300ms
-- Prefer opacity/transform
-- Respect reduced motion
-- Subtle green glow on primary CTAs only
-
-## Style Direction
-
-Premium · athletic · futuristic · minimal · dark · energetic · elegant
-
-References (quality only): Nike Training Club, Whoop, Strava, Freeletics, Apple Fitness, Hevy, Strong, Oura, Linear.
-
-## Anti-patterns
-
-- Emoji as primary icons
-- Excess glow/gradient
-- Generic SaaS dashboard look
-- Absolute black everywhere
-- Oversized cards without hierarchy
-- Medical claims for AI nutrition
+- Altura ~76–88
+- Inactive `#777A84`
+- Active `#00FF85` (+ glow leve no ícone)

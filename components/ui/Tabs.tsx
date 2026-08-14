@@ -54,6 +54,9 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
           <Pressable
             key={option.key}
             onPress={() => onChange(option.key)}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            accessibilityLabel={option.label}
             style={[styles.segment, active && styles.segmentActive]}
           >
             <Text style={[styles.segmentLabel, active && styles.segmentLabelActive]}>
@@ -77,7 +80,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderRadius: radius.full,
     backgroundColor: colors.surfaceMuted,
-    minHeight: 36,
+    minHeight: 44,
     justifyContent: 'center',
   },
   active: {

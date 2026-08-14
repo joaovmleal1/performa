@@ -1,114 +1,201 @@
-import { StyleSheet, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import {
-  AIInsightCard,
   AppButton,
   AppText,
   Card,
+  ChartCard,
   MetricCard,
   Screen,
 } from '@/components/ui';
-import {
-  mockInsights,
-  mockPRs,
-  mockWeightHistory,
-} from '@/data/mock';
+import { mockPRs, mockWeightHistory } from '@/data/mock';
 import { useAppRouter } from '@/hooks/useAppRouter';
-import { colors, spacing } from '@/theme';
+import { useLiftHistoryStore } from '@/stores/lift-history-store';
+import { colors, radius, spacing } from '@/theme';
 
+type TabKey = 'geral' | 'treinos' | 'medidas' | 'fotos';
+
+/** Tela 12 — Progresso */
 export default function ProgressScreen() {
   const router = useAppRouter();
+  const [tab, setTab] = useState<TabKey>('geral');
+  const sessions = useLiftHistoryStore((s) => s.sessions);
+  const personalBests = useMemo(
+    () => useLiftHistoryStore.getState().getPersonalBests(),
+    [sessions],
+  );
   const latest = mockWeightHistory[mockWeightHistory.length - 1];
   const first = mockWeightHistory[0];
-  const delta = latest && first ? latest.weightKg - first.weightKg : 0;
-  const maxW = Math.max(...mockWeightHistory.map((p) => p.weightKg));
-  const minW = Math.min(...mockWeightHistory.map((p) => p.weightKg));
+  const delta = latest && first ? latest.weightKg - first.weightKg : -5.2;
+  const completedWorkouts = sessions.length;
 
   return (
-    <Screen scroll>
-      <View style={styles.header}>
-        <AppText variant="h1">Progresso</AppText>
-        <AppText variant="body" muted>
-          Peso, recordes e insights da sua evolução.
-        </AppText>
+    <Screen scroll tabBarInset>
+      <AppText variant="h1" style={styles.title}>
+        Progresso
+      </AppText>
+
+      <View style={styles.tabs}>
+        {(
+          [
+            ['geral', 'Geral'],
+            ['treinos', 'Treinos'],
+            ['medidas', 'Medidas'],
+            ['fotos', 'Fotos'],
+          ] as const
+        ).map(([key, label]) => {
+          const active = tab === key;
+          return (
+            <Pressable
+              key={key}
+              onPress={() => setTab(key)}
+              style={[styles.tab, active && styles.tabActive]}
+            >
+              <AppText
+                variant="caption"
+                color={active ? colors.onPrimary : colors.textSecondary}
+              >
+                {label}
+              </AppText>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Card style={styles.weightCard}>
+        <View style={styles.weightRow}>
+          <View style={{ gap: 4 }}>
+            <AppText variant="caption" color={colors.textMuted}>
+              Peso
+            </AppText>
+            <AppText variant="metricLg">
+              {(latest?.weightKg ?? 72).toFixed(1).replace('.', ',')} kg
+            </AppText>
+          </View>
+          <View style={{ alignItems: 'flex-end', gap: 2 }}>
+            <AppText variant="h3" color={colors.primary}>
+              {delta > 0 ? '+' : ''}
+              {delta.toFixed(1).replace('.', ',')} kg
+            </AppText>
+            <AppText variant="caption" color={colors.textMuted}>
+              Últimos 30 dias
+            </AppText>
+          </View>
+        </View>
+      </Card>
+
+      <View style={styles.section}>
+        <ChartCard
+          title="Evolução de peso"
+          points={mockWeightHistory.map((point) => point.weightKg)}
+          valueLabel={`${(latest?.weightKg ?? 72).toFixed(1)} kg`}
+          changeLabel={`${delta > 0 ? '+' : ''}${delta.toFixed(1)} kg`}
+        />
       </View>
 
       <View style={styles.row}>
         <MetricCard
-          label="Peso atual"
-          value={`${latest?.weightKg ?? 72} kg`}
-          hint={delta <= 0 ? `${delta.toFixed(1)} kg no período` : `+${delta.toFixed(1)} kg`}
+          label="Treinos"
+          value={String(completedWorkouts || 24)}
+          hint="concluídos"
           accent="green"
         />
         <MetricCard
-          label="Recordes"
-          value={`${mockPRs.length}`}
-          hint="PRs registrados"
+          label="Calorias médias"
+          value="1.950"
+          hint="kcal / dia"
           accent="purple"
         />
       </View>
 
-      <Card style={styles.section}>
-        <AppText variant="h3">Histórico de peso</AppText>
-        <View style={styles.chart}>
-          {mockWeightHistory.map((point) => {
-            const range = maxW - minW || 1;
-            const height = 24 + ((point.weightKg - minW) / range) * 80;
-            return (
-              <View key={point.date} style={styles.chartCol}>
-                <View style={[styles.chartBar, { height }]} />
-                <AppText variant="caption" muted>
-                  {point.date.slice(5)}
-                </AppText>
-              </View>
-            );
-          })}
-        </View>
-      </Card>
-
-      <Card style={styles.section}>
-        <AppText variant="h3">Recordes pessoais</AppText>
-        {mockPRs.map((pr) => (
-          <View key={pr.id} style={styles.prRow}>
-            <View>
-              <AppText variant="bodyMedium">{pr.exerciseName}</AppText>
-              <AppText variant="caption" muted>
-                {pr.date}
+      {(tab === 'medidas' || tab === 'geral') && (
+        <Card style={styles.section}>
+          <AppText variant="h3">Medidas</AppText>
+          {[
+            ['Peso', `${(latest?.weightKg ?? 72).toFixed(1)} kg`],
+            ['Cintura', '78 cm'],
+            ['Peito', '98 cm'],
+            ['Braço', '33 cm'],
+            ['Coxa', '57 cm'],
+            ['Quadril', '98 cm'],
+          ].map(([label, value], i, arr) => (
+            <View
+              key={label}
+              style={[styles.measureRow, i === arr.length - 1 && { borderBottomWidth: 0 }]}
+            >
+              <AppText variant="body">{label}</AppText>
+              <AppText variant="bodyMedium" color={colors.primary}>
+                {value}
               </AppText>
             </View>
-            <AppText variant="label" color={colors.primary}>
-              {pr.weightKg} kg × {pr.reps}
-            </AppText>
-          </View>
-        ))}
-      </Card>
+          ))}
+        </Card>
+      )}
 
-      <View style={styles.insights}>
-        <AppText variant="h3">Insights</AppText>
-        {mockInsights.map((insight) => (
-          <AIInsightCard
-            key={insight.id}
-            title={insight.title}
-            message={insight.message}
-          />
-        ))}
-      </View>
+      {tab === 'treinos' && (
+        <>
+          <Card style={styles.section}>
+            <AppText variant="h3">Progressão de carga</AppText>
+            <AppText variant="caption" color={colors.textMuted}>
+              Cargas anotadas por série nos treinos concluídos.
+            </AppText>
+            {sessions.length === 0 ? (
+              <AppText variant="body" color={colors.textSecondary}>
+                Complete um treino anotando o peso de cada série para ver a evolução aqui.
+              </AppText>
+            ) : (
+              sessions.slice(0, 6).map((session) => (
+                <View key={session.id} style={styles.sessionBlock}>
+                  <View style={styles.measureRow}>
+                    <AppText variant="bodyMedium">{session.workoutName}</AppText>
+                    <AppText variant="caption" color={colors.textMuted}>
+                      {formatDate(session.completedAt.slice(0, 10))}
+                    </AppText>
+                  </View>
+                  {session.exercises.map((ex) => (
+                    <View key={`${session.id}-${ex.exerciseId}`} style={styles.loadRow}>
+                      <AppText variant="caption" color={colors.textSecondary} style={{ flex: 1 }}>
+                        {ex.exerciseName}
+                      </AppText>
+                      <AppText variant="caption" color={colors.primary}>
+                        {ex.sets
+                          .map((s) => `${formatKg(s.weightKg)}×${s.reps}`)
+                          .join(' · ')}
+                      </AppText>
+                    </View>
+                  ))}
+                </View>
+              ))
+            )}
+          </Card>
+
+          <Card style={styles.section}>
+            <AppText variant="h3">Recordes</AppText>
+            {(personalBests.length ? personalBests : mockPRs.map((pr) => ({
+              exerciseId: pr.id,
+              exerciseName: pr.exerciseName,
+              weightKg: pr.weightKg,
+              reps: pr.reps ?? 1,
+              date: pr.date,
+            }))).map((pr) => (
+              <View key={pr.exerciseId} style={styles.measureRow}>
+                <AppText variant="body">{pr.exerciseName}</AppText>
+                <AppText variant="label" color={colors.textSecondary}>
+                  {formatKg(pr.weightKg)} kg × {pr.reps}
+                </AppText>
+              </View>
+            ))}
+          </Card>
+        </>
+      )}
 
       <View style={styles.actions}>
-        <AppButton
-          label="Calendário"
-          variant="secondary"
-          onPress={() => router.push('/calendar')}
-        />
+        <AppButton label="Registrar medidas" onPress={() => setTab('medidas')} />
         <AppButton
           label="Fotos de progresso"
           variant="secondary"
           onPress={() => router.push('/progress-photos')}
-        />
-        <AppButton
-          label="Perguntar ao PERFORMA AI"
-          variant="ai"
-          onPress={() => router.push('/ai')}
         />
       </View>
     </Screen>
@@ -116,29 +203,55 @@ export default function ProgressScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { gap: spacing.xs, marginBottom: spacing.xl, marginTop: spacing.md },
-  row: { flexDirection: 'row', gap: spacing.md },
-  section: { gap: spacing.md, marginTop: spacing.lg },
-  chart: {
+  title: { marginTop: spacing.md, marginBottom: spacing.lg },
+  tabs: { flexDirection: 'row', gap: 6, marginBottom: spacing.lg },
+  tab: {
+    flex: 1,
+    minHeight: 34,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 4,
+  },
+  tabActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  weightCard: { marginBottom: spacing.md },
+  weightRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
     justifyContent: 'space-between',
-    height: 120,
-    gap: 6,
+    alignItems: 'flex-end',
   },
-  chartCol: { flex: 1, alignItems: 'center', gap: 6 },
-  chartBar: {
-    width: '70%',
-    borderRadius: 6,
-    backgroundColor: colors.secondary,
-    minHeight: 12,
-  },
-  prRow: {
+  section: { gap: spacing.md, marginTop: spacing.lg },
+  row: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.lg },
+  measureRow: {
+    minHeight: 48,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.xs,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
-  insights: { gap: spacing.md, marginTop: spacing.xl },
   actions: { gap: spacing.sm, marginTop: spacing.xl, marginBottom: spacing['2xl'] },
+  sessionBlock: { gap: 4, paddingBottom: spacing.sm },
+  loadRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: 2,
+  },
 });
+
+function formatKg(kg: number) {
+  return Number.isInteger(kg) ? String(kg) : String(Math.round(kg * 10) / 10);
+}
+
+function formatDate(isoDate: string) {
+  const [y, m, d] = isoDate.split('-');
+  if (!y || !m || !d) return isoDate;
+  return `${d}/${m}/${y}`;
+}

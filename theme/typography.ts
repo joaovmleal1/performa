@@ -1,5 +1,6 @@
 import { TextStyle } from 'react-native';
 
+/** Tipografia oficial: Sora */
 export const fontFamily = {
   regular: 'Sora_400Regular',
   medium: 'Sora_500Medium',
@@ -12,18 +13,18 @@ export const typography = {
   display: {
     fontFamily: fontFamily.extrabold,
     fontSize: 34,
-    lineHeight: 40,
+    lineHeight: 37,
     letterSpacing: -0.6,
   } satisfies TextStyle,
   h1: {
     fontFamily: fontFamily.bold,
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 30,
+    lineHeight: 32,
     letterSpacing: -0.4,
   } satisfies TextStyle,
   h2: {
     fontFamily: fontFamily.bold,
-    fontSize: 22,
+    fontSize: 24,
     lineHeight: 28,
     letterSpacing: -0.3,
   } satisfies TextStyle,
@@ -35,13 +36,13 @@ export const typography = {
   } satisfies TextStyle,
   body: {
     fontFamily: fontFamily.regular,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
   } satisfies TextStyle,
   bodyMedium: {
     fontFamily: fontFamily.medium,
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 15,
+    lineHeight: 22,
   } satisfies TextStyle,
   label: {
     fontFamily: fontFamily.medium,
@@ -50,25 +51,32 @@ export const typography = {
   } satisfies TextStyle,
   caption: {
     fontFamily: fontFamily.regular,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
   } satisfies TextStyle,
   metric: {
-    fontFamily: fontFamily.semibold,
-    fontSize: 28,
-    lineHeight: 34,
-    letterSpacing: -0.4,
+    fontFamily: fontFamily.bold,
+    fontSize: 32,
+    lineHeight: 36,
+    letterSpacing: -0.5,
   } satisfies TextStyle,
   metricLg: {
     fontFamily: fontFamily.bold,
-    fontSize: 40,
-    lineHeight: 46,
+    fontSize: 48,
+    lineHeight: 52,
     letterSpacing: -0.8,
   } satisfies TextStyle,
   button: {
     fontFamily: fontFamily.semibold,
     fontSize: 16,
     lineHeight: 20,
+  } satisfies TextStyle,
+  wordmark: {
+    fontFamily: fontFamily.extrabold,
+    fontSize: 28,
+    lineHeight: 32,
+    letterSpacing: 2.4,
+    fontStyle: 'italic',
   } satisfies TextStyle,
 } as const;
 

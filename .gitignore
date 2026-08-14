@@ -45,3 +45,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Exercise media (downloaded from Google Drive; run npm run download:exercises)
+public/exercises/
+.vercel
+.env*

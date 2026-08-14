@@ -3,34 +3,24 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
 
+import { PerformaMark } from '@/components/brand/PerformaLogo';
 import { colors, radius, spacing } from '@/theme';
 
 import { Card } from './Card';
 import { AppText } from './AppText';
 
 export function Logo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
-  const mark = size === 'lg' ? 56 : size === 'sm' ? 28 : 40;
+  const mark = size === 'lg' ? 64 : size === 'sm' ? 28 : 40;
   return (
     <View style={styles.logoRow}>
-      <View
-        style={[
-          styles.logoMark,
-          { width: mark, height: mark, borderRadius: mark * 0.28 },
-        ]}
-      >
-        <AppText
-          variant={size === 'lg' ? 'h1' : 'h2'}
-          tone="onPrimary"
-          style={{ fontSize: mark * 0.55, lineHeight: mark * 0.6 }}
-        >
-          P
-        </AppText>
-      </View>
+      <PerformaMark size={mark} />
       {size !== 'sm' ? (
         <View>
-          <AppText variant="h2">PERFORMA</AppText>
-          <AppText variant="caption" tone="muted">
-            TREINO · NUTRIÇÃO · RESULTADOS
+          <AppText variant="h2" style={{ fontStyle: 'italic', letterSpacing: 1.6 }}>
+            PERFORMA
+          </AppText>
+          <AppText variant="caption" color={colors.primary} style={{ letterSpacing: 1.1 }}>
+            TREINO • NUTRIÇÃO • RESULTADOS
           </AppText>
         </View>
       ) : null}
@@ -130,14 +120,24 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
     .map((p) => p[0])
     .join('')
     .toUpperCase();
+  const fontSize = size >= 72 ? 28 : size >= 56 ? 20 : 14;
   return (
     <View
       style={[
         styles.avatar,
-        { width: size, height: size, borderRadius: size / 2 },
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          borderWidth: size >= 64 ? 2 : 1.5,
+        },
       ]}
     >
-      <AppText variant="label" tone="onPrimary">
+      <AppText
+        variant="label"
+        color={colors.primary}
+        style={{ fontSize, lineHeight: fontSize + 4, fontFamily: 'Sora_700Bold' }}
+      >
         {initials}
       </AppText>
     </View>
@@ -147,7 +147,7 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
 export function AiBanner({ children }: { children: React.ReactNode }) {
   return (
     <LinearGradient
-      colors={['rgba(123,92,255,0.2)', 'rgba(0,255,133,0.12)']}
+      colors={['rgba(123,92,255,0.32)', 'rgba(92,140,255,0.16)']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.aiBanner}
@@ -159,14 +159,6 @@ export function AiBanner({ children }: { children: React.ReactNode }) {
 
 const styles = StyleSheet.create({
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  logoMark: {
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: colors.primary,
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-  },
   chartHeader: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -183,7 +175,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   avatar: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.surfaceElevated,
+    borderColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -191,6 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.secondaryMuted,
+    borderColor: 'rgba(123,92,255,0.35)',
+    opacity: 0.95,
   },
 });

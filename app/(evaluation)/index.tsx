@@ -14,10 +14,11 @@ import {
 } from '@/components/ui';
 import { useAuthStore } from '@/stores/auth-store';
 import {
-  EVALUATION_TOTAL_STEPS,
+  getEvaluationTotalSteps,
   useEvaluationStore,
 } from '@/stores/evaluation-store';
 import type {
+  DietInterest,
   ExperienceLevel,
   PrimaryGoal,
   SessionDuration,
@@ -29,6 +30,19 @@ import { colors, spacing } from '@/theme';
 const MEDICAL_DISCLAIMER =
   'O PERFORMA oferece sugestões de treino e nutrição. Consulte um profissional de saúde antes de iniciar ou alterar sua rotina, especialmente em caso de lesões, gravidez ou condições clínicas.';
 
+const SPORT_SUGGESTIONS = [
+  'Corrida / Road race',
+  'Musculação / Bodybuilding',
+  'CrossFit',
+  'Futebol',
+  'Jiu-jitsu',
+  'Natação',
+  'Ciclismo',
+  'Triathlon',
+  'Funcional',
+  'Outro',
+];
+
 export default function EvaluationScreen() {
   const router = useRouter();
   const step = useEvaluationStore((s) => s.step);
@@ -39,6 +53,8 @@ export default function EvaluationScreen() {
   const reset = useEvaluationStore((s) => s.reset);
   const completeEvaluation = useAuthStore((s) => s.completeEvaluation);
   const [restrictionsText, setRestrictionsText] = useState('');
+
+  const totalSteps = getEvaluationTotalSteps(answers);
 
   useEffect(() => {
     if (step === 1 && answers.age == null) patch({ age: 28 });
@@ -64,13 +80,23 @@ export default function EvaluationScreen() {
         return !!answers.trainingDaysPerWeek;
       case 7:
         return !!answers.environment && !!answers.sessionDurationMin;
+      case 8:
+        return !!answers.dietInterest;
+      case 9:
+        return typeof answers.preparationMode === 'boolean';
+      case 10:
+        return (
+          !!answers.preparationSport?.trim() &&
+          !!answers.competitionName?.trim() &&
+          !!answers.competitionDate?.trim()
+        );
       default:
         return false;
     }
   }, [answers, step]);
 
   const handleNext = () => {
-    if (step < EVALUATION_TOTAL_STEPS - 1) {
+    if (step < totalSteps - 1) {
       next();
       return;
     }
@@ -79,6 +105,8 @@ export default function EvaluationScreen() {
       .split(/[,;\n]/)
       .map((item) => item.trim())
       .filter(Boolean);
+
+    const wantsDiet = answers.dietInterest === 'want_with_us';
 
     completeEvaluation({
       sex: answers.sex as Sex,
@@ -91,6 +119,12 @@ export default function EvaluationScreen() {
       environment: answers.environment as TrainingEnvironment,
       sessionDurationMin: answers.sessionDurationMin as SessionDuration,
       restrictions,
+      dietInterest: answers.dietInterest,
+      dietBuilderUnlocked: wantsDiet,
+      preparationMode: Boolean(answers.preparationMode),
+      preparationSport: answers.preparationSport,
+      competitionName: answers.competitionName,
+      competitionDate: answers.competitionDate,
     });
     reset();
     router.replace('/(tabs)');
@@ -98,7 +132,7 @@ export default function EvaluationScreen() {
 
   return (
     <Screen contentStyle={styles.screen}>
-      <ScreenProgress current={step} total={EVALUATION_TOTAL_STEPS} />
+      <ScreenProgress current={step} total={totalSteps} />
       <View style={styles.body}>
         {renderStep(step, answers, patch, restrictionsText, setRestrictionsText)}
       </View>
@@ -107,7 +141,7 @@ export default function EvaluationScreen() {
           <AppButton label="Voltar" variant="ghost" onPress={back} />
         ) : null}
         <AppButton
-          label={step === EVALUATION_TOTAL_STEPS - 1 ? 'Finalizar' : 'Próximo'}
+          label={step === totalSteps - 1 ? 'Finalizar' : 'Próximo'}
           disabled={!canContinue}
           onPress={handleNext}
         />
@@ -277,6 +311,123 @@ function renderStep(
           />
           <AppText variant="caption" muted style={styles.disclaimer}>
             {MEDICAL_DISCLAIMER}
+          </AppText>
+        </Question>
+      );
+    case 8:
+      return (
+        <Question
+          title="E a dieta?"
+          subtitle="Isso define se a montagem do plano alimentar fica desbloqueada para você."
+        >
+          <RadioGroup
+            value={answers.dietInterest}
+            onChange={(value) => patch({ dietInterest: value as DietInterest })}
+            options={[
+              {
+                value: 'already_doing',
+                label: 'Já faço dieta',
+                description: 'Continuo com meu plano atual por enquanto',
+              },
+              {
+                value: 'want_with_us',
+                label: 'Quero montar com o PERFORMA',
+                description: 'Desbloqueia a dieta com IA após a entrevista',
+              },
+              {
+                value: 'not_now',
+                label: 'Agora não',
+                description: 'Posso liberar depois na aba Nutrição',
+              },
+            ]}
+          />
+        </Question>
+      );
+    case 9:
+      return (
+        <Question
+          title="Modo preparação"
+          subtitle="Ative se você está se preparando para um esporte ou competição. Vamos montar a periodização completa."
+        >
+          <RadioGroup
+            value={
+              answers.preparationMode == null
+                ? undefined
+                : answers.preparationMode
+                  ? 'yes'
+                  : 'no'
+            }
+            onChange={(value) =>
+              patch({
+                preparationMode: value === 'yes',
+                ...(value === 'no'
+                  ? {
+                      preparationSport: undefined,
+                      competitionName: undefined,
+                      competitionDate: undefined,
+                    }
+                  : {}),
+              })
+            }
+            options={[
+              {
+                value: 'yes',
+                label: 'Sim, ativar modo preparação',
+                description: 'Esporte/competição + periodização por fases',
+              },
+              {
+                value: 'no',
+                label: 'Não, rotina geral',
+                description: 'Treino contínuo sem foco em prova',
+              },
+            ]}
+          />
+        </Question>
+      );
+    case 10:
+      return (
+        <Question
+          title="Para qual prova você está se preparando?"
+          subtitle="Usaremos isso para montar a estrutura de periodização até a data da competição."
+        >
+          <AppText variant="label" muted>
+            Esporte
+          </AppText>
+          <View style={styles.chips}>
+            {SPORT_SUGGESTIONS.map((sport) => (
+              <Chip
+                key={sport}
+                label={sport}
+                selected={answers.preparationSport === sport}
+                onPress={() => patch({ preparationSport: sport })}
+              />
+            ))}
+          </View>
+          <Input
+            label="Esporte (se outro)"
+            placeholder="Ex.: Powerlifting, Tênis, Surf..."
+            value={
+              SPORT_SUGGESTIONS.includes(answers.preparationSport ?? '')
+                ? ''
+                : (answers.preparationSport ?? '')
+            }
+            onChangeText={(preparationSport) => patch({ preparationSport })}
+          />
+          <Input
+            label="Nome da competição"
+            placeholder="Ex.: Maratona de SP, Campeonato Estadual..."
+            value={answers.competitionName ?? ''}
+            onChangeText={(competitionName) => patch({ competitionName })}
+          />
+          <Input
+            label="Data da competição"
+            placeholder="AAAA-MM-DD"
+            value={answers.competitionDate ?? ''}
+            onChangeText={(competitionDate) => patch({ competitionDate })}
+            autoCapitalize="none"
+          />
+          <AppText variant="caption" muted>
+            Use o formato AAAA-MM-DD (ex.: 2026-11-15).
           </AppText>
         </Question>
       );

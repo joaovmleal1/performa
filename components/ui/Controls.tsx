@@ -34,7 +34,7 @@ export function RadioGroup({ options, value, onChange }: Props) {
             <View style={{ flex: 1 }}>
               <AppText variant="bodyMedium">{option.label}</AppText>
               {option.description ? (
-                <AppText variant="caption" muted>
+                <AppText variant="caption" color={colors.textMuted}>
                   {option.description}
                 </AppText>
               ) : null}
@@ -144,15 +144,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     padding: spacing.lg,
-    borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surfaceLight,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    minHeight: 56,
+    borderColor: colors.border,
+    minHeight: 64,
   },
   itemSelected: {
     borderColor: colors.primary,
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: 'rgba(0,255,133,0.06)',
   },
   radio: {
     width: 22,
@@ -173,10 +173,10 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: radius.full,
-    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMedium,
     borderWidth: 1,
-    borderColor: colors.borderSubtle,
+    borderColor: colors.border,
   },
   chipSelected: {
     backgroundColor: colors.primary,
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
   stepBtn: {
     width: 56,
     height: 56,
-    borderRadius: 16,
-    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMedium,
     borderWidth: 1,
     borderColor: colors.border,
     alignItems: 'center',
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 4,
-    backgroundColor: colors.borderSubtle,
+    backgroundColor: colors.surfaceLight,
     borderRadius: radius.full,
     overflow: 'hidden',
   },
