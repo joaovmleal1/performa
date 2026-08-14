@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 
 import { mockTodayWorkout } from '@/data/mock';
+import { coachDecideWorkoutLoads } from '@/services/coach-agent';
+import { useAuthStore } from '@/stores/auth-store';
 import {
   buildSessionFromLogs,
   useLiftHistoryStore,
@@ -29,18 +31,57 @@ type WorkoutSessionState = {
   resumeRest: () => void;
 };
 
-function seedWorkoutFromHistory(): WorkoutPlan {
+function coachWeightForSet(
+  exercise: WorkoutPlan['exercises'][number] | undefined,
+  setNumber: number,
+  fallback: number,
+) {
+  const decision = exercise?.coachLoad?.sets.find((s) => s.setNumber === setNumber);
+  return decision?.suggestedWeightKg ?? fallback;
+}
+
+/** Monta o treino com decisão individual do Coach por série/usuário */
+function seedWorkoutFromCoach(): WorkoutPlan {
   const workout = structuredClone(mockTodayWorkout);
   const history = useLiftHistoryStore.getState();
+  const user = useAuthStore.getState().user;
+
+  const plans = coachDecideWorkoutLoads({
+    user,
+    exercises: workout.exercises.map((ex) => {
+      const recent = history.getExerciseHistory(ex.exerciseId).slice(0, 3);
+      return {
+        exerciseId: ex.exerciseId,
+        exerciseName: ex.exercise.name,
+        sets: ex.sets,
+        reps: ex.reps,
+        fallbackWeightKg: ex.suggestedWeightKg || ex.previousWeightKg || 20,
+        lastSets: history.getLastSetsForExercise(ex.exerciseId).map((s) => ({
+          setNumber: s.setNumber,
+          weightKg: s.weightKg,
+          reps: s.reps,
+        })),
+        recentSessions: recent.map((entry) => ({
+          sets: entry.sets.map((s) => ({
+            setNumber: s.setNumber,
+            weightKg: s.weightKg,
+            reps: s.reps,
+          })),
+        })),
+      };
+    }),
+  });
 
   workout.exercises = workout.exercises.map((ex) => {
+    const coachLoad = plans[ex.exerciseId];
     const lastSets = history.getLastSetsForExercise(ex.exerciseId);
     const lastWeight =
       lastSets.length > 0
         ? lastSets.reduce((max, s) => Math.max(max, s.weightKg), 0)
         : ex.previousWeightKg;
     const suggested =
-      history.getSuggestedWeight(ex.exerciseId) ??
+      coachLoad?.sets[0]?.suggestedWeightKg ??
+      coachLoad?.sets.find((s) => s.action === 'increase')?.suggestedWeightKg ??
       ex.suggestedWeightKg ??
       lastWeight;
 
@@ -48,7 +89,9 @@ function seedWorkoutFromHistory(): WorkoutPlan {
       ...ex,
       previousWeightKg: lastWeight,
       suggestedWeightKg: suggested,
+      coachLoad,
       completed: false,
+      notes: coachLoad?.summary,
     };
   });
 
@@ -82,14 +125,13 @@ export const useWorkoutSessionStore = create<WorkoutSessionState>((set, get) => 
   logs: {},
   sessionFinished: false,
   startSession: () => {
-    const workout = seedWorkoutFromHistory();
+    const workout = seedWorkoutFromCoach();
     const first = workout.exercises[0];
-    const history = useLiftHistoryStore.getState();
-    const setOneWeight =
-      (first && history.getLastWeightForSet(first.exerciseId, 1)) ??
-      first?.suggestedWeightKg ??
-      first?.previousWeightKg ??
-      20;
+    const setOneWeight = coachWeightForSet(
+      first,
+      1,
+      first?.suggestedWeightKg ?? first?.previousWeightKg ?? 20,
+    );
 
     set({
       workout,
@@ -155,12 +197,11 @@ export const useWorkoutSessionStore = create<WorkoutSessionState>((set, get) => 
       updated.exercises = updated.exercises.map((ex, i) =>
         i === state.exerciseIndex ? { ...ex, completed: true } : ex,
       );
-      const history = useLiftHistoryStore.getState();
-      const nextWeight =
-        (nextExercise && history.getLastWeightForSet(nextExercise.exerciseId, 1)) ??
-        nextExercise?.suggestedWeightKg ??
-        nextExercise?.previousWeightKg ??
-        20;
+      const nextWeight = coachWeightForSet(
+        nextExercise,
+        1,
+        nextExercise?.suggestedWeightKg ?? nextExercise?.previousWeightKg ?? 20,
+      );
 
       set({
         logs: nextLogs,
@@ -177,10 +218,7 @@ export const useWorkoutSessionStore = create<WorkoutSessionState>((set, get) => 
     }
 
     const nextSetNumber = state.setIndex + 2;
-    const history = useLiftHistoryStore.getState();
-    const nextSetWeight =
-      history.getLastWeightForSet(exercise.exerciseId, nextSetNumber) ??
-      state.currentWeight;
+    const nextSetWeight = coachWeightForSet(exercise, nextSetNumber, state.currentWeight);
 
     set({
       logs: nextLogs,

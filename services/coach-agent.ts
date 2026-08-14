@@ -1,7 +1,12 @@
 import { retrieveKnowledge, knowledgeSources } from '@/data/knowledge';
 import { buildPeriodization } from '@/lib/periodization';
 import { openRouterChat } from '@/services/openrouter';
-import type { PeriodizationPlan, UserProfile } from '@/types';
+import type {
+  ExerciseLoadCoachPlan,
+  PeriodizationPlan,
+  SetLoadDecision,
+  UserProfile,
+} from '@/types';
 
 export type CoachContext = {
   user?: UserProfile | null;
@@ -332,6 +337,226 @@ export function coachBuildPeriodization(input: {
   });
 
   return { ...plan, coachNotes };
+}
+
+export type { ExerciseLoadCoachPlan, SetLoadDecision };
+
+type DecideLoadsInput = {
+  exerciseId: string;
+  exerciseName: string;
+  targetSets: number;
+  targetReps: number;
+  fallbackWeightKg: number;
+  /** Séries do último treino deste exercício */
+  lastSets: { setNumber: number; weightKg: number; reps: number }[];
+  /** Histórico recente (mais novo → mais antigo), opcional */
+  recentSessions?: { sets: { setNumber: number; weightKg: number; reps: number }[] }[];
+  user?: UserProfile | null;
+};
+
+function roundToStep(kg: number, step = 0.25) {
+  return Math.round(kg / step) * step;
+}
+
+function progressionStepKg(user: UserProfile | null | undefined, weightKg: number): number {
+  const experience = user?.experience ?? 'beginner';
+  const goal = user?.goal ?? 'gain_muscle';
+
+  let step = experience === 'beginner' ? 1.25 : 2.5;
+  // Cargas leves (halteres/isoladores): passos menores
+  if (weightKg > 0 && weightKg < 20) step = 1.25;
+  if (weightKg >= 100 && experience === 'advanced') step = 2.5;
+
+  if (goal === 'lose_fat' || goal === 'health' || goal === 'maintain') {
+    step = Math.min(step, 1.25);
+  }
+  if (goal === 'conditioning') {
+    step = Math.min(step, 1.25);
+  }
+  return step;
+}
+
+function isConservativePhase(user?: UserProfile | null): boolean {
+  if (!user?.preparationMode || !user.competitionDate) return false;
+  const diffMs = new Date(user.competitionDate).getTime() - Date.now();
+  const weeksLeft = diffMs / (7 * 24 * 60 * 60 * 1000);
+  return weeksLeft <= 3;
+}
+
+/**
+ * Agente Coach decide a carga de cada série para o próximo treino,
+ * individualmente com base no perfil + histórico do aluno.
+ */
+export function coachDecideSetLoads(input: DecideLoadsInput): ExerciseLoadCoachPlan {
+  const user = input.user ?? null;
+  const name = user?.name?.split(' ')[0] ?? 'Aluno';
+  const experience = user?.experience ?? 'beginner';
+  const goal = user?.goal ?? 'gain_muscle';
+  const conservative = isConservativePhase(user);
+  const stepBase = progressionStepKg(user, input.fallbackWeightKg);
+
+  const decisions: SetLoadDecision[] = [];
+
+  for (let setNumber = 1; setNumber <= input.targetSets; setNumber++) {
+    const last =
+      input.lastSets.find((s) => s.setNumber === setNumber) ??
+      input.lastSets[input.lastSets.length - 1];
+
+    if (!last) {
+      const startKg = roundToStep(input.fallbackWeightKg);
+      decisions.push({
+        setNumber,
+        previousWeightKg: null,
+        suggestedWeightKg: startKg,
+        deltaKg: 0,
+        action: 'start',
+        rationale: `${name}, sem histórico nesta série — comece em ${startKg} kg e anote o resultado.`,
+      });
+      continue;
+    }
+
+    const hitTarget = last.reps >= input.targetReps;
+    const crushed = last.reps >= input.targetReps + 2;
+    const missedHard = last.reps <= Math.max(1, Math.floor(input.targetReps * 0.7));
+    const missedSoft = last.reps < input.targetReps;
+
+    let action: SetLoadDecision['action'] = 'hold';
+    let delta = 0;
+    let rationale = '';
+
+    if (conservative) {
+      action = 'hold';
+      delta = 0;
+      rationale = `Fase de preparação/pico — mantenha ${last.weightKg} kg e priorize qualidade técnica.`;
+    } else if (missedHard) {
+      action = 'decrease';
+      delta = -progressionStepKg(user, last.weightKg);
+      rationale = `Série ${setNumber}: só ${last.reps}/${input.targetReps} reps a ${last.weightKg} kg — reduza ${Math.abs(delta)} kg para recuperar a faixa.`;
+    } else if (missedSoft) {
+      action = 'hold';
+      delta = 0;
+      rationale = `Série ${setNumber}: ${last.reps}/${input.targetReps} reps — mantenha ${last.weightKg} kg até fechar as reps.`;
+    } else if (crushed && experience !== 'beginner') {
+      action = 'increase';
+      delta = progressionStepKg(user, last.weightKg);
+      // Hipertrofia/definição: pode ser um pouco mais agressivo em compostos pesados
+      if ((goal === 'gain_muscle' || goal === 'definition') && last.weightKg >= 40) {
+        delta = progressionStepKg(user, last.weightKg);
+      }
+      rationale = `Série ${setNumber}: fechou ${last.reps} reps com folga a ${last.weightKg} kg — aumente +${delta} kg.`;
+    } else if (hitTarget) {
+      if (experience === 'beginner' && setNumber > 1) {
+        // Iniciante: sobe só na 1ª série se o restante também foi ok; senão segura
+        const allHit = input.lastSets.every((s) => s.reps >= input.targetReps);
+        if (allHit && setNumber === 1) {
+          action = 'increase';
+          delta = stepBase;
+          rationale = `Perfil iniciante: todas as séries bateram as reps — suba +${delta} kg com cautela.`;
+        } else if (allHit) {
+          action = 'increase';
+          delta = stepBase;
+          rationale = `Série ${setNumber}: reps ok no último treino — progressão +${delta} kg.`;
+        } else {
+          action = 'hold';
+          delta = 0;
+          rationale = `Iniciante: estabilize a técnica em ${last.weightKg} kg antes de subir.`;
+        }
+      } else {
+        action = 'increase';
+        delta = progressionStepKg(user, last.weightKg);
+        const goalHint =
+          goal === 'gain_muscle'
+            ? 'foco em hipertrofia'
+            : goal === 'lose_fat'
+              ? 'progressão conservadora (emagrecimento)'
+              : `objetivo ${goal}`;
+        rationale = `Série ${setNumber}: ${last.reps}/${input.targetReps} a ${last.weightKg} kg · ${experience} · ${goalHint} → +${delta} kg.`;
+      }
+    } else {
+      action = 'hold';
+      delta = 0;
+      rationale = `Mantenha ${last.weightKg} kg nesta série.`;
+    }
+
+    // Tendência: se as últimas 2 sessões já aumentaram e as reps caíram, segura
+    if (action === 'increase' && input.recentSessions && input.recentSessions.length >= 2) {
+      const [newest, older] = input.recentSessions;
+      const n = newest?.sets.find((s) => s.setNumber === setNumber);
+      const o = older?.sets.find((s) => s.setNumber === setNumber);
+      if (n && o && n.weightKg > o.weightKg && n.reps < o.reps && n.reps < input.targetReps) {
+        action = 'hold';
+        delta = 0;
+        rationale = `Carga já subiu e as reps caíram — estabilize em ${last.weightKg} kg.`;
+      }
+    }
+
+    const suggested = roundToStep(Math.max(0, last.weightKg + delta));
+    decisions.push({
+      setNumber,
+      previousWeightKg: last.weightKg,
+      suggestedWeightKg: suggested,
+      deltaKg: roundToStep(suggested - last.weightKg),
+      action,
+      rationale,
+    });
+  }
+
+  const increases = decisions.filter((d) => d.action === 'increase').length;
+  const decreases = decisions.filter((d) => d.action === 'decrease').length;
+  let summary: string;
+  if (!input.lastSets.length) {
+    summary = `Coach: primeira referência para ${input.exerciseName}. Anote as cargas para eu ajustar nas próximas.`;
+  } else if (increases > 0 && decreases === 0) {
+    summary = `Coach: progresso liberado em ${increases} série(s) de ${input.exerciseName}.`;
+  } else if (decreases > 0) {
+    summary = `Coach: ajuste para baixo em ${decreases} série(s) — priorize a faixa de reps.`;
+  } else {
+    summary = `Coach: mantenha as cargas de ${input.exerciseName} nesta sessão.`;
+  }
+
+  // Enriquecer summary com conhecimento (opcional, curto)
+  const chunks = retrieveKnowledge(
+    `progressive overload ${experience} ${goal} load progression`,
+    1,
+  );
+  const tip = chunks[0]?.content.split(/(?<=[.!?])\s+/)[0]?.slice(0, 120);
+  if (tip && input.lastSets.length > 0) {
+    summary = `${summary} ${tip}`;
+  }
+
+  return {
+    exerciseId: input.exerciseId,
+    sets: decisions,
+    summary,
+    provider: 'coach-local',
+  };
+}
+
+/**
+ * Decide cargas de todos os exercícios do treino para o usuário atual.
+ */
+export function coachDecideWorkoutLoads(input: {
+  exercises: {
+    exerciseId: string;
+    exerciseName: string;
+    sets: number;
+    reps: number;
+    fallbackWeightKg: number;
+    lastSets: { setNumber: number; weightKg: number; reps: number }[];
+    recentSessions?: { sets: { setNumber: number; weightKg: number; reps: number }[] }[];
+  }[];
+  user?: UserProfile | null;
+}): Record<string, ExerciseLoadCoachPlan> {
+  const out: Record<string, ExerciseLoadCoachPlan> = {};
+  for (const ex of input.exercises) {
+    out[ex.exerciseId] = coachDecideSetLoads({
+      ...ex,
+      targetSets: ex.sets,
+      targetReps: ex.reps,
+      user: input.user,
+    });
+  }
+  return out;
 }
 
 export function coachSuggestedPrompts(user?: UserProfile | null): string[] {

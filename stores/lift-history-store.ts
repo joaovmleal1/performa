@@ -66,11 +66,10 @@ export const useLiftHistoryStore = create<LiftHistoryState>()(
         return null;
       },
       getSuggestedWeight: (exerciseId) => {
+        // Fallback simples; a decisão oficial fica no Coach (coachDecideSetLoads)
         const sets = get().getLastSetsForExercise(exerciseId);
         if (!sets.length) return null;
-        const top = topWeightOf(sets);
-        // Sugestão leve de progressão (+2,5 kg) quando a última sessão teve carga
-        return Math.round((top + 2.5) * 2) / 2;
+        return sets.reduce((max, s) => Math.max(max, s.weightKg), 0);
       },
       getPersonalBests: () => {
         const bestByExercise = new Map<

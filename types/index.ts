@@ -160,6 +160,27 @@ export interface WorkoutExercise {
   completed: boolean;
   notes?: string;
   order?: number;
+  /** Decisão do Coach para carga por série nesta sessão */
+  coachLoad?: ExerciseLoadCoachPlan;
+}
+
+export type LoadAction = 'increase' | 'hold' | 'decrease' | 'start';
+
+export interface SetLoadDecision {
+  setNumber: number;
+  previousWeightKg: number | null;
+  suggestedWeightKg: number;
+  deltaKg: number;
+  action: LoadAction;
+  rationale: string;
+}
+
+/** Plano de carga individual gerado pelo agente Coach */
+export interface ExerciseLoadCoachPlan {
+  exerciseId: string;
+  sets: SetLoadDecision[];
+  summary: string;
+  provider: 'coach-local' | 'coach-cloud';
 }
 
 export interface WorkoutPlan {

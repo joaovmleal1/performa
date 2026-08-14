@@ -154,6 +154,7 @@ export default function WorkoutSessionScreen() {
   const lastSessionSets = getLastSetsForExercise(exercise.exerciseId);
   const lastSameSet = getLastWeightForSet(exercise.exerciseId, setIndex + 1);
   const lastSameSetReps = lastSessionSets.find((s) => s.setNumber === setIndex + 1)?.reps;
+  const currentCoachSet = exercise.coachLoad?.sets.find((s) => s.setNumber === setIndex + 1);
 
   return (
     <Screen scroll edges={['top', 'left', 'right', 'bottom']}>
@@ -175,12 +176,14 @@ export default function WorkoutSessionScreen() {
       <Card style={styles.setMap}>
         <AppText variant="h3">Mapa de séries</AppText>
         <AppText variant="caption" color={colors.textMuted}>
-          Anote a carga de cada série para acompanhar a progressão.
+          {exercise.coachLoad?.summary ??
+            'Anote a carga de cada série para o Coach ajustar a progressão.'}
         </AppText>
         {Array.from({ length: exercise.sets }).map((_, i) => {
           const setNumber = i + 1;
           const logged = completedSets.find((s) => s.setNumber === setNumber);
           const prev = lastSessionSets.find((s) => s.setNumber === setNumber);
+          const coachSet = exercise.coachLoad?.sets.find((s) => s.setNumber === setNumber);
           const isCurrent = setNumber === setIndex + 1;
 
           return (
@@ -211,8 +214,22 @@ export default function WorkoutSessionScreen() {
                   <AppText variant="bodyMedium">
                     Série {setNumber}
                     {isCurrent ? ' · agora' : ''}
+                    {coachSet?.action === 'increase' && !logged ? ' · subir' : ''}
+                    {coachSet?.action === 'decrease' && !logged ? ' · reduzir' : ''}
                   </AppText>
-                  {prev ? (
+                  {coachSet ? (
+                    <AppText variant="caption" color={colors.textMuted}>
+                      Coach · {formatLoad(coachSet.suggestedWeightKg)} kg
+                      {coachSet.deltaKg > 0
+                        ? ` (+${formatLoad(coachSet.deltaKg)})`
+                        : coachSet.deltaKg < 0
+                          ? ` (${formatLoad(coachSet.deltaKg)})`
+                          : ''}
+                      {prev
+                        ? ` · último ${formatLoad(prev.weightKg)}×${prev.reps}`
+                        : ''}
+                    </AppText>
+                  ) : prev ? (
                     <AppText variant="caption" color={colors.textMuted}>
                       Último treino · {formatLoad(prev.weightKg)} kg × {prev.reps}
                     </AppText>
@@ -225,13 +242,21 @@ export default function WorkoutSessionScreen() {
               </View>
               <AppText
                 variant="label"
-                color={logged ? colors.primary : colors.textMuted}
+                color={
+                  logged
+                    ? colors.primary
+                    : coachSet?.action === 'increase'
+                      ? colors.primary
+                      : colors.textMuted
+                }
               >
                 {logged
                   ? `${formatLoad(logged.weightKg)} kg × ${logged.reps}`
                   : isCurrent
                     ? `${formatLoad(currentWeight)} kg`
-                    : '—'}
+                    : coachSet
+                      ? `${formatLoad(coachSet.suggestedWeightKg)} kg`
+                      : '—'}
               </AppText>
             </View>
           );
@@ -254,7 +279,32 @@ export default function WorkoutSessionScreen() {
         </AppText>
         <NumberStepper value={currentReps} min={1} max={50} onChange={setReps} />
 
-        {lastSameSet != null ? (
+        {currentCoachSet ? (
+          <View style={styles.coachHint}>
+            <AppText variant="caption" color={colors.secondary} center>
+              Coach ·{' '}
+              {currentCoachSet.action === 'increase'
+                ? `aumentar para ${formatLoad(currentCoachSet.suggestedWeightKg)} kg`
+                : currentCoachSet.action === 'decrease'
+                  ? `reduzir para ${formatLoad(currentCoachSet.suggestedWeightKg)} kg`
+                  : currentCoachSet.action === 'hold'
+                    ? `manter ${formatLoad(currentCoachSet.suggestedWeightKg)} kg`
+                    : `começar em ${formatLoad(currentCoachSet.suggestedWeightKg)} kg`}
+            </AppText>
+            <AppText variant="caption" color={colors.textMuted} center>
+              {currentCoachSet.rationale}
+            </AppText>
+            {currentCoachSet.suggestedWeightKg !== currentWeight ? (
+              <AppButton
+                label={`Usar ${formatLoad(currentCoachSet.suggestedWeightKg)} kg`}
+                variant="secondary"
+                size="md"
+                onPress={() => setWeight(currentCoachSet.suggestedWeightKg)}
+                style={{ marginTop: spacing.sm }}
+              />
+            ) : null}
+          </View>
+        ) : lastSameSet != null ? (
           <AppText
             variant="caption"
             color={colors.textMuted}
@@ -264,15 +314,6 @@ export default function WorkoutSessionScreen() {
             Referência · série {setIndex + 1} no último treino:{' '}
             {formatLoad(lastSameSet)} kg
             {lastSameSetReps != null ? ` × ${lastSameSetReps}` : ''}
-          </AppText>
-        ) : exercise.previousWeightKg != null ? (
-          <AppText
-            variant="caption"
-            color={colors.textMuted}
-            center
-            style={{ marginTop: spacing.md }}
-          >
-            Sugestão · {formatLoad(exercise.suggestedWeightKg)} kg
           </AppText>
         ) : null}
 
@@ -371,5 +412,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  coachHint: {
+    marginTop: spacing.md,
+    gap: spacing.xs,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceLight,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 });

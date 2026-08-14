@@ -10,12 +10,16 @@ export {
   coachAnswerAsync,
   coachAnswerLocal,
   coachBuildPeriodization,
+  coachDecideSetLoads,
+  coachDecideWorkoutLoads,
   coachSuggestedPrompts,
   listCoachSources,
   type CoachAnswer,
   type CoachContext,
   type CoachMessage,
   type CoachPeriodizationResult,
+  type ExerciseLoadCoachPlan,
+  type SetLoadDecision,
 } from '@/services/coach-agent';
 
 /** Compat legado: retorna só o texto (local). */

@@ -85,6 +85,7 @@ type ExerciseCardProps = {
   reps: number;
   suggestedWeightKg?: number;
   previousWeightKg?: number;
+  coachTag?: string;
   completed?: boolean;
   color: string;
   gifUrl?: string;
@@ -97,6 +98,7 @@ export function ExerciseCard({
   reps,
   suggestedWeightKg,
   previousWeightKg,
+  coachTag,
   completed,
   color,
   gifUrl,
@@ -121,6 +123,7 @@ export function ExerciseCard({
             {sets} séries • {reps} reps
             {previousWeightKg != null ? ` · ant. ${previousWeightKg} kg` : ''}
             {suggestedWeightKg != null ? ` · sug. ${suggestedWeightKg} kg` : ''}
+            {coachTag ? ` · ${coachTag}` : ''}
           </AppText>
         </View>
         {completed ? (
